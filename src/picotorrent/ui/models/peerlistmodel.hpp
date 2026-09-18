@@ -12,6 +12,10 @@
 
 namespace pt
 {
+namespace Core
+{
+    class GeoIP;
+}
 namespace UI
 {
 namespace Models
@@ -22,15 +26,20 @@ namespace Models
         enum Column
         {
             IP,
+            Country,
+            Type,
             Client,
             Flags,
             DownloadRate,
             UploadRate,
+            Downloaded,
+            Uploaded,
             Progress,
             _Max
         };
 
-        PeerListModel();
+        // geoip may be null, in which case the country column stays empty.
+        PeerListModel(Core::GeoIP const* geoip);
         virtual ~PeerListModel();
 
         void ResetPeers();
@@ -42,6 +51,7 @@ namespace Models
         void GetValueByRow(wxVariant &variant, unsigned row, unsigned col) const wxOVERRIDE;
         bool SetValueByRow(const wxVariant &variant, unsigned row, unsigned col) wxOVERRIDE;
 
+        Core::GeoIP const* m_geoip;
         std::vector<libtorrent::peer_info> m_data;
     };
 }

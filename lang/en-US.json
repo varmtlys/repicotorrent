@@ -230,5 +230,11 @@
     "exported_magnet_link_s": "Exported magnet link(s)",
     "theme": "Theme",
     "light_theme": "Light",
-    "follow_system_theme": "System"
+    "follow_system_theme": "System",
+    "uploaded": "Uploaded",
+    "country": "Country",
+    "show_peer_country": "Show peer country",
+    "peer_seed": "Seed",
+    "peer_leecher": "Leecher",
+    "peers_summary": "Seeds: {0} connected, {1} in swarm    Leechers: {2} connected, {3} in swarm"
 }

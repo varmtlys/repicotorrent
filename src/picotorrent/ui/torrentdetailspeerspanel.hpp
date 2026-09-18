@@ -13,6 +13,10 @@ namespace BitTorrent
 {
     class TorrentHandle;
 }
+namespace Core
+{
+    class GeoIP;
+}
 namespace UI
 {
 namespace Models
@@ -22,7 +26,7 @@ namespace Models
     class TorrentDetailsPeersPanel : public wxPanel
     {
     public:
-        TorrentDetailsPeersPanel(wxWindow* parent, wxWindowID id);
+        TorrentDetailsPeersPanel(wxWindow* parent, wxWindowID id, Core::GeoIP const* geoip);
 
         void Refresh(BitTorrent::TorrentHandle* torrent);
         void Reset();
@@ -31,6 +35,7 @@ namespace Models
         BitTorrent::TorrentHandle* m_torrent;
         Models::PeerListModel* m_peersModel;
         wxDataViewCtrl* m_peersView;
+        wxStaticText* m_summary;
     };
 }
 }

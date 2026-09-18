@@ -78,12 +78,16 @@ PreferencesConnectionPage::PreferencesConnectionPage(wxWindow* parent, std::shar
     m_enablePex = new wxCheckBox(privacySizer->GetStaticBox(), wxID_ANY, i18n("enable_pex"));
     m_enablePex->SetValue(m_cfg->Get<bool>("libtorrent.enable_pex").value_or(true));
 
+    m_enableGeoIP = new wxCheckBox(privacySizer->GetStaticBox(), wxID_ANY, i18n("show_peer_country"));
+    m_enableGeoIP->SetValue(m_cfg->Get<bool>("geoip.enabled").value_or(true));
+
     privacyGrid->AddGrowableCol(0, 1);
     privacyGrid->AddGrowableCol(1, 1);
     privacyGrid->AddGrowableCol(2, 1);
     privacyGrid->Add(m_enableDht, 1, wxEXPAND);
     privacyGrid->Add(m_enableLsd, 1, wxEXPAND);
     privacyGrid->Add(m_enablePex, 1, wxEXPAND);
+    privacyGrid->Add(m_enableGeoIP, 1, wxEXPAND);
     privacySizer->Add(privacyGrid, 1, wxEXPAND | wxALL, 5);
 
     wxStaticBoxSizer* filterSizer = new wxStaticBoxSizer(wxHORIZONTAL, this, i18n("ip_filter"));
@@ -226,6 +230,14 @@ void PreferencesConnectionPage::Save(bool* restartRequired)
     m_cfg->Set("libtorrent.enable_dht", m_enableDht->GetValue());
     m_cfg->Set("libtorrent.enable_lsd", m_enableLsd->GetValue());
     m_cfg->Set("libtorrent.enable_pex", m_enablePex->GetValue());
+
+    // GeoIP opens (or downloads) its database once, on startup.
+    if (m_enableGeoIP->GetValue() != m_cfg->Get<bool>("geoip.enabled").value_or(true))
+    {
+        *restartRequired = true;
+    }
+
+    m_cfg->Set("geoip.enabled", m_enableGeoIP->GetValue());
 
     if (m_enableFilter->GetValue() != m_cfg->Get<bool>("ipfilter.enabled"))
     {

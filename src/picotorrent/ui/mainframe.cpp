@@ -24,6 +24,7 @@
 #include "../core/configuration.hpp"
 #include "../core/database.hpp"
 #include "../core/environment.hpp"
+#include "../core/geoip/geoip.hpp"
 #include "../core/utils.hpp"
 #include "../ipc/server.hpp"
 #include "console.hpp"
@@ -58,9 +59,10 @@ MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr
     m_options(options),
     m_session(new BitTorrent::Session(this, db, cfg, env)),
     m_splitter(new wxSplitterWindow(this, ptID_MAIN_SPLITTER)),
+    m_geoip(std::make_unique<Core::GeoIP>(env, cfg)),
     m_statusBar(new StatusBar(this)),
     m_taskBarIcon(new TaskBarIcon(this)),
-    m_torrentDetails(new TorrentDetailsView(m_splitter, ptID_MAIN_TORRENT_DETAILS, cfg)),
+    m_torrentDetails(new TorrentDetailsView(m_splitter, ptID_MAIN_TORRENT_DETAILS, cfg, m_geoip.get())),
     m_torrentListModel(new Models::TorrentListModel()),
     m_torrentList(new TorrentListView(m_splitter, ptID_MAIN_TORRENT_LIST, m_torrentListModel)),
     m_torrentsCount(0),

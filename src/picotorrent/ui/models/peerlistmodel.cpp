@@ -4,13 +4,15 @@
 #include <fmt/xchar.h>
 #include <libtorrent/peer_info.hpp>
 
+#include "../../core/geoip/geoip.hpp"
 #include "../../core/utils.hpp"
 #include "../translator.hpp"
 
 namespace lt = libtorrent;
 using pt::UI::Models::PeerListModel;
 
-PeerListModel::PeerListModel()
+PeerListModel::PeerListModel(pt::Core::GeoIP const* geoip)
+    : m_geoip(geoip)
 {
 }
 
@@ -86,6 +88,16 @@ void PeerListModel::GetValueByRow(wxVariant &variant, unsigned int row, unsigned
     {
     case Column::IP:
         variant = peer.ip.address().to_string();
+        break;
+    case Column::Country:
+        variant = m_geoip == nullptr
+            ? std::string()
+            : m_geoip->LookupCountryCode(peer.ip.data());
+        break;
+    case Column::Type:
+        variant = (peer.flags & lt::peer_info::seed)
+            ? i18n("peer_seed")
+            : i18n("peer_leecher");
         break;
     case Column::Client:
         variant = wxString::FromUTF8(peer.client);
@@ -205,6 +217,20 @@ void PeerListModel::GetValueByRow(wxVariant &variant, unsigned int row, unsigned
                 Utils::toHumanFileSize(peer.payload_up_speed));
         }
 
+        break;
+    }
+    case Column::Downloaded:
+    {
+        variant = peer.total_download <= 0
+            ? std::wstring(L"-")
+            : Utils::toHumanFileSize(peer.total_download);
+        break;
+    }
+    case Column::Uploaded:
+    {
+        variant = peer.total_upload <= 0
+            ? std::wstring(L"-")
+            : Utils::toHumanFileSize(peer.total_upload);
         break;
     }
     case Column::Progress:

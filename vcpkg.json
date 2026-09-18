@@ -5,6 +5,7 @@
   "dependencies": [
     "boost-log",
     "fmt",
+    "libmaxminddb",
     "libtorrent",
     "nlohmann-json",
     "sqlite3"

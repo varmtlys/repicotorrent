@@ -15,6 +15,7 @@
 #include <wx/version.h>
 
 #include "../../buildinfo.hpp"
+#include "../../core/geoip/maxminddatabase.hpp"
 #include "../translator.hpp"
 
 using json = nlohmann::json;
@@ -48,6 +49,10 @@ AboutDialog::AboutDialog(wxWindow* parent, wxWindowID id)
 
     lv->InsertItem(lv->GetItemCount(), "Boost");
     lv->SetItem(lv->GetItemCount() - 1, 1, boostVersion.str());
+    lv->SetItem(lv->GetItemCount() - 1, 2, "-");
+
+    lv->InsertItem(lv->GetItemCount(), "libmaxminddb");
+    lv->SetItem(lv->GetItemCount() - 1, 1, Core::MaxMindDatabase::LibraryVersion());
     lv->SetItem(lv->GetItemCount() - 1, 2, "-");
 
     lv->InsertItem(lv->GetItemCount(), "fmt");
@@ -86,6 +91,9 @@ AboutDialog::AboutDialog(wxWindow* parent, wxWindowID id)
     footerSizer->AddStretchSpacer();
     footerSizer->Add(new wxHyperlinkCtrl(this, wxID_ANY, "https://picotorrent.org", "https://picotorrent.org?app"));
 
+    // Required by the DB-IP Lite license (CC BY 4.0) the country column uses.
+    auto geoipAttribution = new wxHyperlinkCtrl(this, wxID_ANY, "IP Geolocation by DB-IP", "https://db-ip.com");
+
     auto border = FromDIP(11);
     auto sizer = new wxBoxSizer(wxVERTICAL);
     sizer->Add(bmp, 0, wxLEFT | wxRIGHT | wxTOP | wxCENTER, border);
@@ -93,6 +101,8 @@ AboutDialog::AboutDialog(wxWindow* parent, wxWindowID id)
     sizer->Add(desc, 0, wxEXPAND | wxLEFT | wxRIGHT, border);
     sizer->AddSpacer(FromDIP(7));
     sizer->Add(lv, wxSizerFlags(1).Border(wxLEFT | wxRIGHT, border).Expand());
+    sizer->AddSpacer(FromDIP(7));
+    sizer->Add(geoipAttribution, 0, wxLEFT | wxRIGHT, border);
     sizer->AddSpacer(FromDIP(7));
     sizer->Add(footerSizer, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, border);
 

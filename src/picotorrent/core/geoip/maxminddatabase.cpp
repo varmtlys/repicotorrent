@@ -1,12 +1,12 @@
 #include "maxminddatabase.hpp"
 
-#include <maxminddb.h>
+#include <boost/log/trivial.hpp>
+#include <maxminddb/maxminddb.h>
 
-#include "loguru.hpp"
 #include "../utils.hpp"
 
 namespace fs = std::filesystem;
-using pt::MaxMindDatabase;
+using pt::Core::MaxMindDatabase;
 
 MaxMindDatabase::MaxMindDatabase()
     : m_db(new MMDB_s())
@@ -15,71 +15,72 @@ MaxMindDatabase::MaxMindDatabase()
 
 MaxMindDatabase::~MaxMindDatabase()
 {
-    MMDB_close(m_db);
+    Close();
     delete m_db;
 }
 
-void MaxMindDatabase::load(fs::path const& databaseFile)
+bool MaxMindDatabase::Open(fs::path const& databaseFile)
 {
-    MMDB_close(m_db);
+    Close();
 
-    std::string convFile = Utils::toStdString(databaseFile.wstring());
+    // libmaxminddb converts the path from UTF-8 and opens it with CreateFileW,
+    // so non-ASCII profile folders work.
+    std::string path = Utils::toStdString(databaseFile.wstring());
 
-    if (!fs::exists(databaseFile))
-    {
-        LOG_F(ERROR, "GeoLite2 database file does not exist: %s", convFile.c_str());
-        return;
-    }
-
-    int res = MMDB_open(convFile.c_str(), MMDB_MODE_MMAP, m_db);
+    int res = MMDB_open(path.c_str(), MMDB_MODE_MMAP, m_db);
 
     if (res != MMDB_SUCCESS)
     {
-        LOG_F(ERROR, "Failed to open GeoLite2 database - error code %d", res);
+        BOOST_LOG_TRIVIAL(warning) << "Failed to open GeoIP database " << path << ": " << MMDB_strerror(res);
+        return false;
     }
+
+    m_isOpen = true;
+
+    return true;
 }
 
-std::string MaxMindDatabase::lookup(std::string const& ip)
+void MaxMindDatabase::Close()
 {
-    int gaiError;
-    int mmdbError;
+    if (!m_isOpen)
+    {
+        return;
+    }
 
-    MMDB_lookup_result_s result = MMDB_lookup_string(
-        m_db,
-        ip.c_str(),
-        &gaiError,
-        &mmdbError);
+    MMDB_close(m_db);
+    m_isOpen = false;
+}
 
-    if (gaiError != 0)
+std::string MaxMindDatabase::LookupCountryCode(sockaddr const* address) const
+{
+    if (!m_isOpen || address == nullptr)
     {
         return std::string();
     }
 
-    if (mmdbError != MMDB_SUCCESS)
+    // Looking up the socket address directly skips the string round-trip and
+    // the getaddrinfo() call MMDB_lookup_string makes.
+    int mmdbError = MMDB_SUCCESS;
+    MMDB_lookup_result_s result = MMDB_lookup_sockaddr(m_db, address, &mmdbError);
+
+    if (mmdbError != MMDB_SUCCESS || !result.found_entry)
     {
         return std::string();
     }
 
-    if (result.found_entry)
+    MMDB_entry_data_s data;
+
+    if (MMDB_get_value(&result.entry, &data, "country", "iso_code", nullptr) != MMDB_SUCCESS
+        || !data.has_data
+        || data.type != MMDB_DATA_TYPE_UTF8_STRING)
     {
-        MMDB_entry_data_s data;
-
-        int status = MMDB_get_value(
-            &result.entry,
-            &data,
-            "country", "iso_code",
-            nullptr);
-
-        if (status != MMDB_SUCCESS)
-        {
-            return std::string();
-        }
-
-        if (data.has_data)
-        {
-            return std::string(data.utf8_string, data.data_size);
-        }
+        return std::string();
     }
 
-    return std::string();
+    return std::string(data.utf8_string, data.data_size);
+}
+
+char const* MaxMindDatabase::LibraryVersion()
+{
+    return MMDB_lib_version();
 }

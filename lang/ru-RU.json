@@ -305,5 +305,10 @@
     "copyright_text": "© 2015-2021",
     "exported_magnet_link_s": "Экспортированные Magnet-сслыки",
     "export": "Экспортировать",
-    "torrent_file_s": "Торрент-файл(ы)"
+    "torrent_file_s": "Торрент-файл(ы)",
+    "country": "Страна",
+    "show_peer_country": "Показывать страну пира",
+    "peer_seed": "Сид",
+    "peer_leecher": "Личер",
+    "peers_summary": "Сиды: {0} подключено, {1} в рое    Личеры: {2} подключено, {3} в рое"
 }

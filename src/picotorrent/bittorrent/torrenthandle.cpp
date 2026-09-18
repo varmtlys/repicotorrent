@@ -1,5 +1,7 @@
 #include "torrenthandle.hpp"
 
+#include <algorithm>
+
 #include <libtorrent/announce_entry.hpp>
 #include <libtorrent/session.hpp>
 #include <libtorrent/torrent_handle.hpp>
@@ -351,6 +353,11 @@ std::unique_ptr<TorrentStatus> TorrentHandle::Update(lt::torrent_status const& t
     nts.savePath = ts.save_path;
     nts.seedsCurrent = ts.num_seeds;
     nts.seedsTotal = ts.list_seeds;
+
+    // The tracker's scrape counts the whole swarm but is -1 until it answers,
+    // and misses peers only DHT/PeX told us about - take whichever is larger.
+    nts.swarmSeeds = std::max(ts.num_complete, ts.list_seeds);
+    nts.swarmLeechers = std::max(ts.num_incomplete, ts.list_peers - ts.list_seeds);
     nts.state = getTorrentStatusState(ts);
     nts.torrentFile = ts.torrent_file;
     nts.totalWanted = ts.total_wanted;

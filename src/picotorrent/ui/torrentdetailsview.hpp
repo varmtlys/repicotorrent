@@ -12,7 +12,7 @@
 #include <wx/notebook.h>
 
 namespace pt::BitTorrent { class TorrentHandle; }
-namespace pt::Core { class Configuration; }
+namespace pt::Core { class Configuration; class GeoIP; }
 
 namespace pt::UI
 {
@@ -24,7 +24,7 @@ namespace pt::UI
     class TorrentDetailsView : public wxNotebook
     {
     public:
-        TorrentDetailsView(wxWindow* parent, wxWindowID id, std::shared_ptr<Core::Configuration> cfg);
+        TorrentDetailsView(wxWindow* parent, wxWindowID id, std::shared_ptr<Core::Configuration> cfg, Core::GeoIP const* geoip);
         virtual ~TorrentDetailsView();
 
         void Refresh(std::map<libtorrent::info_hash_t, BitTorrent::TorrentHandle*> const& torrents);

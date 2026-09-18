@@ -62,6 +62,8 @@ namespace BitTorrent
         std::string                                           savePath;
         int                                                   seedsCurrent         = 0;
         int                                                   seedsTotal           = 0;
+        int                                                   swarmSeeds           = 0;
+        int                                                   swarmLeechers        = 0;
         State                                                 state                = State::Unknown;
         std::weak_ptr<const libtorrent::torrent_info>         torrentFile;
         std::int64_t                                          totalWanted          = 0;

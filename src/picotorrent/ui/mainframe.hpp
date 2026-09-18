@@ -34,6 +34,7 @@ namespace Core
     class Configuration;
     class Database;
     class Environment;
+    class GeoIP;
 }
 namespace IPC
 {
@@ -85,6 +86,10 @@ namespace Models
         void UpdateLabels();
 
         wxSplitterWindow* m_splitter;
+
+        // Declared before m_torrentDetails, which is handed a pointer to it
+        // in the constructor's initializer list.
+        std::unique_ptr<Core::GeoIP> m_geoip;
 
         StatusBar* m_statusBar;
         TaskBarIcon* m_taskBarIcon;

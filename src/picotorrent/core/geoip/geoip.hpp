@@ -1,49 +1,53 @@
 #pragma once
 
-#include <memory>
-#include <string>
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
 
-#include <QObject>
+#include <filesystem>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <thread>
+
+#include "maxminddatabase.hpp"
 
 namespace pt
 {
+namespace Core
+{
     class Configuration;
     class Environment;
-    class HttpClient;
-    class HttpResponse;
 
-    class GeoIP : public QObject
+    // Country lookups for peer addresses, backed by the free DB-IP Lite country
+    // database (CC BY 4.0 - attributed in the about dialog). The database lives
+    // in the application data folder and is refreshed on startup once it is a
+    // month old; lookups keep using the old file until the new one is in place.
+    //
+    // Create and use on the UI thread. Only the download runs elsewhere.
+    class GeoIP : public wxEvtHandler
     {
-        Q_OBJECT
-
     public:
-        GeoIP(QObject* parent, std::shared_ptr<Environment> env, std::shared_ptr<Configuration> cfg);
-        ~GeoIP();
+        GeoIP(std::shared_ptr<Environment> env, std::shared_ptr<Configuration> cfg);
+        virtual ~GeoIP();
 
-        void load();
-        std::string lookupCountryCode(std::string const& ip);
-
-    public slots:
-        /*
-        Updates the MaxMind GeoIP database. Emits the `databaseUpdated`
-        signal when the new database has been downloaded and loaded in
-        memory.
-        */
-        void update();
-
-    signals:
-        void databaseLoaded();
-        void updateRequired();
-
-    private slots:
-        void databaseDownloaded(HttpResponse* response);
+        // Empty when GeoIP is disabled, no database has been downloaded yet or
+        // the address is unknown to it.
+        std::string LookupCountryCode(sockaddr const* address) const;
 
     private:
-        struct DatabaseHandle;
+        void Update();
+        int Download(wchar_t const* url, std::string& body);
+        bool IsCancelled();
 
-        std::shared_ptr<Configuration> m_cfg;
-        std::shared_ptr<Environment> m_env;
-        std::shared_ptr<HttpClient> m_httpClient;
-        std::shared_ptr<DatabaseHandle> m_db;
+        std::filesystem::path m_databaseFile;
+        MaxMindDatabase m_db;
+
+        std::thread m_updater;
+        std::mutex m_mutex;
+        void* m_request = nullptr; // HINTERNET of the running download
+        bool m_cancelled = false;
     };
+}
 }

@@ -34,6 +34,14 @@ find_package(LibtorrentRasterbar CONFIG REQUIRED)
 find_package(nlohmann_json       CONFIG REQUIRED)
 find_package(unofficial-sqlite3  CONFIG REQUIRED)
 
+# The vcpkg libmaxminddb port installs no CMake config
+find_path(MAXMINDDB_INCLUDE_DIR maxminddb/maxminddb.h)
+find_library(MAXMINDDB_LIBRARY NAMES libmaxminddb maxminddb)
+
+if(NOT MAXMINDDB_INCLUDE_DIR OR NOT MAXMINDDB_LIBRARY)
+    message(FATAL_ERROR "libmaxminddb not found")
+endif()
+
 # Generate buildinfo file
 configure_file("${CMAKE_SOURCE_DIR}/src/picotorrent/buildinfo.cpp.in" "${CMAKE_SOURCE_DIR}/src/picotorrent/buildinfo.cpp" @ONLY)
 
@@ -104,6 +112,10 @@ add_executable(
     src/picotorrent/core/database
     src/picotorrent/core/environment
     src/picotorrent/core/utils
+
+    # GeoIP
+    src/picotorrent/core/geoip/geoip
+    src/picotorrent/core/geoip/maxminddatabase
 
     # Http
     src/picotorrent/http/httpclient
@@ -191,6 +203,7 @@ target_include_directories(
     PRIVATE
 
     include
+    ${MAXMINDDB_INCLUDE_DIR}
 )
 
 target_link_libraries(
@@ -228,6 +241,10 @@ target_link_libraries(
 
     # Rasterbar-libtorrent
     LibtorrentRasterbar::torrent-rasterbar
+
+    # libmaxminddb (static, needs Winsock)
+    ${MAXMINDDB_LIBRARY}
+    ws2_32
 
     # PQL
     PicoTorrentPQL
