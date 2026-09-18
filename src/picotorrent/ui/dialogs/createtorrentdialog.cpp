@@ -8,6 +8,7 @@
 #include <fmt/xchar.h>
 #include <libtorrent/add_torrent_params.hpp>
 #include <libtorrent/create_torrent.hpp>
+#include <libtorrent/load_torrent.hpp>
 #include <libtorrent/torrent_info.hpp>
 #include <wx/hyperlink.h>
 #include <wx/tokenzr.h>
@@ -225,10 +226,18 @@ CreateTorrentDialog::CreateTorrentDialog(wxWindow* parent, wxWindowID id, std::s
 
             if (m_addToSession->IsChecked())
             {
-                lt::add_torrent_params p;
-                p.save_path = sp.bp;
-                p.ti = std::make_shared<lt::torrent_info>(save.GetPath().ToStdString());
-                m_session->AddTorrent(p);
+                // torrent_info's ctor from a filename is deprecated; the
+                // 2.1 way parses into an add_torrent_params - trackers and
+                // comment included, so take all of it, not just .ti.
+                lt::error_code ec;
+                lt::add_torrent_params p = lt::load_torrent_file(
+                    save.GetPath().ToStdString(), ec, lt::load_torrent_limits());
+
+                if (!ec)
+                {
+                    p.save_path = sp.bp;
+                    m_session->AddTorrent(p);
+                }
             }
 
             EndDialog(wxOK);
@@ -270,10 +279,12 @@ void CreateTorrentDialog::GenerateTorrent(std::unique_ptr<CreateTorrentParams> p
     if (p->mode == Mode::v1) { flags = lt::create_torrent::v1_only; }
     if (p->mode == Mode::v2) { flags = lt::create_torrent::v2_only; }
 
-    lt::file_storage fs;
-    lt::add_files(fs, p->path, flags);
+    // libtorrent 2.1: files are collected with list_files() and handed to
+    // the ctor as create_file_entry values; the file_storage-based
+    // add_files() flow is deprecated and compiled out of this build.
+    std::vector<lt::create_file_entry> files = lt::list_files(p->path, flags);
 
-    lt::create_torrent ct(fs, 0, flags);
+    lt::create_torrent ct(std::move(files), 0, flags);
     ct.set_comment(p->comment.c_str());
     ct.set_creator(p->creator.c_str());
     ct.set_priv(p->priv);

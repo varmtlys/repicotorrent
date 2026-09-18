@@ -216,7 +216,13 @@ void TorrentDetailsOverviewPanel::Refresh(pt::BitTorrent::TorrentHandle* torrent
 
     if (auto tf = status.torrentFile.lock())
     {
-        m_comment->SetLabel(tf->comment());
+        // The comment came through the add-torrent pipeline; torrent_info
+        // no longer exposes it in the 2.1 ABI.
+        m_comment->SetLabel(
+            status.comment.empty()
+                ? wxString("-")
+                : wxString(status.comment));
+
         m_priv->SetLabel(
             tf->priv()
             ? i18n("yes")

@@ -399,12 +399,12 @@ wxString AddTorrentDialog::GetTorrentDisplayInfoHash(libtorrent::add_torrent_par
 
 wxString AddTorrentDialog::GetTorrentDisplayComment(libtorrent::add_torrent_params const& params)
 {
-    if (params.ti)
-    {
-        return params.ti->comment();
-    }
-
-    return "-";
+    // The comment lives in the root dictionary of the torrent file; in
+    // libtorrent 2.1 that is parsed into add_torrent_params::comment, not
+    // torrent_info.
+    return params.comment.empty()
+        ? wxString("-")
+        : wxString(params.comment);
 }
 
 void AddTorrentDialog::Load()
@@ -504,50 +504,27 @@ void AddTorrentDialog::OnRemoveTracker(wxCommandEvent&)
 {
     long selected = m_trackers->GetFirstSelected();
 
-    std::vector<lt::announce_entry> tiTrackers;
-    size_t tiTrackersRemoved = 0;
-    size_t tiTrackersTotal = 0;
     size_t paramsTrackersRemoved = 0;
-
-    if (m_params.ti)
-    {
-        tiTrackers = m_params.ti->trackers();
-        tiTrackersTotal = tiTrackers.size();
-    }
 
     while (selected >= 0)
     {
-        if (size_t(selected) < (tiTrackers.size() + tiTrackersRemoved) && tiTrackers.size() > 0)
-        {
-            tiTrackers.erase(
-                tiTrackers.begin() + (selected - tiTrackersRemoved));
-            tiTrackersRemoved += 1;
-        }
-        else
-        {
-            size_t offset = selected - tiTrackersTotal - paramsTrackersRemoved;
+        // The m_params.trackers / tracker_tiers pairs are filled from the
+        // announce-list by load_torrent_file() in libtorrent 2.1;
+        // torrent_info::trackers()/clear_trackers()/add_tracker() are gone
+        // from this build's ABI.
+        size_t offset = selected - paramsTrackersRemoved;
 
-            if (offset < m_params.trackers.size() && m_params.trackers.size() > 0)
-            {
-                m_params.trackers.erase(
-                    m_params.trackers.begin() + offset);
-                m_params.tracker_tiers.erase(
-                    m_params.tracker_tiers.begin() + offset);
+        if (offset < m_params.trackers.size() && m_params.trackers.size() > 0)
+        {
+            m_params.trackers.erase(
+                m_params.trackers.begin() + offset);
+            m_params.tracker_tiers.erase(
+                m_params.tracker_tiers.begin() + offset);
 
-                paramsTrackersRemoved += 1;
-            }
+            paramsTrackersRemoved += 1;
         }
 
         selected = m_trackers->GetNextSelected(selected);
-    }
-
-    if (m_params.ti && tiTrackersRemoved > 0)
-    {
-        m_params.ti->clear_trackers();
-        for (auto const& ae : tiTrackers)
-        {
-            m_params.ti->add_tracker(ae.url, ae.tier);
-        }
     }
 
     ReloadTrackers();
@@ -558,24 +535,12 @@ void AddTorrentDialog::ReloadTrackers()
     m_trackers->Freeze();
     m_trackers->DeleteAllItems();
 
-    // trackers
-    if (m_params.ti)
-    {
-        for (auto const& tracker : m_params.ti->trackers())
-        {
-            int row = m_trackers->GetItemCount();
-
-            m_trackers->InsertItem(row, Utils::toStdWString(tracker.url));
-            m_trackers->SetItem(row, 1, std::to_string(tracker.tier));
-        }
-    }
-
     for (size_t i = 0; i < m_params.trackers.size(); i++)
     {
         int row = m_trackers->GetItemCount();
         int tier = -1;
 
-        if (m_params.tracker_tiers.size() >= i)
+        if (i < m_params.tracker_tiers.size())
         {
             tier = m_params.tracker_tiers.at(i);
         }

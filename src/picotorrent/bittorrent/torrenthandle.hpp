@@ -67,6 +67,8 @@ namespace BitTorrent
         void ClearLabel();
         void SetLabel(int id, std::string const& name, bool muted = false);
 
+        void SetComment(std::string const& comment);
+
         libtorrent::torrent_handle& WrappedHandle();
 
     private:
@@ -86,6 +88,7 @@ namespace BitTorrent
 
         int m_labelId = -1;
         std::string m_labelName;
+        std::string m_comment;
     };
 }
 }

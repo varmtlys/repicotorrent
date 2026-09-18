@@ -1,5 +1,8 @@
 #include "pieceprogressbar.hpp"
 
+#include <algorithm>
+#include <cmath>
+
 #include "../../core/configuration.hpp"
 
 #include <wx/dcbuffer.h>
@@ -46,7 +49,17 @@ void PieceProgressBar::RenderProgress(wxDC& dc)
 
     if (m_bitfield.size() > 0)
     {
-        wxBitmap prg(m_bitfield.size() + 2, this->GetClientSize().GetHeight());
+        wxSize clientSize = this->GetClientSize();
+
+        // Aggregate pieces per pixel column instead of building one bitmap
+        // bitmap (and running one DrawLine per piece) sized to the piece
+        // count - a 100k-piece torrent used to allocate a 6 MB bitmap and
+        // issue 100k draws per second. innerWidth columns map the whole
+        // piece range onto the widget.
+        int innerWidth = clientSize.GetWidth() - 2;
+        float piecesPerColumn = static_cast<float>(m_bitfield.size()) / std::max(innerWidth, 1);
+
+        wxBitmap prg(clientSize);
         wxMemoryDC memDC;
 
         memDC.SelectObject(prg);
@@ -56,13 +69,30 @@ void PieceProgressBar::RenderProgress(wxDC& dc)
 
         memDC.SetPen(bar);
 
-        for (int idx = 0; idx < m_bitfield.size(); idx++)
+        for (int col = 0; col < innerWidth; col++)
         {
-            lt::piece_index_t pcs{ idx };
+            int firstIdx = static_cast<int>(std::floor(col * piecesPerColumn));
+            int lastIdx = static_cast<int>(std::ceil((col + 1) * piecesPerColumn));
 
-            if (m_bitfield[pcs])
+            lastIdx = std::min(lastIdx, static_cast<int>(m_bitfield.size()));
+            firstIdx = std::min(firstIdx, lastIdx);
+
+            // Pieces partially in this column gate the column: a column
+            // only lights up when every piece it touches is here.
+            bool complete = true;
+
+            for (int idx = firstIdx; idx < lastIdx; idx++)
             {
-                memDC.DrawLine(idx + 1, 1, idx + 1, prg.GetHeight() - 1);
+                if (!m_bitfield[lt::piece_index_t(idx)])
+                {
+                    complete = false;
+                    break;
+                }
+            }
+
+            if (complete)
+            {
+                memDC.DrawLine(col + 1, 1, col + 1, prg.GetHeight() - 1);
             }
         }
 

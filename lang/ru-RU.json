@@ -210,6 +210,7 @@
     "enable_dht": "Включить DHT",
     "enable_lsd": "Включить LSD",
     "enable_pex": "Включить PeX",
+    "enable_webtorrent": "Включить WebTorrent (использует публичный STUN-сервер)",
     "file": "Файл",
     "comment": "Комментарий",
     "skip_add_torrent_dialog": "Пропускать окно \"Добавить торрент\"",

@@ -1,7 +1,7 @@
 #include "maxminddatabase.hpp"
 
 #include <boost/log/trivial.hpp>
-#include <maxminddb/maxminddb.h>
+#include <maxminddb.h>
 
 #include "../utils.hpp"
 

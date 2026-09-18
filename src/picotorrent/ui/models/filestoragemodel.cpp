@@ -100,7 +100,9 @@ void FileStorageModel::RebuildTree(std::shared_ptr<const lt::torrent_info> ti)
         return;
     }
 
-    lt::file_storage const& files = ti->files();
+    // torrent_info::files() is deprecated in 2.1; layout() is the
+    // renamed-files-aware replacement.
+    lt::file_storage const& files = ti->layout();
 
     for (lt::file_index_t idx : files.file_range())
     {
@@ -138,7 +140,9 @@ void FileStorageModel::RebuildTree(std::shared_ptr<const lt::torrent_info> ti)
 
         auto n = std::make_shared<Node>();
         n->index = idx;
-        n->name = files.file_name(idx).to_string();
+        // file_name() returns a string_view in 2.1 - copy into std::string
+        // since the node stores its own name.
+        n->name = std::string(files.file_name(idx));
         n->parent = currentNode;
         n->priority = lt::default_priority;
         n->size = files.file_size(idx);

@@ -3,10 +3,12 @@
 #include <filesystem>
 #include <fstream>
 
-#include <libtorrent/create_torrent.hpp>
-#include <libtorrent/magnet_uri.hpp>
+#include <libtorrent/add_torrent_params.hpp>
+#include <libtorrent/torrent_status.hpp>
+#include <libtorrent/write_resume_data.hpp>
 #include <wx/clipbrd.h>
 
+#include "../bittorrent/magneturi.hpp"
 #include "../bittorrent/torrenthandle.hpp"
 #include "../bittorrent/torrentstatus.hpp"
 #include "../core/configuration.hpp"
@@ -157,7 +159,7 @@ TorrentContextMenu::TorrentContextMenu(wxWindow* parent, std::shared_ptr<pt::Cor
 
             for (auto torrent : selectedTorrents)
             {
-                ss << lt::make_magnet_uri(torrent->WrappedHandle()) << "\n";
+                ss << BitTorrent::makeMagnetUri(torrent->WrappedHandle()) << "\n";
             }
 
             TextOutputDialog dlg(m_parent, wxID_ANY, i18n("magnet_link_s"), i18n("exported_magnet_link_s"));
@@ -185,15 +187,62 @@ TorrentContextMenu::TorrentContextMenu(wxWindow* parent, std::shared_ptr<pt::Cor
 
             for (auto torrent : selectedTorrents)
             {
-                if (auto tf = torrent->WrappedHandle().torrent_file_with_hashes())
-                {
-                    lt::create_torrent ct(*tf.get());
-                    lt::entry e = ct.generate();
+                // libtorrent 2.1 removed torrent_handle::torrent_file_with_hashes
+                // together with the torrent_info-based create_torrent. The
+                // replacement is write_torrent_file() on an add_torrent_params.
+                lt::torrent_status ts = torrent->WrappedHandle().status(
+                    lt::torrent_handle::query_torrent_file);
 
-                    std::string fileName = tf->name() + ".torrent";
-                    std::ofstream out(outputDir / fileName, std::ios::binary);
-                    lt::bencode(std::ostreambuf_iterator<char>(out), e);
+                auto src = ts.torrent_file.lock();
+                if (!src) { continue; }
+
+                lt::add_torrent_params atp;
+                atp.ti = src;
+
+                for (lt::announce_entry const& ae : torrent->WrappedHandle().trackers())
+                {
+                    atp.trackers.push_back(ae.url);
                 }
+
+                for (std::string const& s : torrent->WrappedHandle().url_seeds())
+                {
+                    atp.url_seeds.push_back(s);
+                }
+
+                atp.comment = torrent->Status().comment;
+
+                // merkle_trees wants whole trees (root first), piece_layers()
+                // hands out just the piece layer - write_torrent_file() threw
+                // on every v2/hybrid torrent. Write the layers ourselves, keyed
+                // by file root the way BEP 52 lays them out.
+                lt::entry e = lt::write_torrent_file(atp, lt::write_flags::allow_missing_piece_layer);
+
+                auto const layers = torrent->WrappedHandle().piece_layers();
+                lt::file_storage const& fs = src->layout();
+
+                for (lt::file_index_t f : fs.file_range())
+                {
+                    int const i = static_cast<int>(f);
+
+                    if (fs.pad_file_at(f)
+                        || fs.file_size(f) <= fs.piece_length()
+                        || i >= static_cast<int>(layers.size())
+                        || static_cast<int>(layers[i].size()) != fs.file_num_pieces(f))
+                    {
+                        continue;
+                    }
+
+                    std::string& layer = e["piece layers"][fs.root(f).to_string()].string();
+
+                    for (lt::sha256_hash const& h : layers[i])
+                    {
+                        layer += h.to_string();
+                    }
+                }
+
+                std::string fileName = src->name() + ".torrent";
+                std::ofstream out(outputDir / fileName, std::ios::binary);
+                lt::bencode(std::ostreambuf_iterator<char>(out), e);
             }
         },
         TorrentContextMenu::ptID_EXPORT_TORRENT_FILE);

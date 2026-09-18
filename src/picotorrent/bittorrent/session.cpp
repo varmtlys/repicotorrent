@@ -34,6 +34,7 @@
 #include "addparams.hpp"
 #include "infohash.hpp"
 #include "ipfilterparser.hpp"
+#include "magneturi.hpp"
 #include "semver.hpp"
 #include "sessionstatistics.hpp"
 #include "torrenthandle.hpp"
@@ -162,6 +163,15 @@ static lt::settings_pack getSettingsPack(std::shared_ptr<pt::Core::Configuration
     settings.set_bool(lt::settings_pack::dht_enforce_node_id, true);
     settings.set_bool(lt::settings_pack::dht_privacy_lookups, true);
     settings.set_bool(lt::settings_pack::dht_ignore_dark_internet, true);
+
+    // WebTorrent is built into libtorrent 2.1 and is opt-in: without offers
+    // WebRTC (wss trackers, WebRTC swarms) stay silent. Enabling it routes
+    // outgoing traffic through a public STUN server - see the checkbox
+    // which turns this on.
+    if (!cfg->Get<bool>("webtorrent.enabled").value_or(false))
+    {
+        setInt(settings, lt::settings_pack::max_webtorrent_offers, 0);
+    }
 
     // Limits
     setInt(settings, lt::settings_pack::active_checking, cfg->Get<int>("libtorrent.active_checking"));
@@ -613,6 +623,11 @@ void Session::OnAlert()
             AddParams* add = ata->params.userdata.get<AddParams>();
             if (add && add->labelId > 0) { handle->SetLabel(add->labelId, add->labelName, true); }
 
+            // The comment is part of the torrent file root dictionary, which
+            // libtorrent 2.1 hands over in params.comment - load_torrent_file()
+            // fills it for .torrent adds, read_resume_data() on restore.
+            if (!ata->params.comment.empty()) { handle->SetComment(ata->params.comment); }
+
             m_torrents.insert({ ata->handle.info_hashes(), handle });
 
             auto stmt = m_db->CreateStatement("SELECT COUNT(*) FROM torrent WHERE info_hash = $1");
@@ -994,7 +1009,7 @@ void Session::OnSaveResumeDataTimer(wxTimerEvent&)
     // asking every torrent one by one froze the UI for as long as it took the
     // session to answer N times. get_torrent_status() answers in one go.
     auto torrents = m_session->get_torrent_status(
-        [](lt::torrent_status const& st) { return st.need_save_resume; });
+        [](lt::torrent_status const& st) { return st.need_save_resume_data != lt::resume_data_flags_t{}; });
 
     for (lt::torrent_status const& st : torrents)
     {
@@ -1210,7 +1225,7 @@ void Session::SaveTorrents()
     {
         if (!st.handle.is_valid()
             || !st.has_metadata
-            || !st.need_save_resume)
+            || st.need_save_resume_data == lt::resume_data_flags_t{})
         {
             continue;
         }
@@ -1242,7 +1257,7 @@ void Session::SaveTorrents()
         // Store the magnet uri
         stmt = m_db->CreateStatement("REPLACE INTO torrent_magnet_uri (info_hash, magnet_uri, save_path) VALUES (?, ?, ?);");
         stmt->Bind(1, str(st.info_hashes));
-        stmt->Bind(2, lt::make_magnet_uri(st.handle));
+        stmt->Bind(2, makeMagnetUri(st.handle));
         stmt->Bind(3, st.handle.status(lt::torrent_handle::query_save_path).save_path);
         stmt->Execute();
     }
@@ -1260,8 +1275,11 @@ void Session::SaveTorrents()
             break;
         }
 
-        lt::alert const* tmp = m_session->wait_for_alert(lt::seconds(1));
-        if (tmp == nullptr) { continue; }
+        // wait_for_alert() returns bool in 2.1 (true = an alert arrived
+        // within max_wait); the alerts themselves still come out of
+        // pop_alerts().
+        bool gotAlert = m_session->wait_for_alert(lt::seconds(1));
+        if (!gotAlert) { continue; }
 
         std::vector<lt::alert*> alerts;
         m_session->pop_alerts(&alerts);

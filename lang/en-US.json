@@ -142,6 +142,7 @@
     "enable_dht": "Enable DHT",
     "enable_lsd": "Enable LSD",
     "enable_pex": "Enable PeX",
+    "enable_webtorrent": "Enable WebTorrent (uses a public STUN server)",
     "comment": "Comment",
     "skip_add_torrent_dialog": "Skip 'Add torrent' dialog",
     "start_torrent": "Start torrent",

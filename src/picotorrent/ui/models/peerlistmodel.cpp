@@ -36,7 +36,9 @@ void PeerListModel::Update(std::vector<lt::peer_info> const& peers)
             peers.end(),
             [it](lt::peer_info const& p)
             {
-                return p.ip == it->ip;
+                // peer_info::ip was removed in libtorrent 2.1; the remote
+                // endpoint replaces it for both matching and display.
+                return p.remote_endpoint() == it->remote_endpoint();
             });
 
         if (f == peers.end())
@@ -54,7 +56,7 @@ void PeerListModel::Update(std::vector<lt::peer_info> const& peers)
 
     for (auto it = peers.begin(); it != peers.end(); it++)
     {
-        auto f = std::find_if(m_data.begin(), m_data.end(), [it](lt::peer_info& p) { return p.ip == it->ip; });
+        auto f = std::find_if(m_data.begin(), m_data.end(), [it](lt::peer_info& p) { return p.remote_endpoint() == it->remote_endpoint(); });
 
         if (f == m_data.end())
         {
@@ -87,12 +89,19 @@ void PeerListModel::GetValueByRow(wxVariant &variant, unsigned int row, unsigned
     switch (col)
     {
     case Column::IP:
-        variant = peer.ip.address().to_string();
+        // std::ostringstream: the operator<< output is neither deprecated
+        // (asio removed address::to_string with BOOST_ASIO_NO_DEPRECATED)
+        // nor locale-formatted.
+        {
+            std::stringstream ss;
+            ss << peer.remote_endpoint().address();
+            variant = ss.str();
+        }
         break;
     case Column::Country:
         variant = m_geoip == nullptr
             ? std::string()
-            : m_geoip->LookupCountryCode(peer.ip.data());
+            : m_geoip->LookupCountryCode(peer.remote_endpoint().data());
         break;
     case Column::Type:
         variant = (peer.flags & lt::peer_info::seed)

@@ -40,6 +40,7 @@ namespace Dialogs
         wxCheckBox* m_enableDht;
         wxCheckBox* m_enableLsd;
         wxCheckBox* m_enablePex;
+        wxCheckBox* m_enableWebTorrent;
         wxCheckBox* m_enableGeoIP;
 
         wxCheckBox* m_enableFilter;
