@@ -91,6 +91,7 @@ TorrentDetailsOverviewPanel::TorrentDetailsOverviewPanel(wxWindow* parent, wxWin
     m_name(new CopyableStaticText(this)),
     m_isDarkMode(isDarkMode),
     m_infoHash(new CopyableStaticText(this)),
+    m_infoHashV2(new CopyableStaticText(this)),
     m_savePath(new CopyableStaticText(this)),
     m_pieces(new CopyableStaticText(this)),
     m_comment(new CopyableStaticText(this)),
@@ -113,6 +114,8 @@ TorrentDetailsOverviewPanel::TorrentDetailsOverviewPanel(wxWindow* parent, wxWin
     m_sizer->Add(m_name, 0, wxEXPAND);
     m_sizer->Add(BoldLabel(this, wxID_ANY, i18n("info_hash")));
     m_sizer->Add(m_infoHash, 0, wxEXPAND);
+    m_sizer->Add(BoldLabel(this, wxID_ANY, i18n("info_hash_v2")));
+    m_sizer->Add(m_infoHashV2, 0, wxEXPAND);
 
     m_sizer->Add(BoldLabel(this, wxID_ANY, i18n("save_path")));
     m_sizer->Add(m_savePath, 0, wxEXPAND);
@@ -165,7 +168,20 @@ void TorrentDetailsOverviewPanel::Refresh(pt::BitTorrent::TorrentHandle* torrent
 
     m_name->SetLabel(Utils::toStdWString(status.name));
     m_savePath->SetLabel(Utils::toStdWString(status.savePath));
-    m_infoHash->SetLabel(status.infoHash);
+
+    // The primary row shows the v1 hash when there is one - it is what
+    // older trackers and most cross-seeds are keyed on - and the second
+    // row the v2 hash of a hybrid torrent.
+    m_infoHash->SetLabel(
+        status.v1Hash.empty()
+            ? wxString(status.infoHash)
+            : wxString(status.v1Hash));
+
+    m_infoHashV2->SetLabel(
+        (!status.v1Hash.empty() && !status.v2Hash.empty())
+            ? wxString(status.v2Hash)
+            : wxString("-"));
+
     m_pieces->SetLabel(
         fmt::format(
             i18n("d_of_d"),
@@ -233,6 +249,7 @@ void TorrentDetailsOverviewPanel::Reset()
 
     m_name->SetLabel("-");
     m_infoHash->SetLabel("-");
+    m_infoHashV2->SetLabel("-");
     m_savePath->SetLabel("-");
     m_pieces->SetLabel("-");
     m_comment->SetLabel("-");

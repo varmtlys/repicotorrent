@@ -63,6 +63,7 @@ namespace BitTorrent
 
         // Labels
         int Label();
+        std::string const& LabelName() const;
         void ClearLabel();
         void SetLabel(int id, std::string const& name, bool muted = false);
 

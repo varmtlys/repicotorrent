@@ -48,6 +48,10 @@ namespace BitTorrent
         std::string                                           errorDetails;
         std::chrono::seconds                                  eta{ 0 };
         std::string                                           infoHash;
+        // Hybrid (v1+v2) torrents carry both hashes; v1 is what older
+        // trackers index, v2 is what new ones do. Empty when absent.
+        std::string                                           v1Hash;
+        std::string                                           v2Hash;
         std::string                                           labelName;
         std::chrono::seconds                                  lastDownload{ -1 };
         std::chrono::seconds                                  lastUpload{ -1 };

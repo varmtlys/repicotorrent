@@ -371,27 +371,23 @@ wxString AddTorrentDialog::GetTorrentDisplayInfoHash(libtorrent::add_torrent_par
 {
     std::stringstream hash;
 
-    if (params.ti)
+    lt::info_hash_t const ih = params.ti
+        ? params.ti->info_hashes()
+        : params.info_hashes;
+
+    // Hybrid torrents carry both hashes: v1 is what older trackers index,
+    // v2 is what new ones do. Show both, v1 first.
+    if (ih.has_v1() && ih.has_v2())
     {
-        if (params.ti->info_hashes().has_v2())
-        {
-            hash << params.ti->info_hashes().v2;
-        }
-        else
-        {
-            hash << params.ti->info_hashes().v1;
-        }
+        hash << ih.v1 << "\n" << ih.v2;
     }
-    else if (params.info_hashes.has_v1() || params.info_hashes.has_v2())
+    else if (ih.has_v2())
     {
-        if (params.info_hashes.has_v2())
-        {
-            hash << params.info_hashes.v2;
-        }
-        else
-        {
-            hash << params.info_hashes.v1;
-        }
+        hash << ih.v2;
+    }
+    else if (ih.has_v1())
+    {
+        hash << ih.v1;
     }
     else
     {

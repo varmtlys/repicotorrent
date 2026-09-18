@@ -258,6 +258,11 @@ int TorrentHandle::Label()
     return m_labelId;
 }
 
+std::string const& TorrentHandle::LabelName() const
+{
+    return m_labelName;
+}
+
 void TorrentHandle::BuildStatus(libtorrent::torrent_status const& ts)
 {
     m_status = Update(ts);
@@ -287,10 +292,18 @@ std::unique_ptr<TorrentStatus> TorrentHandle::Update(lt::torrent_status const& t
         hash << ts.info_hashes.v1;
     }
 
+    std::string v1Hash;
+    std::string v2Hash;
+
+    if (ts.info_hashes.has_v1()) { std::stringstream ss; ss << ts.info_hashes.v1; v1Hash = ss.str(); }
+    if (ts.info_hashes.has_v2()) { std::stringstream ss; ss << ts.info_hashes.v2; v2Hash = ss.str(); }
+
     if (!m_th->is_valid())
     {
         TorrentStatus invalid;
         invalid.infoHash = hash.str();
+        invalid.v1Hash = v1Hash;
+        invalid.v2Hash = v2Hash;
         return std::make_unique<TorrentStatus>(invalid);
     }
 
@@ -336,6 +349,8 @@ std::unique_ptr<TorrentStatus> TorrentHandle::Update(lt::torrent_status const& t
     nts.eta = eta;
     nts.forced = (!(ts.flags & lt::torrent_flags::paused) && !(ts.flags & lt::torrent_flags::auto_managed));
     nts.infoHash = hash.str();
+    nts.v1Hash = v1Hash;
+    nts.v2Hash = v2Hash;
     nts.labelName = m_labelName;
     nts.lastDownload = ts.last_download.time_since_epoch().count() > 0 ? std::chrono::seconds(lt::total_seconds(lt::clock_type::now() - ts.last_download)) : std::chrono::seconds(-1);
     nts.lastUpload = ts.last_upload.time_since_epoch().count() > 0 ? std::chrono::seconds(lt::total_seconds(lt::clock_type::now() - ts.last_upload)) : std::chrono::seconds(-1);

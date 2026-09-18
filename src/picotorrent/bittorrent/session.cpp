@@ -156,6 +156,13 @@ static lt::settings_pack getSettingsPack(std::shared_ptr<pt::Core::Configuration
     setBool(settings, lt::settings_pack::enable_dht, cfg->Get<bool>("libtorrent.enable_dht"));
     setBool(settings, lt::settings_pack::enable_lsd, cfg->Get<bool>("libtorrent.enable_lsd"));
 
+    // DHT hardening (BEP 42/43). libtorrent ships with the first two off,
+    // which lets nodes claim routing table slots with IDs crafted to win
+    // lookups, and lets lookups leak the info hashes we are interested in.
+    settings.set_bool(lt::settings_pack::dht_enforce_node_id, true);
+    settings.set_bool(lt::settings_pack::dht_privacy_lookups, true);
+    settings.set_bool(lt::settings_pack::dht_ignore_dark_internet, true);
+
     // Limits
     setInt(settings, lt::settings_pack::active_checking, cfg->Get<int>("libtorrent.active_checking"));
     setInt(settings, lt::settings_pack::active_dht_limit, cfg->Get<int>("libtorrent.active_dht_limit"));
@@ -862,6 +869,68 @@ void Session::OnAlert()
                 }
             }
 
+            break;
+        }
+
+        case lt::torrent_conflict_alert::alert_type:
+        {
+            // Two swarms resolved to the same info hash - typically the same
+            // hybrid torrent added twice through different hashes. libtorrent
+            // fails BOTH torrents with duplicate_torrent and leaves them
+            // paused; the only way out is to remove both and re-add one from
+            // the metadata carried by this alert.
+            lt::torrent_conflict_alert* tca = lt::alert_cast<lt::torrent_conflict_alert>(alert);
+
+            if (!tca->metadata)
+            {
+                BOOST_LOG_TRIVIAL(error) << "Torrent conflict without metadata: " << tca->message();
+                break;
+            }
+
+            BOOST_LOG_TRIVIAL(warning) << "Resolving torrent conflict: " << tca->message();
+
+            // Keep the identity of the torrent which downloaded the metadata:
+            // its save path and label are what the user expects to survive.
+            lt::torrent_handle survivor = tca->handle.is_valid()
+                ? tca->handle
+                : tca->conflicting_torrent;
+
+            std::string savePath;
+            int labelId = -1;
+            std::string labelName;
+
+            if (survivor.is_valid())
+            {
+                savePath = survivor.status().save_path;
+
+                auto it = FindTorrent(survivor.info_hashes());
+                if (it != m_torrents.end())
+                {
+                    labelId = it->second->Label();
+                    labelName = it->second->LabelName();
+                }
+            }
+
+            if (savePath.empty())
+            {
+                savePath = m_cfg->Get<std::string>("default_save_path").value_or("");
+            }
+
+            // One of them may have been one of our ephemeral metadata
+            // searches - forget it, so nothing later removes a dead handle.
+            if (tca->handle.is_valid()) { RemoveMetadataHandle(tca->handle.info_hashes()); }
+            if (tca->conflicting_torrent.is_valid()) { RemoveMetadataHandle(tca->conflicting_torrent.info_hashes()); }
+
+            if (tca->handle.is_valid()) { m_session->remove_torrent(tca->handle); }
+            if (tca->conflicting_torrent.is_valid()) { m_session->remove_torrent(tca->conflicting_torrent); }
+
+            lt::add_torrent_params params;
+            params.ti = tca->metadata;
+            params.save_path = savePath;
+            params.flags = lt::torrent_flags::update_subscribe | lt::torrent_flags::auto_managed;
+            params.userdata = lt::client_data_t(new AddParams{ labelId, labelName });
+
+            AddTorrent(params);
             break;
         }
 
