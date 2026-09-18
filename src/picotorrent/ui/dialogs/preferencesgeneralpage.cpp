@@ -159,8 +159,8 @@ PreferencesGeneralPage::PreferencesGeneralPage(wxWindow* parent, std::shared_ptr
         m_theme->SetSelection(0);
     }
 
-    m_labelColor->SetValue(m_cfg->Get<bool>("use_label_as_list_bgcolor").value());
-    m_skipAddTorrentDialog->SetValue(m_cfg->Get<bool>("skip_add_torrent_dialog").value());
+    m_labelColor->SetValue(m_cfg->Get<bool>("use_label_as_list_bgcolor").value_or(false));
+    m_skipAddTorrentDialog->SetValue(m_cfg->Get<bool>("skip_add_torrent_dialog").value_or(false));
 
     AutoRunKey key;
     if (key.Exists())
@@ -172,12 +172,12 @@ PreferencesGeneralPage::PreferencesGeneralPage(wxWindow* parent, std::shared_ptr
     m_startPosition->Append(i18n("minimized"), new ClientData<Configuration::WindowState>(Configuration::WindowState::Minimized));
     m_startPosition->Append(i18n("hidden"), new ClientData<Configuration::WindowState>(Configuration::WindowState::Hidden));
     m_startPosition->Append(i18n("maximized"), new ClientData<Configuration::WindowState>(Configuration::WindowState::Maximized));
-    m_startPosition->SetSelection(m_cfg->Get<int>("start_position").value());
+    m_startPosition->SetSelection(m_cfg->Get<int>("start_position").value_or(0));
 
     // Notification area
-    m_showNotificationIcon->SetValue(m_cfg->Get<bool>("show_in_notification_area").value());
-    m_minimizeNotification->SetValue(m_cfg->Get<bool>("minimize_to_notification_area").value());
-    m_closeNotification->SetValue(m_cfg->Get<bool>("close_to_notification_area").value());
+    m_showNotificationIcon->SetValue(m_cfg->Get<bool>("show_in_notification_area").value_or(true));
+    m_minimizeNotification->SetValue(m_cfg->Get<bool>("minimize_to_notification_area").value_or(false));
+    m_closeNotification->SetValue(m_cfg->Get<bool>("close_to_notification_area").value_or(false));
 
     m_showNotificationIcon->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&)
         {

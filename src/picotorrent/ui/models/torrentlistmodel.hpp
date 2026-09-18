@@ -54,7 +54,6 @@ namespace pt::UI::Models
         virtual ~TorrentListModel();
 
         void AddTorrent(BitTorrent::TorrentHandle* torrent);
-        int GetRowIndex(BitTorrent::TorrentHandle* torrent);
         BitTorrent::TorrentHandle* GetTorrentFromItem(wxDataViewItem const& item);
         void RemoveTorrent(libtorrent::info_hash_t const& hash);
         void UpdateTorrents(std::vector<BitTorrent::TorrentHandle*> torrents);

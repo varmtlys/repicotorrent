@@ -21,7 +21,11 @@ bool ApplicationOptionsConnection::OnExecute(const wxString&, const void *data, 
 {
     std::string textData = GetTextFromData(data, size, format);
 
-    m_frame->GetEventHandler()->CallAfter([this, textData]()
+    // Capture the frame, not this: wxIPC can destroy the connection before the
+    // deferred call runs.
+    auto* frame = m_frame;
+
+    frame->GetEventHandler()->CallAfter([frame, textData]()
         {
             json j;
             pt::CommandLineOptions options;
@@ -40,16 +44,16 @@ bool ApplicationOptionsConnection::OnExecute(const wxString&, const void *data, 
                 return;
             }
 
-            m_frame->MSWGetTaskBarButton()->Show();
+            if (auto button = frame->MSWGetTaskBarButton()) { button->Show(); }
 
-            if (m_frame->IsIconized())
+            if (frame->IsIconized())
             {
-                m_frame->Restore();
+                frame->Restore();
             }
 
-            m_frame->Raise();
-            m_frame->Show();
-            m_frame->HandleParams(options);
+            frame->Raise();
+            frame->Show();
+            frame->HandleParams(options);
         });
 
     return true;

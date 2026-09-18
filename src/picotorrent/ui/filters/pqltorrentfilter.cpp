@@ -418,6 +418,6 @@ std::unique_ptr<pt::UI::Filters::TorrentFilter> PqlTorrentFilter::Create(std::st
 
 bool PqlTorrentFilter::Includes(pt::BitTorrent::TorrentHandle const& torrent)
 {
-    TorrentStatus ts = torrent.Status();
+    TorrentStatus const& ts = torrent.Status();
     return m_filter(ts);
 }

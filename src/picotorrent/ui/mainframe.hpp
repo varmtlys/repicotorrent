@@ -8,6 +8,7 @@
 #include <libtorrent/fwd.hpp>
 #include <libtorrent/info_hash.hpp>
 
+#include <chrono>
 #include <map>
 #include <unordered_set>
 #include <vector>
@@ -110,6 +111,7 @@ namespace Models
 
         std::unordered_set<Dialogs::AddTorrentDialog*> m_addDialogs;
         std::map<libtorrent::info_hash_t, BitTorrent::TorrentHandle*> m_selection;
+        std::chrono::steady_clock::time_point m_lastDiskSpaceCheck;
         int64_t m_torrentsCount;
     };
 }

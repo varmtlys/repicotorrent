@@ -237,6 +237,20 @@ target_link_libraries(
 
 set_property(TARGET PicoTorrent PROPERTY ENABLE_EXPORTS 1)
 
+# Self-checks for the pure logic in src/picotorrent/bittorrent (no wx, no UI).
+enable_testing()
+
+add_executable(PicoTorrent-tests src/tests/main)
+
+target_link_libraries(
+    PicoTorrent-tests
+    PRIVATE
+    Boost::boost
+    LibtorrentRasterbar::torrent-rasterbar
+)
+
+add_test(NAME PicoTorrent-tests COMMAND PicoTorrent-tests)
+
 # Plugins
 add_library(
     Plugin_Updater

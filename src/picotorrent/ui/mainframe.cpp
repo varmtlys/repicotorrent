@@ -78,7 +78,7 @@ MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr
         m_torrentDetails);
 
     m_torrentListModel->SetBackgroundColorEnabled(
-        m_cfg->Get<bool>("use_label_as_list_bgcolor").value());
+        m_cfg->Get<bool>("use_label_as_list_bgcolor").value_or(false));
 
     auto sizer = new wxBoxSizer(wxVERTICAL);
     sizer->Add(m_console, 0, wxEXPAND);
@@ -105,15 +105,15 @@ MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr
 
     // Set checked on menu items
     m_menuItemConsoleInput->SetCheckable(true);
-    m_menuItemConsoleInput->Check(m_cfg->Get<bool>("ui.show_console_input").value());
+    m_menuItemConsoleInput->Check(m_cfg->Get<bool>("ui.show_console_input").value_or(false));
     m_menuItemDetailsPanel->SetCheckable(true);
-    m_menuItemDetailsPanel->Check(m_cfg->Get<bool>("ui.show_details_panel").value());
+    m_menuItemDetailsPanel->Check(m_cfg->Get<bool>("ui.show_details_panel").value_or(true));
     m_menuItemStatusBar->SetCheckable(true);
-    m_menuItemStatusBar->Check(m_cfg->Get<bool>("ui.show_status_bar").value());
+    m_menuItemStatusBar->Check(m_cfg->Get<bool>("ui.show_status_bar").value_or(true));
 
-    if (!m_cfg->Get<bool>("ui.show_console_input").value()) { m_console->Hide(); }
-    if (!m_cfg->Get<bool>("ui.show_details_panel").value()) { m_splitter->Unsplit(); }
-    if (!m_cfg->Get<bool>("ui.show_status_bar").value()) { m_statusBar->Hide(); }
+    if (!m_cfg->Get<bool>("ui.show_console_input").value_or(false)) { m_console->Hide(); }
+    if (!m_cfg->Get<bool>("ui.show_details_panel").value_or(true)) { m_splitter->Unsplit(); }
+    if (!m_cfg->Get<bool>("ui.show_status_bar").value_or(true)) { m_statusBar->Hide(); }
 
     if (!wxPersistenceManager::Get().RegisterAndRestore(this))
     {
@@ -123,7 +123,7 @@ MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr
     // Session events
     this->Bind(ptEVT_SESSION_STATISTICS, [this](pt::BitTorrent::SessionStatisticsEvent& evt)
         {
-            bool dhtEnabled = m_cfg->Get<bool>("libtorrent.enable_dht").value();
+            bool dhtEnabled = m_cfg->Get<bool>("libtorrent.enable_dht").value_or(true);
             m_statusBar->UpdateDhtNodesCount(dhtEnabled ? evt.GetData().dhtNodes : -1);
         });
 
@@ -237,6 +237,8 @@ MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr
             for (wxDataViewItem& item : items)
             {
                 auto torrent = m_torrentListModel->GetTorrentFromItem(item);
+                if (torrent == nullptr) { continue; }
+
                 m_selection.insert({ torrent->InfoHash(), torrent });
             }
 
@@ -326,12 +328,12 @@ MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr
         });
 
     // Update status bar
-    m_statusBar->UpdateDhtNodesCount(m_cfg->Get<bool>("libtorrent.enable_dht").value() ? 0 : -1);
+    m_statusBar->UpdateDhtNodesCount(m_cfg->Get<bool>("libtorrent.enable_dht").value_or(true) ? 0 : -1);
     m_statusBar->UpdateTorrentCount(m_torrentsCount);
-    m_statusBar->UpdateIPFilterStatus(m_cfg->Get<bool>("ipfilter.enabled").value());
+    m_statusBar->UpdateIPFilterStatus(m_cfg->Get<bool>("ipfilter.enabled").value_or(false));
 
     // Show taskbar icon
-    if (m_cfg->Get<bool>("show_in_notification_area").value())
+    if (m_cfg->Get<bool>("show_in_notification_area").value_or(true))
     {
         m_taskBarIcon->Show();
     }
@@ -404,7 +406,7 @@ void MainFrame::AddTorrents(std::vector<lt::add_torrent_params>& params, bool us
         }
         else
         {
-            p.save_path = m_cfg->Get<std::string>("default_save_path").value();
+            p.save_path = m_cfg->Get<std::string>("default_save_path").value_or("");
         }
         p.userdata = lt::client_data_t(our);
 
@@ -455,7 +457,7 @@ void MainFrame::AddTorrents(std::vector<lt::add_torrent_params>& params, bool us
         }
     }
 
-    if (m_cfg->Get<bool>("skip_add_torrent_dialog").value() || (m_options.silent && use_commandline_options))
+    if (m_cfg->Get<bool>("skip_add_torrent_dialog").value_or(false) || (m_options.silent && use_commandline_options))
     {
         for (lt::add_torrent_params& p : params)
         {
@@ -522,47 +524,68 @@ void MainFrame::HandleParams(pt::CommandLineOptions const& options)
 
 void MainFrame::CheckDiskSpace(std::vector<pt::BitTorrent::TorrentHandle*> const& torrents)
 {
-    bool shouldCheck = m_cfg->Get<bool>("pause_on_low_disk_space").value();
-    int limit = m_cfg->Get<int>("pause_on_low_disk_space_limit").value();
-
-    if (!shouldCheck)
+    if (!m_cfg->Get<bool>("pause_on_low_disk_space").value_or(false))
     {
         return;
     }
 
+    // Called for every torrent on every status update, ie. once a second. One
+    // GetDiskFreeSpaceEx() per torrent at that rate is a synchronous disk (or
+    // network share) round-trip per torrent per second, from the UI thread.
+    auto const now = std::chrono::steady_clock::now();
+
+    if (now - m_lastDiskSpaceCheck < std::chrono::seconds(30))
+    {
+        return;
+    }
+
+    m_lastDiskSpaceCheck = now;
+
+    int limit = m_cfg->Get<int>("pause_on_low_disk_space_limit").value_or(5);
+    float diskSpaceLimit = limit / 100.0f;
+
+    // Torrents commonly share a save path - ask the volume once per path.
+    std::map<std::string, bool> isLow;
+
     for (auto torrent : torrents)
     {
-        auto status = torrent->Status();
+        auto const& status = torrent->Status();
 
-        ULARGE_INTEGER freeBytesAvailableToCaller;
-        ULARGE_INTEGER totalNumberOfBytes;
-        ULARGE_INTEGER totalNumberOfFreeBytes;
+        auto find = isLow.find(status.savePath);
 
-        BOOL res = GetDiskFreeSpaceEx(
-            Utils::toStdWString(status.savePath).c_str(),
-            &freeBytesAvailableToCaller,
-            &totalNumberOfBytes,
-            &totalNumberOfFreeBytes);
-
-        if (res)
+        if (find == isLow.end())
         {
-            float diskSpaceAvailable = static_cast<float>(freeBytesAvailableToCaller.QuadPart) / static_cast<float>(totalNumberOfBytes.QuadPart);
-            float diskSpaceLimit = limit / 100.0f;
+            ULARGE_INTEGER freeBytesAvailableToCaller;
+            ULARGE_INTEGER totalNumberOfBytes;
+            ULARGE_INTEGER totalNumberOfFreeBytes;
 
-            if (diskSpaceAvailable < diskSpaceLimit)
+            bool low = false;
+
+            BOOL res = GetDiskFreeSpaceEx(
+                Utils::toStdWString(status.savePath).c_str(),
+                &freeBytesAvailableToCaller,
+                &totalNumberOfBytes,
+                &totalNumberOfFreeBytes);
+
+            if (res && totalNumberOfBytes.QuadPart > 0)
             {
-                BOOST_LOG_TRIVIAL(info) << "Pausing torrent "
-                    << status.infoHash << " due to disk space too low (avail: "
-                    << diskSpaceAvailable << ", limit: "
-                    << diskSpaceLimit << ")";
-
-                torrent->Pause();
-
-                m_taskBarIcon->ShowBalloon(
-                    i18n("pause_on_low_disk_space_alert"),
-                    status.name);
+                float diskSpaceAvailable = static_cast<float>(freeBytesAvailableToCaller.QuadPart) / static_cast<float>(totalNumberOfBytes.QuadPart);
+                low = diskSpaceAvailable < diskSpaceLimit;
             }
+
+            find = isLow.insert({ status.savePath, low }).first;
         }
+
+        if (!find->second) { continue; }
+
+        BOOST_LOG_TRIVIAL(info) << "Pausing torrent " << status.infoHash
+            << " due to disk space too low (limit: " << diskSpaceLimit << ")";
+
+        torrent->Pause();
+
+        m_taskBarIcon->ShowBalloon(
+            i18n("pause_on_low_disk_space_alert"),
+            status.name);
     }
 }
 
@@ -671,11 +694,11 @@ wxMenuBar* MainFrame::CreateMainMenu()
 void MainFrame::OnClose(wxCloseEvent& evt)
 {
     if (evt.CanVeto()
-        && m_cfg->Get<bool>("show_in_notification_area").value()
-        && m_cfg->Get<bool>("close_to_notification_area").value())
+        && m_cfg->Get<bool>("show_in_notification_area").value_or(true)
+        && m_cfg->Get<bool>("close_to_notification_area").value_or(false))
     {
         Hide();
-        MSWGetTaskBarButton()->Hide();
+        if (auto button = MSWGetTaskBarButton()) { button->Hide(); }
     }
     else
     {
@@ -751,16 +774,16 @@ void MainFrame::OnHelpAbout(wxCommandEvent&)
 void MainFrame::OnIconize(wxIconizeEvent& ev)
 {
     if (ev.IsIconized()
-        && m_cfg->Get<bool>("show_in_notification_area").value()
-        && m_cfg->Get<bool>("minimize_to_notification_area").value())
+        && m_cfg->Get<bool>("show_in_notification_area").value_or(true)
+        && m_cfg->Get<bool>("minimize_to_notification_area").value_or(false))
     {
-        MSWGetTaskBarButton()->Hide();
+        if (auto button = MSWGetTaskBarButton()) { button->Hide(); }
     }
 }
 
 void MainFrame::OnTaskBarLeftDown(wxTaskBarIconEvent&)
 {
-    this->MSWGetTaskBarButton()->Show();
+    if (auto button = this->MSWGetTaskBarButton()) { button->Show(); }
 
     if (this->IsIconized())
     {
@@ -795,18 +818,18 @@ void MainFrame::OnViewPreferences(wxCommandEvent&)
         // Reload settings
         m_session->ReloadSettings();
 
-        if (m_cfg->Get<bool>("show_in_notification_area").value() && !m_taskBarIcon->IsIconInstalled())
+        if (m_cfg->Get<bool>("show_in_notification_area").value_or(true) && !m_taskBarIcon->IsIconInstalled())
         {
             m_taskBarIcon->Show();
         }
-        else if (!m_cfg->Get<bool>("show_in_notification_area").value() && m_taskBarIcon->IsIconInstalled())
+        else if (!m_cfg->Get<bool>("show_in_notification_area").value_or(true) && m_taskBarIcon->IsIconInstalled())
         {
             m_taskBarIcon->Hide();
         }
 
         m_torrentDetails->ReloadConfiguration();
         m_torrentListModel->SetBackgroundColorEnabled(
-            m_cfg->Get<bool>("use_label_as_list_bgcolor").value());
+            m_cfg->Get<bool>("use_label_as_list_bgcolor").value_or(false));
 
         this->CreateLabelMenuItems();
         this->UpdateLabels();
@@ -853,9 +876,13 @@ void MainFrame::ShowTorrentContextMenu(wxCommandEvent&)
 
     for (wxDataViewItem& item : items)
     {
-        selectedTorrents.push_back(
-            m_torrentListModel->GetTorrentFromItem(item));
+        if (auto torrent = m_torrentListModel->GetTorrentFromItem(item))
+        {
+            selectedTorrents.push_back(torrent);
+        }
     }
+
+    if (selectedTorrents.empty()) { return; }
 
     TorrentContextMenu menu(this, m_cfg, selectedTorrents);
     PopupMenu(&menu);

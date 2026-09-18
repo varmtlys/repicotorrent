@@ -97,10 +97,16 @@ namespace BitTorrent
             ptID_TIMER_RESUME_DATA
         };
 
+        // Looks up m_torrents tolerating the info_hash_t a hybrid torrent
+        // reports after metadata arrives, which is not the one it was added
+        // with. Returns m_torrents.end() when the torrent is unknown.
+        std::map<libtorrent::info_hash_t, TorrentHandle*>::iterator FindTorrent(libtorrent::info_hash_t const& hash);
+
         bool IsSearching(libtorrent::info_hash_t hash);
         bool IsSearching(libtorrent::info_hash_t hash, libtorrent::info_hash_t& result);
         void LoadIPFilter(std::string const& filePath);
         void LoadTorrents();
+        void MigrateInfoHashKey(libtorrent::info_hash_t const& hash);
         void OnAlert();
         void OnSaveResumeDataTimer(wxTimerEvent&);
         void PauseAfterRecheck(TorrentHandle*);

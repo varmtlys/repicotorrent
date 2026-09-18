@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 
+#include <cstring>
 #include <vector>
 
 #include "../bittorrent/torrenthandle.hpp"
@@ -94,7 +95,7 @@ libpico_result_t libpico_config_get(libpico_plugin_t* plugin, libpico_config_t**
 libpico_result_t libpico_config_bool_get(libpico_config_t* cfg, const char* key, bool* result)
 {
     auto config = reinterpret_cast<pt::Core::Configuration*>(cfg);
-    *result = config->Get<bool>(key).value();
+    *result = config->Get<bool>(key).value_or(false);
     return libpico_ok;
 }
 
@@ -102,8 +103,17 @@ libpico_result_t libpico_config_string_get(libpico_config_t* cfg, const char* ke
 {
     auto config = reinterpret_cast<pt::Core::Configuration*>(cfg);
     auto res = config->Get<std::string>(key).value_or("");
-    strncpy(result, res.c_str(), *len);
-    *len = res.size();
+
+    // Never report more than the caller's buffer holds, and always terminate:
+    // callers build a std::string from (result, *len).
+    size_t const capacity = *len;
+    size_t const copied = res.size() < capacity ? res.size() : (capacity > 0 ? capacity - 1 : 0);
+
+    memcpy(result, res.c_str(), copied);
+    if (capacity > 0) { result[copied] = '\0'; }
+
+    *len = copied;
+
     return libpico_ok;
 }
 

@@ -156,7 +156,7 @@ TorrentDetailsOverviewPanel::TorrentDetailsOverviewPanel(wxWindow* parent, wxWin
 
 void TorrentDetailsOverviewPanel::Refresh(pt::BitTorrent::TorrentHandle* torrent)
 {
-    auto status = torrent->Status();
+    auto const& status = torrent->Status();
 
     if (m_pieceProgress != nullptr)
     {

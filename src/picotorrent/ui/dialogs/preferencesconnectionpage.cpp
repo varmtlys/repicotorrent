@@ -56,10 +56,10 @@ PreferencesConnectionPage::PreferencesConnectionPage(wxWindow* parent, std::shar
     wxFlexGridSizer* encryptionGrid = new wxFlexGridSizer(1, 10, 10);
 
     m_incomingEncryption = new wxCheckBox(encryptionSizer->GetStaticBox(), wxID_ANY, i18n("require_encryption_incoming"));
-    m_incomingEncryption->SetValue(m_cfg->Get<bool>("libtorrent.require_incoming_encryption").value());
+    m_incomingEncryption->SetValue(m_cfg->Get<bool>("libtorrent.require_incoming_encryption").value_or(false));
 
     m_outgoingEncryption = new wxCheckBox(encryptionSizer->GetStaticBox(), wxID_ANY, i18n("require_encryption_outgoing"));
-    m_outgoingEncryption->SetValue(m_cfg->Get<bool>("libtorrent.require_outgoing_encryption").value());
+    m_outgoingEncryption->SetValue(m_cfg->Get<bool>("libtorrent.require_outgoing_encryption").value_or(false));
 
     encryptionGrid->AddGrowableCol(0, 1);
     encryptionGrid->Add(m_incomingEncryption, 1, wxEXPAND);
@@ -70,13 +70,13 @@ PreferencesConnectionPage::PreferencesConnectionPage(wxWindow* parent, std::shar
     wxFlexGridSizer* privacyGrid = new wxFlexGridSizer(3, 10, 10);
 
     m_enableDht = new wxCheckBox(privacySizer->GetStaticBox(), wxID_ANY, i18n("enable_dht"));
-    m_enableDht->SetValue(m_cfg->Get<bool>("libtorrent.enable_dht").value());
+    m_enableDht->SetValue(m_cfg->Get<bool>("libtorrent.enable_dht").value_or(true));
 
     m_enableLsd = new wxCheckBox(privacySizer->GetStaticBox(), wxID_ANY, i18n("enable_lsd"));
-    m_enableLsd->SetValue(m_cfg->Get<bool>("libtorrent.enable_lsd").value());
+    m_enableLsd->SetValue(m_cfg->Get<bool>("libtorrent.enable_lsd").value_or(true));
 
     m_enablePex = new wxCheckBox(privacySizer->GetStaticBox(), wxID_ANY, i18n("enable_pex"));
-    m_enablePex->SetValue(m_cfg->Get<bool>("libtorrent.enable_pex").value());
+    m_enablePex->SetValue(m_cfg->Get<bool>("libtorrent.enable_pex").value_or(true));
 
     privacyGrid->AddGrowableCol(0, 1);
     privacyGrid->AddGrowableCol(1, 1);
@@ -88,12 +88,12 @@ PreferencesConnectionPage::PreferencesConnectionPage(wxWindow* parent, std::shar
 
     wxStaticBoxSizer* filterSizer = new wxStaticBoxSizer(wxHORIZONTAL, this, i18n("ip_filter"));
     m_enableFilter = new wxCheckBox(filterSizer->GetStaticBox(), wxID_ANY, wxEmptyString);
-    m_enableFilter->SetValue(m_cfg->Get<bool>("ipfilter.enabled").value());
+    m_enableFilter->SetValue(m_cfg->Get<bool>("ipfilter.enabled").value_or(false));
 
     m_filterPath = new wxTextCtrl(filterSizer->GetStaticBox(), wxID_ANY, m_cfg->Get<std::string>("ipfilter.file_path").value_or(""));
-    m_filterPath->Enable(m_cfg->Get<bool>("ipfilter.enabled").value());
+    m_filterPath->Enable(m_cfg->Get<bool>("ipfilter.enabled").value_or(false));
     m_filterBrowse = new wxButton(filterSizer->GetStaticBox(), wxID_ANY, i18n("browse"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
-    m_filterBrowse->Enable(m_cfg->Get<bool>("ipfilter.enabled").value());
+    m_filterBrowse->Enable(m_cfg->Get<bool>("ipfilter.enabled").value_or(false));
 
     auto filterInputSizer = new wxBoxSizer(wxHORIZONTAL);
     filterInputSizer->Add(m_filterPath, 1, wxEXPAND | wxRIGHT, FromDIP(2));

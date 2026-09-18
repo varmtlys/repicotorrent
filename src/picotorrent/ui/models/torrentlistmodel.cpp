@@ -27,7 +27,11 @@ TorrentListModel::~TorrentListModel()
 void TorrentListModel::AddTorrent(pt::BitTorrent::TorrentHandle* torrent)
 {
     m_torrents.insert({ torrent->InfoHash(), torrent });
-    ApplyFilter();
+
+    // Only this torrent can have changed. Re-filtering everything made loading
+    // a session quadratic in the number of torrents (each ApplyFilter() scans
+    // m_filtered once per torrent).
+    ApplyFilter({ torrent });
 }
 
 void TorrentListModel::ClearFilter()
@@ -54,20 +58,17 @@ void TorrentListModel::SetLabelFilter(int labelId)
     ApplyFilter();
 }
 
-int TorrentListModel::GetRowIndex(TorrentHandle* torrent)
-{
-    return std::distance(
-        m_filtered.begin(),
-        std::find(
-            m_filtered.begin(),
-            m_filtered.end(), torrent->InfoHash()));
-}
-
 TorrentHandle* TorrentListModel::GetTorrentFromItem(wxDataViewItem const& item)
 {
     uint32_t row = this->GetRow(item);
-    auto const& hash = m_filtered.at(row);
-    return m_torrents.at(hash);
+
+    if (row >= m_filtered.size()) { return nullptr; }
+
+    auto find = m_torrents.find(m_filtered.at(row));
+
+    return find == m_torrents.end()
+        ? nullptr
+        : find->second;
 }
 
 void TorrentListModel::RemoveTorrent(lt::info_hash_t const& hash)
@@ -100,11 +101,16 @@ void TorrentListModel::SetBackgroundColorEnabled(bool enabled)
 
 int TorrentListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem& item2, unsigned int column, bool ascending) const
 {
-    auto const& hash1 = m_filtered.at(GetRow(item1));
-    auto const& hash2 = m_filtered.at(GetRow(item2));
+    unsigned int const row1 = GetRow(item1);
+    unsigned int const row2 = GetRow(item2);
 
-    auto const& lfind = m_torrents.find(hash1);
-    auto const& rfind = m_torrents.find(hash2);
+    if (row1 >= m_filtered.size() || row2 >= m_filtered.size())
+    {
+        return 0;
+    }
+
+    auto const& lfind = m_torrents.find(m_filtered.at(row1));
+    auto const& rfind = m_torrents.find(m_filtered.at(row2));
 
     if (lfind == m_torrents.end()
         || rfind == m_torrents.end())
@@ -127,7 +133,7 @@ int TorrentListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem&
     {
         auto compvalue = _strcmpi(l.name.c_str(),r.name.c_str());
         if (compvalue < 0) { return ascending ? -1 : 1; }
-        else if (compvalue == 0) { return hashSort(ascending, l, l); }
+        else if (compvalue == 0) { return hashSort(ascending, l, r); }
         else{ return ascending ? 1 : -1; }
     };
 
@@ -235,8 +241,13 @@ int TorrentListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem&
 
 bool TorrentListModel::GetAttrByRow(unsigned int row, unsigned int col, wxDataViewItemAttr& attr) const
 {
-    auto const& hash = m_filtered.at(row);
-    BitTorrent::TorrentHandle* torrent = m_torrents.at(hash);
+    if (row >= m_filtered.size()) { return false; }
+
+    auto findTorrent = m_torrents.find(m_filtered.at(row));
+
+    if (findTorrent == m_torrents.end()) { return false; }
+
+    BitTorrent::TorrentHandle* torrent = findTorrent->second;
 
     // torrent has a label and a color
     if (torrent->Label() > 0
@@ -252,7 +263,7 @@ bool TorrentListModel::GetAttrByRow(unsigned int row, unsigned int col, wxDataVi
     {
     case Columns::Status:
     {
-        BitTorrent::TorrentStatus  status = torrent->Status();
+        BitTorrent::TorrentStatus const& status = torrent->Status();
 
         if (status.state == TorrentStatus::State::Error)
         {
@@ -295,7 +306,7 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
     }
 
     BitTorrent::TorrentHandle* torrent = findTorrent->second;
-    BitTorrent::TorrentStatus  status = torrent->Status();
+    BitTorrent::TorrentStatus const& status = torrent->Status();
 
     switch (col)
     {
@@ -556,7 +567,11 @@ void TorrentListModel::UpdateLabels(std::map<int, std::tuple<std::string, std::s
     for (auto const& infoHash : m_filtered)
     {
         // if this torrent has a label which have changed color, we need to update it
-        auto torrent = m_torrents.at(infoHash);
+        auto find = m_torrents.find(infoHash);
+
+        if (find == m_torrents.end()) { continue; }
+
+        auto torrent = find->second;
 
         // skip torrent if no label
         if (torrent->Label() < 0) { continue; }

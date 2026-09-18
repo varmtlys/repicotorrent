@@ -226,7 +226,7 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
 
             for (wxDataViewItem& item : items)
             {
-                m_model->GetTorrentFromItem(item)->Remove();
+                if (auto torrent = m_model->GetTorrentFromItem(item)) { torrent->Remove(); }
             }
         },
         ptID_KEY_DELETE);
@@ -250,7 +250,7 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
 
             for (wxDataViewItem& item : items)
             {
-                m_model->GetTorrentFromItem(item)->RemoveFiles();
+                if (auto torrent = m_model->GetTorrentFromItem(item)) { torrent->RemoveFiles(); }
             }
         },
         ptID_KEY_DELETE_FILES);

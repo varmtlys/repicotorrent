@@ -39,10 +39,22 @@ void TorrentDetailsView::Refresh(std::map<lt::info_hash_t, pt::BitTorrent::Torre
         return;
     }
 
-    m_overview->Refresh(torrents.begin()->second);
-    m_files->Refresh(torrents.begin()->second);
-    m_peers->Refresh(torrents.begin()->second);
-    m_trackers->Refresh(torrents.begin()->second);
+    auto torrent = torrents.begin()->second;
+
+    // Only the visible page. Refreshing all four every second meant two
+    // get_peer_info() calls plus trackers() and file_progress() - each a
+    // blocking round-trip to the session thread - for pages nobody is looking
+    // at. Switching tabs refreshes the new page within the second.
+    int const selected = this->GetSelection();
+
+    if (selected == wxNOT_FOUND) { return; }
+
+    wxWindow* page = this->GetPage(static_cast<size_t>(selected));
+
+    if      (page == m_overview) { m_overview->Refresh(torrent); }
+    else if (page == m_files)    { m_files->Refresh(torrent); }
+    else if (page == m_peers)    { m_peers->Refresh(torrent); }
+    else if (page == m_trackers) { m_trackers->Refresh(torrent); }
 }
 
 void TorrentDetailsView::ReloadConfiguration()

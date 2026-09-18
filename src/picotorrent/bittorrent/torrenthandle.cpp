@@ -77,7 +77,8 @@ TorrentStatus::State getTorrentStatusState(lt::torrent_status const& ts)
 }
 
 TorrentHandle::TorrentHandle(pt::BitTorrent::Session* session, lt::torrent_handle const& th)
-    : m_session(session)
+    : m_session(session),
+    m_infoHash(th.info_hashes())
 {
     m_th = std::make_unique<lt::torrent_handle>(th);
     m_status = Update(th.status());
@@ -134,7 +135,7 @@ void TorrentHandle::GetPeerInfo(std::vector<lt::peer_info>& peers) const
 
 lt::info_hash_t TorrentHandle::InfoHash()
 {
-    return m_th->info_hashes();
+    return m_infoHash;
 }
 
 bool TorrentHandle::IsSequentialDownload()
@@ -234,9 +235,9 @@ void TorrentHandle::SetSequentialDownload(bool seq)
     }
 }
 
-TorrentStatus TorrentHandle::Status() const
+TorrentStatus const& TorrentHandle::Status() const
 {
-    return *m_status.get();
+    return *m_status;
 }
 
 std::vector<lt::announce_entry> TorrentHandle::Trackers() const
@@ -337,7 +338,10 @@ std::unique_ptr<TorrentStatus> TorrentHandle::Update(lt::torrent_status const& t
     nts.lastDownload = ts.last_download.time_since_epoch().count() > 0 ? std::chrono::seconds(lt::total_seconds(lt::clock_type::now() - ts.last_download)) : std::chrono::seconds(-1);
     nts.lastUpload = ts.last_upload.time_since_epoch().count() > 0 ? std::chrono::seconds(lt::total_seconds(lt::clock_type::now() - ts.last_upload)) : std::chrono::seconds(-1);
     nts.name = ts.name.empty() ? nts.infoHash : ts.name;
-    nts.paused = (m_th->flags() & lt::torrent_flags::paused) == lt::torrent_flags::paused;
+    // ts.flags is the same value torrent_handle::flags() would return, except
+    // that flags() is a blocking round-trip to the session thread - once per
+    // torrent per second, from the UI thread.
+    nts.paused = (ts.flags & lt::torrent_flags::paused) == lt::torrent_flags::paused;
     nts.peersCurrent = ts.num_peers - ts.num_seeds;
     nts.peersTotal = ts.list_peers - ts.list_seeds;
     nts.pieces = ts.pieces;

@@ -41,7 +41,7 @@ void TorrentDetailsFilesPanel::Refresh(pt::BitTorrent::TorrentHandle* torrent)
         return;
     }
 
-    auto status = torrent->Status();
+    auto const& status = torrent->Status();
 
     if (auto tf = status.torrentFile.lock())
     {

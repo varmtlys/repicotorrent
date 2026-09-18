@@ -1,5 +1,6 @@
 #include "httpclient.hpp"
 
+#include <cwchar>
 #include <sstream>
 
 wxDEFINE_EVENT(ptEVT_HTTP_RESPONSE, wxCommandEvent);
@@ -62,7 +63,14 @@ void HttpClient::Get(wxString const& url, std::function<void(int, std::string co
     uc.dwHostNameLength = DWORD(-1);
     uc.dwUrlPathLength = DWORD(-1);
     uc.dwExtraInfoLength = DWORD(-1);
-    WinHttpCrackUrl(url.wc_str(), static_cast<DWORD>(url.size()), 0, &uc);
+
+    if (!WinHttpCrackUrl(url.wc_str(), static_cast<DWORD>(url.size()), 0, &uc))
+    {
+        // lpszScheme and friends are left null, and constructing a wstring
+        // from them is undefined. The url comes from configuration.
+        callback(0, std::string());
+        return;
+    }
 
     std::wstring scheme(uc.lpszScheme, uc.dwSchemeLength);
     bool secure = scheme == L"https";
@@ -70,6 +78,13 @@ void HttpClient::Get(wxString const& url, std::function<void(int, std::string co
     std::wstring host(uc.lpszHostName, uc.dwHostNameLength);
     HINTERNET hConnect = WinHttpConnect(m_session, host.c_str(), uc.nPort, NULL);
     HINTERNET hRequest = WinHttpOpenRequest(hConnect, L"GET", uc.lpszUrlPath, NULL, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, secure ? WINHTTP_FLAG_SECURE : 0);
+
+    if (hRequest == NULL)
+    {
+        WinHttpCloseHandle(hConnect);
+        callback(0, std::string());
+        return;
+    }
 
     auto state = new State();
     state->callback = callback;
@@ -89,7 +104,10 @@ void HttpClient::Get(wxString const& url, std::function<void(int, std::string co
 
 std::wstring HttpClient::ReadHeader(HINTERNET hRequest, DWORD dwHeader)
 {
-    DWORD bufLen;
+    // bufLen is a byte count, and the two argument wstring constructor used
+    // here takes (pointer, count) - so this used to read bufLen wide characters
+    // out of a two byte literal.
+    DWORD bufLen = 0;
 
     WinHttpQueryHeaders(
         hRequest,
@@ -99,15 +117,25 @@ std::wstring HttpClient::ReadHeader(HINTERNET hRequest, DWORD dwHeader)
         &bufLen,
         WINHTTP_NO_HEADER_INDEX);
 
-    std::wstring res(L"\0", bufLen);
+    if (bufLen == 0)
+    {
+        return std::wstring();
+    }
 
-    WinHttpQueryHeaders(
+    std::wstring res(bufLen / sizeof(wchar_t) + 1, wchar_t());
+
+    if (!WinHttpQueryHeaders(
         hRequest,
         dwHeader,
         WINHTTP_HEADER_NAME_BY_INDEX,
         &res[0],
         &bufLen,
-        WINHTTP_NO_HEADER_INDEX);
+        WINHTTP_NO_HEADER_INDEX))
+    {
+        return std::wstring();
+    }
+
+    res.resize(std::wcslen(res.c_str()));
 
     return res;
 }
@@ -143,23 +171,44 @@ void HttpClient::StatusCallbackProxy(HINTERNET, DWORD_PTR dwContext, DWORD dwInt
     case WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE:
     {
         std::wstring status_str = ReadHeader(state->hRequest, WINHTTP_QUERY_STATUS_CODE);
-        state->statusCode = std::stoi(status_str);
+
+        // std::stoi throws on a header we cannot parse, and this runs on a
+        // WinHTTP worker thread where nothing would catch it.
+        state->statusCode = static_cast<int>(std::wcstol(status_str.c_str(), nullptr, 10));
+
         WinHttpQueryDataAvailable(state->hRequest, NULL);
         break;
     }
 
     case WINHTTP_CALLBACK_STATUS_READ_COMPLETE:
     {
-        if (dwStatusInformationLength != 0)
+        char* buf = static_cast<char*>(lpStatusInformation);
+
+        if (dwStatusInformationLength == 0)
         {
-            char* buf = static_cast<char*>(lpStatusInformation);
-            state->response << std::string(buf, dwStatusInformationLength);
+            // End of the response body - the buffer is still ours to free.
             delete[] buf;
-
-            state->totalSize += state->dataSize;
-
-            WinHttpQueryDataAvailable(state->hRequest, NULL);
+            break;
         }
+
+        state->response << std::string(buf, dwStatusInformationLength);
+        delete[] buf;
+
+        state->totalSize += state->dataSize;
+
+        WinHttpQueryDataAvailable(state->hRequest, NULL);
+        break;
+    }
+
+    case WINHTTP_CALLBACK_STATUS_REQUEST_ERROR:
+    {
+        // Without this the callback never fired on a network error: the caller
+        // waited forever and State (plus both HINTERNET handles) leaked.
+        state->statusCode = 0;
+
+        wxCommandEvent evt(ptEVT_HTTP_RESPONSE);
+        evt.SetClientData(state);
+        wxPostEvent(state->client, evt);
         break;
     }
 

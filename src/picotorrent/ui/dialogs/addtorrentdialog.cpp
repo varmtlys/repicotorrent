@@ -175,7 +175,7 @@ AddTorrentDialog::AddTorrentDialog(wxWindow* parent, wxWindowID id, lt::add_torr
     // Load labels
     Core::Configuration::Label lbl;
     lbl.id = -1;
-    lbl.savePath = m_cfg->Get<std::string>("default_save_path").value();
+    lbl.savePath = m_cfg->Get<std::string>("default_save_path").value_or("");
     lbl.savePathEnabled = true;
 
     m_torrentLabel->Append(i18n("none"), wxNullBitmap, new ClientData<Core::Configuration::Label>(lbl));

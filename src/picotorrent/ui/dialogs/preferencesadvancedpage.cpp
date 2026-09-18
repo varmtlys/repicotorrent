@@ -24,7 +24,7 @@ struct Property
         { \
             []() { return new wx ##t1 ##Property(label); },\
             description, \
-            [](Configuration* cfg, wxPGProperty* prop) { prop->SetValue(cfg->Get<##t3>(key).value()); }, \
+            [](Configuration* cfg, wxPGProperty* prop) { if (auto v = cfg->Get<##t3>(key)) { prop->SetValue(v.value()); } }, \
             [](Configuration* cfg, wxPGProperty* prop) { cfg->Set(key, prop->GetValue().Get ##t2()); } \
         } \
     }

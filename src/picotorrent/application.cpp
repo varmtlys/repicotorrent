@@ -146,15 +146,15 @@ bool Application::OnInit()
         m_plugins.end(),
         [mainFrame](auto plugin) { plugin->EmitEvent(libpico_event_mainwnd_created, mainFrame); });
 
-    auto windowState = static_cast<pt::Core::Configuration::WindowState>(cfg->Get<int>("start_position").value());
+    auto windowState = static_cast<pt::Core::Configuration::WindowState>(cfg->Get<int>("start_position").value_or(0));
 
     switch (windowState)
     {
     case pt::Core::Configuration::WindowState::Hidden:
         // Only valid if we have a notify icon
-        if (cfg->Get<bool>("show_in_notification_area").value())
+        if (cfg->Get<bool>("show_in_notification_area").value_or(true))
         {
-            mainFrame->MSWGetTaskBarButton()->Hide();
+            if (auto button = mainFrame->MSWGetTaskBarButton()) { button->Hide(); }
         }
         else
         {

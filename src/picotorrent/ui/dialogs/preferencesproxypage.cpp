@@ -61,7 +61,7 @@ PreferencesProxyPage::PreferencesProxyPage(wxWindow* parent, std::shared_ptr<Con
     {
         auto clientData = reinterpret_cast<ClientData<Configuration::ConnectionProxyType>*>(m_type->GetClientObject(i));
 
-        if (clientData->GetValue() == static_cast<Configuration::ConnectionProxyType>(m_cfg->Get<int>("libtorrent.proxy_type").value()))
+        if (clientData->GetValue() == static_cast<Configuration::ConnectionProxyType>(m_cfg->Get<int>("libtorrent.proxy_type").value_or(0)))
         {
             m_type->Select(i);
             break;
@@ -73,9 +73,9 @@ PreferencesProxyPage::PreferencesProxyPage(wxWindow* parent, std::shared_ptr<Con
     if (auto proxyUsername = m_cfg->Get<std::string>("libtorrent.proxy_username")) m_username->SetValue(proxyUsername.value());
     if (auto proxyPassword = m_cfg->Get<std::string>("libtorrent.proxy_password")) m_password->SetValue(proxyPassword.value());
 
-    m_proxyHostnames->SetValue(m_cfg->Get<bool>("libtorrent.proxy_hostnames").value());
-    m_proxyPeers->SetValue(m_cfg->Get<bool>("libtorrent.proxy_peers").value());
-    m_proxyTrackers->SetValue(m_cfg->Get<bool>("libtorrent.proxy_trackers").value());
+    m_proxyHostnames->SetValue(m_cfg->Get<bool>("libtorrent.proxy_hostnames").value_or(false));
+    m_proxyPeers->SetValue(m_cfg->Get<bool>("libtorrent.proxy_peers").value_or(false));
+    m_proxyTrackers->SetValue(m_cfg->Get<bool>("libtorrent.proxy_trackers").value_or(false));
 
     this->SetSizerAndFit(sizer);
     this->UpdateUI();

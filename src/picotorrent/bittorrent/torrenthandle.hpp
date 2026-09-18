@@ -10,6 +10,7 @@
 
 #include <libtorrent/download_priority.hpp>
 #include <libtorrent/fwd.hpp>
+#include <libtorrent/info_hash.hpp>
 #include <libtorrent/sha1_hash.hpp>
 
 namespace pt
@@ -35,7 +36,12 @@ namespace BitTorrent
         bool IsValid();
         void ReplaceTrackers(std::vector<libtorrent::announce_entry> const& trackers);
         void ScrapeTracker(int trackerIndex);
-        TorrentStatus Status() const;
+
+        // Returned by reference: the status holds a piece bitfield, and this is
+        // read once per visible cell per repaint plus O(n log n) times per sort.
+        // The reference is invalidated by the next status update, so do not hold
+        // on to it across event handlers.
+        TorrentStatus const& Status() const;
         std::vector<libtorrent::announce_entry> Trackers() const;
 
         void ForceReannounce();
@@ -71,7 +77,13 @@ namespace BitTorrent
         Session* m_session;
         std::unique_ptr<libtorrent::torrent_handle> m_th;
         std::unique_ptr<TorrentStatus> m_status;
-        int m_labelId;
+
+        // The info hash the torrent was added with. A hybrid torrent's live
+        // info_hash_t gains its v2 hash when metadata arrives, which would
+        // silently invalidate every map keyed on this value.
+        libtorrent::info_hash_t m_infoHash;
+
+        int m_labelId = -1;
         std::string m_labelName;
     };
 }

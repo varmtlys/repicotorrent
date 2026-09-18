@@ -53,7 +53,8 @@ namespace Core
 
         bool MigrationExists(std::string const& name);
 
-        sqlite3* m_db;
+        sqlite3* m_db = nullptr;
+        bool m_isOpen = false;
         std::shared_ptr<Environment> m_env;
     };
 }

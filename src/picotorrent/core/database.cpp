@@ -152,9 +152,24 @@ Database::Database(std::shared_ptr<pt::Core::Environment> env)
 
     BOOST_LOG_TRIVIAL(info) << "Loading PicoTorrent database from " << convertedPath;
 
-    sqlite3_open(convertedPath.c_str(), &m_db);
+    int res = sqlite3_open(convertedPath.c_str(), &m_db);
+
+    if (res != SQLITE_OK)
+    {
+        // Migrate() reports the failure to the user and OnInit aborts. Anything
+        // else here would prepare statements against a dead handle.
+        BOOST_LOG_TRIVIAL(error) << "Failed to open database: " << sqlite3_errmsg(m_db);
+        return;
+    }
+
+    m_isOpen = true;
 
     Execute("PRAGMA foreign_keys = ON;");
+
+    // Resume data is written per torrent, and every write was its own implicit
+    // transaction with an fsync - which is what made shutdown slow.
+    Execute("PRAGMA journal_mode = WAL;");
+    Execute("PRAGMA synchronous = NORMAL;");
 
     sqlite3_create_function(
         m_db,
@@ -190,6 +205,11 @@ void Database::Execute(std::string const& sql)
 
 bool Database::Migrate()
 {
+    if (!m_isOpen)
+    {
+        return false;
+    }
+
     // create migration_history table
     const char* migrationHistory = "create table if not exists migration_history ("
             "id integer primary key,"
@@ -230,6 +250,8 @@ bool Database::Migrate()
                 &sql) != SQLITE_OK)
             {
                 BOOST_LOG_TRIVIAL(error) << "Failed to prepare migration " << m.name << " (" << sqlite3_errmsg(m_db) << ")";
+                sqlite3_finalize(statement);
+                Execute("ROLLBACK;");
                 return false;
             }
 
@@ -243,6 +265,8 @@ bool Database::Migrate()
             if (stepResult != SQLITE_OK && stepResult != SQLITE_DONE)
             {
                 BOOST_LOG_TRIVIAL(error) << "Failed to step/execute migration " << m.name << " (" << sqlite3_errmsg(m_db) << ")";
+                sqlite3_finalize(statement);
+                Execute("ROLLBACK;");
                 return false;
             }
 
@@ -263,9 +287,12 @@ bool Database::Migrate()
 
 std::shared_ptr<Database::Statement> Database::CreateStatement(std::string const& sql)
 {
-    sqlite3_stmt* stmt;
+    // Checking only for SQLITE_ERROR let SQLITE_NOTADB, SQLITE_CORRUPT and
+    // friends through with stmt left uninitialized, which then went to
+    // sqlite3_finalize() in the destructor.
+    sqlite3_stmt* stmt = nullptr;
 
-    if (sqlite3_prepare_v2(m_db, sql.c_str(), -1, &stmt, nullptr) == SQLITE_ERROR)
+    if (sqlite3_prepare_v2(m_db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK)
     {
         const char* err = sqlite3_errmsg(m_db);
         BOOST_LOG_TRIVIAL(error) << "failed to execute SQL statement: " << err;
