@@ -32,18 +32,14 @@ namespace pt::UI::Models
         enum Columns
         {
             Name,
-            QueuePosition,
-            Size,
             SizeRemaining,
             Status,
             Progress,
             ETA,
-            DownloadSpeed,
-            UploadSpeed,
+            Transfer,
             Availability,
             Ratio,
-            Seeds,
-            Peers,
+            Swarm,
             AddedOn,
             CompletedOn,
             Label,
@@ -58,6 +54,7 @@ namespace pt::UI::Models
         void RemoveTorrent(libtorrent::info_hash_t const& hash);
         void UpdateTorrents(std::vector<BitTorrent::TorrentHandle*> torrents);
         void SetBackgroundColorEnabled(bool enabled);
+        void SetStateIconSize(int size);
 
         void ClearFilter();
         void ClearLabelFilter();
@@ -91,6 +88,7 @@ namespace pt::UI::Models
         std::map<int, std::tuple<std::string, std::string>> m_labels;
         std::map<int, wxColor> m_labelsColors;
         std::map<int, wxIcon> m_labelsIcons;
+        std::map<int, wxIcon> m_stateIcons;
         std::map<libtorrent::info_hash_t, BitTorrent::TorrentHandle*> m_torrents;
     };
 }

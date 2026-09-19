@@ -16,6 +16,7 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
 {
     this->AssociateModel(m_model);
     m_model->DecRef();
+    m_model->SetStateIconSize(FromDIP(16));
 
     auto defaultFlags = wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE;
 
@@ -23,30 +24,10 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
         ColumnMetadata(
             new wxDataViewColumn(
                 i18n("name"),
-                new wxDataViewTextRenderer(),
+                new wxDataViewIconTextRenderer(),
                 TorrentListModel::Columns::Name,
                 FromDIP(180),
                 wxALIGN_NOT,
-                defaultFlags)));
-
-    m_columns.push_back(
-        ColumnMetadata(
-            new wxDataViewColumn(
-                i18n("queue_position"),
-                new wxDataViewTextRenderer(),
-                TorrentListModel::Columns::QueuePosition,
-                FromDIP(30),
-                wxALIGN_RIGHT,
-                defaultFlags)));
-
-    m_columns.push_back(
-        ColumnMetadata(
-            new wxDataViewColumn(
-                i18n("size"),
-                new wxDataViewTextRenderer(),
-                TorrentListModel::Columns::Size,
-                FromDIP(80),
-                wxALIGN_RIGHT,
                 defaultFlags)));
 
     m_columns.push_back(
@@ -68,7 +49,8 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
                 TorrentListModel::Columns::Status,
                 FromDIP(120),
                 wxALIGN_NOT,
-                defaultFlags)));
+                defaultFlags),
+            true));
 
     m_columns.push_back(
         ColumnMetadata(
@@ -93,20 +75,10 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
     m_columns.push_back(
         ColumnMetadata(
             new wxDataViewColumn(
-                i18n("dl"),
+                i18n("transfer"),
                 new wxDataViewTextRenderer(),
-                TorrentListModel::Columns::DownloadSpeed,
-                FromDIP(80),
-                wxALIGN_RIGHT,
-                defaultFlags)));
-
-    m_columns.push_back(
-        ColumnMetadata(
-            new wxDataViewColumn(
-                i18n("ul"),
-                new wxDataViewTextRenderer(),
-                TorrentListModel::Columns::UploadSpeed,
-                FromDIP(80),
+                TorrentListModel::Columns::Transfer,
+                FromDIP(280),
                 wxALIGN_RIGHT,
                 defaultFlags)));
 
@@ -133,22 +105,12 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
     m_columns.push_back(
         ColumnMetadata(
             new wxDataViewColumn(
-                i18n("seeds"),
+                i18n("swarm"),
                 new wxDataViewTextRenderer(),
-                TorrentListModel::Columns::Seeds,
-                FromDIP(80),
+                TorrentListModel::Columns::Swarm,
+                FromDIP(170),
                 wxALIGN_RIGHT,
-                wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_RESIZABLE)));
-
-    m_columns.push_back(
-        ColumnMetadata(
-            new wxDataViewColumn(
-                i18n("peers"),
-                new wxDataViewTextRenderer(),
-                TorrentListModel::Columns::Peers,
-                FromDIP(80),
-                wxALIGN_RIGHT,
-                wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_RESIZABLE)));
+                defaultFlags)));
 
     m_columns.push_back(
         ColumnMetadata(

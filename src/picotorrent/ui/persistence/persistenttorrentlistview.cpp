@@ -1,7 +1,5 @@
 #include "persistenttorrentlistview.hpp"
 
-#include <map>
-
 #include <nlohmann/json.hpp>
 
 #include "../models/torrentlistmodel.hpp"
@@ -11,26 +9,6 @@ using json = nlohmann::json;
 using pt::UI::TorrentListView;
 using pt::UI::Models::TorrentListModel;
 using pt::UI::Persistence::PersistentTorrentListView;
-
-static std::map<TorrentListModel::Columns, std::string> ColumnNames =
-{
-    { TorrentListModel::Columns::Name,          "Col_Name" },
-    { TorrentListModel::Columns::QueuePosition, "Col_QueuePosition" },
-    { TorrentListModel::Columns::Size,          "Col_Size" },
-    { TorrentListModel::Columns::SizeRemaining, "Col_SizeRemaining" },
-    { TorrentListModel::Columns::Status,        "Col_Status" },
-    { TorrentListModel::Columns::Progress,      "Col_Progress" },
-    { TorrentListModel::Columns::ETA,           "Col_ETA" },
-    { TorrentListModel::Columns::DownloadSpeed, "Col_DownloadSpeed" },
-    { TorrentListModel::Columns::UploadSpeed,   "Col_UploadSpeed" },
-    { TorrentListModel::Columns::Availability,  "Col_Availability" },
-    { TorrentListModel::Columns::Ratio,         "Col_Ratio" },
-    { TorrentListModel::Columns::Seeds,         "Col_Seeds" },
-    { TorrentListModel::Columns::Peers,         "Col_Peers" },
-    { TorrentListModel::Columns::AddedOn,       "Col_AddedOn" },
-    { TorrentListModel::Columns::CompletedOn,   "Col_CompletedOn" },
-    { TorrentListModel::Columns::Label,         "Col_Label" },
-};
 
 PersistentTorrentListView::PersistentTorrentListView(TorrentListView* tlv)
     : wxPersistentWindow<TorrentListView>(tlv),

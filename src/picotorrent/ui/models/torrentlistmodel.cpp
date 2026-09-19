@@ -3,6 +3,7 @@
 #include <boost/log/trivial.hpp>
 #include <fmt/format.h>
 #include <fmt/xchar.h>
+#include <wx/graphics.h>
 
 #include "../../bittorrent/torrenthandle.hpp"
 #include "../../bittorrent/torrentstatus.hpp"
@@ -13,6 +14,74 @@
 using pt::BitTorrent::TorrentHandle;
 using pt::BitTorrent::TorrentStatus;
 using pt::UI::Models::TorrentListModel;
+
+namespace
+{
+    enum class Shape { ArrowDown, ArrowUp, Pause, Dot, Ring, Error };
+
+    // Drawn rather than loaded so the icons stay crisp at any DPI and read
+    // the same on light and dark backgrounds. Coordinates are in a 16x16 box.
+    wxIcon makeStateIcon(int size, Shape shape, wxColour const& color)
+    {
+        wxImage img(size, size);
+        img.InitAlpha();
+        std::fill(img.GetAlpha(), img.GetAlpha() + size * size, static_cast<unsigned char>(0));
+
+        {
+            std::unique_ptr<wxGraphicsContext> gc(wxGraphicsContext::Create(img));
+            gc->Scale(size / 16.0, size / 16.0);
+            gc->SetPen(*wxTRANSPARENT_PEN);
+            gc->SetBrush(wxBrush(color));
+
+            switch (shape)
+            {
+            case Shape::ArrowDown:
+            case Shape::ArrowUp:
+            {
+                wxPoint2DDouble const down[] =
+                {
+                    { 6, 2 }, { 10, 2 }, { 10, 8 }, { 14, 8 }, { 8, 14.5 }, { 2, 8 }, { 6, 8 }
+                };
+
+                wxGraphicsPath path = gc->CreatePath();
+
+                for (size_t i = 0; i < std::size(down); i++)
+                {
+                    double const y = shape == Shape::ArrowUp ? 16 - down[i].m_y : down[i].m_y;
+                    if (i == 0) { path.MoveToPoint(down[i].m_x, y); }
+                    else { path.AddLineToPoint(down[i].m_x, y); }
+                }
+
+                path.CloseSubpath();
+                gc->FillPath(path);
+                break;
+            }
+            case Shape::Pause:
+                gc->DrawRectangle(3.5, 2.5, 3.5, 11);
+                gc->DrawRectangle(9, 2.5, 3.5, 11);
+                break;
+            case Shape::Dot:
+                gc->DrawEllipse(2.5, 2.5, 11, 11);
+                break;
+            case Shape::Ring:
+                gc->SetPen(wxPen(color, 2));
+                gc->SetBrush(*wxTRANSPARENT_BRUSH);
+                gc->DrawEllipse(3, 3, 10, 10);
+                break;
+            case Shape::Error:
+                gc->DrawEllipse(1, 1, 14, 14);
+                gc->SetBrush(*wxWHITE_BRUSH);
+                gc->DrawRectangle(7, 3.5, 2, 6.5);
+                gc->DrawEllipse(6.8, 11, 2.4, 2.4);
+                break;
+            }
+        }
+
+        wxIcon icon;
+        icon.CopyFromBitmap(wxBitmap(img));
+        return icon;
+    }
+}
 
 TorrentListModel::TorrentListModel()
     : m_filter(nullptr),
@@ -93,6 +162,34 @@ void TorrentListModel::UpdateTorrents(std::vector<TorrentHandle*> torrents)
     ApplyFilter(torrents);
 }
 
+void TorrentListModel::SetStateIconSize(int size)
+{
+    wxColour const green(46, 160, 67);
+    wxColour const blue(47, 128, 237);
+    wxColour const gray(140, 140, 140);
+    wxColour const amber(224, 160, 32);
+    wxColour const red(215, 58, 50);
+
+    wxIcon const checking = makeStateIcon(size, Shape::Dot, amber);
+    wxIcon const paused = makeStateIcon(size, Shape::Pause, gray);
+
+    m_stateIcons =
+    {
+        { TorrentStatus::State::Unknown,             makeStateIcon(size, Shape::Ring, gray) },
+        { TorrentStatus::State::Error,               makeStateIcon(size, Shape::Error, red) },
+        { TorrentStatus::State::CheckingFiles,       checking },
+        { TorrentStatus::State::CheckingResumeData,  checking },
+        { TorrentStatus::State::Downloading,         makeStateIcon(size, Shape::ArrowDown, green) },
+        { TorrentStatus::State::DownloadingChecking, checking },
+        { TorrentStatus::State::DownloadingMetadata, makeStateIcon(size, Shape::Ring, green) },
+        { TorrentStatus::State::DownloadingPaused,   paused },
+        { TorrentStatus::State::DownloadingQueued,   makeStateIcon(size, Shape::ArrowDown, gray) },
+        { TorrentStatus::State::Uploading,           makeStateIcon(size, Shape::ArrowUp, blue) },
+        { TorrentStatus::State::UploadingPaused,     paused },
+        { TorrentStatus::State::UploadingQueued,     makeStateIcon(size, Shape::ArrowUp, gray) },
+    };
+}
+
 void TorrentListModel::SetBackgroundColorEnabled(bool enabled)
 {
     m_backgroundColorEnabled = enabled;
@@ -143,20 +240,6 @@ int TorrentListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem&
     {
         return nameSort(ascending, lhs, rhs);
     }
-    case Columns::QueuePosition:
-    {
-        if (lhs.queuePosition < rhs.queuePosition)  { return ascending ? -1 :  1; }
-        if (lhs.queuePosition > rhs.queuePosition)  { return ascending ?  1 : -1; }
-        if (lhs.queuePosition == rhs.queuePosition) { return hashSort(ascending, lhs, rhs); }
-        break;
-    }
-    case Columns::Size:
-    {
-        if (lhs.totalWanted < rhs.totalWanted) { return ascending ? -1 :  1; }
-        if (lhs.totalWanted > rhs.totalWanted) { return ascending ?  1 : -1; }
-        if (lhs.totalWanted == rhs.totalWanted) { return hashSort(ascending, lhs, rhs); }
-        break;
-    }
     case Columns::SizeRemaining:
     {
         if (lhs.totalWantedRemaining < rhs.totalWantedRemaining) { return ascending ? -1 : 1; }
@@ -185,19 +268,16 @@ int TorrentListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem&
         if (lhs.eta == rhs.eta) { return hashSort(ascending, lhs, rhs); }
         break;
     }
-    case Columns::DownloadSpeed:
+    case Columns::Transfer:
     {
+        // In the order the values are shown: size, download rate, upload rate.
+        if (lhs.totalWanted < rhs.totalWanted) { return ascending ? -1 : 1; }
+        if (lhs.totalWanted > rhs.totalWanted) { return ascending ? 1 : -1; }
         if (lhs.downloadPayloadRate < rhs.downloadPayloadRate) { return ascending ? -1 : 1; }
         if (lhs.downloadPayloadRate > rhs.downloadPayloadRate) { return ascending ? 1 : -1; }
-        if (lhs.downloadPayloadRate == rhs.downloadPayloadRate) { return hashSort(ascending, lhs, rhs); }
-        break;
-    }
-    case Columns::UploadSpeed:
-    {
         if (lhs.uploadPayloadRate < rhs.uploadPayloadRate) { return ascending ? -1 : 1; }
         if (lhs.uploadPayloadRate > rhs.uploadPayloadRate) { return ascending ? 1 : -1; }
-        if (lhs.uploadPayloadRate == rhs.uploadPayloadRate) { return hashSort(ascending, lhs, rhs); }
-        break;
+        return hashSort(ascending, lhs, rhs);
     }
     case Columns::Availability:
     {
@@ -212,6 +292,15 @@ int TorrentListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem&
         if (lhs.ratio > rhs.ratio) { return ascending ? 1 : -1; }
         if (lhs.ratio == rhs.ratio) { return hashSort(ascending, lhs, rhs); }
         break;
+    }
+    case Columns::Swarm:
+    {
+        // Connected seeds first, connected leechers break ties.
+        if (lhs.seedsCurrent < rhs.seedsCurrent) { return ascending ? -1 : 1; }
+        if (lhs.seedsCurrent > rhs.seedsCurrent) { return ascending ? 1 : -1; }
+        if (lhs.peersCurrent < rhs.peersCurrent) { return ascending ? -1 : 1; }
+        if (lhs.peersCurrent > rhs.peersCurrent) { return ascending ? 1 : -1; }
+        return hashSort(ascending, lhs, rhs);
     }
     case Columns::AddedOn:
     {
@@ -312,19 +401,12 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
     {
     case Columns::Name:
     {
-        variant = Utils::toStdWString(status.name);
-        break;
-    }
-    case Columns::QueuePosition:
-    {
-        variant = status.queuePosition < 0
-            ? "-"
-            : std::to_string(status.queuePosition + 1);
-        break;
-    }
-    case Columns::Size:
-    {
-        variant = Utils::toHumanFileSize(status.totalWanted);
+        auto icon = m_stateIcons.find(status.state);
+
+        variant << wxDataViewIconText(
+            Utils::toStdWString(status.name),
+            icon == m_stateIcons.end() ? wxNullIcon : icon->second);
+
         break;
     }
     case Columns::SizeRemaining:
@@ -440,33 +522,29 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
 
         break;
     }
-    case Columns::DownloadSpeed:
+    case Columns::Transfer:
     {
-        variant = "-";
-
-        if (status.paused || status.state == TorrentStatus::Uploading || status.downloadPayloadRate == 0)
+        // <size> / <downloaded> (<download rate>) / <uploaded> (<upload rate>),
+        // with "-" for anything that is zero.
+        auto amount = [](std::int64_t bytes) -> std::wstring
         {
-            break;
-        }
+            return bytes > 0 ? Utils::toHumanFileSize(bytes) : L"-";
+        };
+
+        auto rate = [](int bytes) -> std::wstring
+        {
+            return bytes > 0
+                ? fmt::format(i18n("per_second_format"), Utils::toHumanFileSize(bytes))
+                : L"-";
+        };
 
         variant = fmt::format(
-            i18n("per_second_format"),
-            Utils::toHumanFileSize(status.downloadPayloadRate));
-
-        break;
-    }
-    case Columns::UploadSpeed:
-    {
-        variant = "-";
-
-        if (status.paused || status.uploadPayloadRate == 0)
-        {
-            break;
-        }
-
-        variant = fmt::format(
-            i18n("per_second_format"),
-            Utils::toHumanFileSize(status.uploadPayloadRate));
+            i18n("transfer_format"),
+            amount(status.totalWanted),
+            amount(status.allTimeDownload),
+            rate(status.downloadPayloadRate),
+            amount(status.allTimeUpload),
+            rate(status.uploadPayloadRate));
 
         break;
     }
@@ -488,8 +566,10 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
         variant = fmt::format("{:.3f}", status.ratio);
         break;
     }
-    case Columns::Seeds:
+    case Columns::Swarm:
     {
+        // <seeds> (<in swarm>) / <peers> (<in swarm>) / <leechers> (<in swarm>):
+        // connected against what the tracker scrape or the peer list knows.
         variant = "-";
 
         if (status.paused)
@@ -498,25 +578,13 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
         }
 
         variant = fmt::format(
-            i18n("d_of_d"),
+            i18n("swarm_format"),
             status.seedsCurrent,
-            status.seedsTotal);
-
-        break;
-    }
-    case Columns::Peers:
-    {
-        variant = "-";
-
-        if (status.paused)
-        {
-            break;
-        }
-
-        variant = fmt::format(
-            i18n("d_of_d"),
+            status.swarmSeeds,
+            status.seedsCurrent + status.peersCurrent,
+            status.swarmSeeds + status.swarmLeechers,
             status.peersCurrent,
-            status.peersTotal);
+            status.swarmLeechers);
 
         break;
     }

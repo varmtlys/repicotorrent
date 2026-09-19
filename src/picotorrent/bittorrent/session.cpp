@@ -266,7 +266,7 @@ static lt::settings_pack getSettingsPack(std::shared_ptr<pt::Core::Configuration
 
     // Calculate user agent
     std::stringstream user_agent;
-    user_agent << "PicoTorrent/" << pt::BuildInfo::version();
+    user_agent << "PicoTorrent/" << pt::BuildInfo::semver();
 
     // Calculate peer id
     semver::version v(pt::BuildInfo::version());
@@ -1023,6 +1023,10 @@ void Session::OnSaveResumeDataTimer(wxTimerEvent&)
     }
 
     BOOST_LOG_TRIVIAL(info) << saved << " torrent(s) needed to save resume data";
+
+    // The DHT node cache used to be written on clean exit only, so a crash
+    // threw away every node learned since the last start.
+    SaveState();
 }
 
 bool Session::IsSearching(lt::info_hash_t hash)
@@ -1193,8 +1197,21 @@ void Session::PauseAfterRecheck(pt::BitTorrent::TorrentHandle* th)
 
 void Session::SaveState()
 {
+    // The saved routing table is the node cache the next start bootstraps
+    // from: libtorrent contacts those nodes, keeps the ones that answer and
+    // searches on from them, so dead nodes fall out on the next save. A table
+    // that is empty (DHT off, no network, exit before bootstrap finished)
+    // must not overwrite a good cache.
+    lt::session_params const state = m_session->session_state(lt::session::save_dht_state);
+
+    if (state.dht_state.nodes.empty() && state.dht_state.nodes6.empty())
+    {
+        BOOST_LOG_TRIVIAL(info) << "DHT routing table is empty, keeping the cached nodes";
+        return;
+    }
+
     std::vector<char> stateBuffer = lt::write_session_params_buf(
-        m_session->session_state(),
+        state,
         lt::session::save_dht_state);
 
     auto stmt = m_db->CreateStatement("INSERT INTO session_state (state_data, timestamp) VALUES (?, strftime('%s'))");

@@ -106,7 +106,7 @@ void PieceProgressBar::RenderProgress(wxDC& dc)
     else
     {
         dc.SetBrush(m_bgColor);
-        dc.SetPen(wxColor(190, 190, 190));
+        dc.SetPen(m_bgColor.GetLuminance() < 0.5 ? wxColor(60, 60, 60) : wxColor(190, 190, 190));
         dc.DrawRectangle(this->GetClientRect());
     }
 }

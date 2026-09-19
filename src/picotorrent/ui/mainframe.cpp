@@ -731,8 +731,8 @@ void MainFrame::OnFileAddTorrent(wxCommandEvent&)
     Win32::OpenFileDialog ofd;
 
     ofd.SetFileTypes({
-        std::make_tuple(L"Torrent files", L"*.torrent"),
-        std::make_tuple(L"All files (*.*)", L"*.*")
+        std::make_tuple(i18n("torrent_files"), L"*.torrent"),
+        std::make_tuple(i18n("all_files"), L"*.*")
     });
 
     ofd.SetOption(Win32::OpenFileDialog::Option::Multi);

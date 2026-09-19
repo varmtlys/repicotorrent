@@ -39,8 +39,11 @@ std::string Utils::toStdString(std::wstring const& input)
 
 std::wstring Utils::toStdWString(std::string const& input)
 {
-    int size = MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, NULL, 0);
-    std::wstring result(size, '\0');
-    MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, &result[0], size);
+    // An explicit length, not -1: with -1 the terminating NUL was converted
+    // too and ended up inside the string, showing as a stray space wherever
+    // a translation was formatted into a longer text.
+    int size = MultiByteToWideChar(CP_UTF8, 0, input.data(), static_cast<int>(input.size()), NULL, 0);
+    std::wstring result(size, L'\0');
+    MultiByteToWideChar(CP_UTF8, 0, input.data(), static_cast<int>(input.size()), result.data(), size);
     return result;
 }

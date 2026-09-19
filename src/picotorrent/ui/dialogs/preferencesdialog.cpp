@@ -32,7 +32,11 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent, std::shared_ptr<pt::Core:
     m_advanced(new PreferencesAdvancedPage(m_book, cfg)),
     m_wantsRestart(false)
 {
-    m_list = new wxListBox(this, wxID_ANY);
+    // A list box keeps painting the white inner edge of its sunken border
+    // when the border is swapped after creation (see Application), so pick
+    // the dark-mode border up front.
+    m_list = new wxListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, nullptr,
+        wxSystemSettings::GetAppearance().IsUsingDarkBackground() ? wxBORDER_SIMPLE : wxBORDER_DEFAULT);
     m_list->Append(i18n("general"));
     m_list->Append(i18n("downloads"));
     m_list->Append(i18n("labels"));

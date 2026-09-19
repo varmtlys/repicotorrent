@@ -59,14 +59,12 @@ namespace BitTorrent
         std::string                                           name;
         bool                                                  paused               = false;
         int                                                   peersCurrent         = 0;
-        int                                                   peersTotal           = 0;
         libtorrent::typed_bitfield<libtorrent::piece_index_t> pieces;
         float                                                 progress             = 0;
         int                                                   queuePosition        = -1;
         float                                                 ratio                = 0;
         std::string                                           savePath;
         int                                                   seedsCurrent         = 0;
-        int                                                   seedsTotal           = 0;
         int                                                   swarmSeeds           = 0;
         int                                                   swarmLeechers        = 0;
         State                                                 state                = State::Unknown;

@@ -25,14 +25,16 @@ namespace API
         Application();
         virtual ~Application();
 
+        virtual int FilterEvent(wxEvent& event) wxOVERRIDE;
         virtual bool OnCmdLineParsed(wxCmdLineParser& parser) wxOVERRIDE;
         virtual bool OnInit() wxOVERRIDE;
         virtual void OnInitCmdLine(wxCmdLineParser&) wxOVERRIDE;
 
     private:
-        void ActivateOtherInstance();
+        bool ActivateOtherInstance();
         void WaitForPreviousInstance(long pid);
 
+        bool m_darkMode = false;
         pt::CommandLineOptions m_options;
         std::vector<API::IPlugin*> m_plugins;
         std::unique_ptr<PersistenceManager> m_persistence;

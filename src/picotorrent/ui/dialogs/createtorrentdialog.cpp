@@ -113,7 +113,7 @@ CreateTorrentDialog::CreateTorrentDialog(wxWindow* parent, wxWindowID id, std::s
     m_addToSession = new wxCheckBox(optionsSizer->GetStaticBox(), wxID_ANY, i18n("add_to_session"));
     m_addToSession->SetValue(true);
     m_comment = new wxTextCtrl(optionsSizer->GetStaticBox(), wxID_ANY, wxEmptyString);
-    m_creator = new wxTextCtrl(optionsSizer->GetStaticBox(), wxID_ANY, fmt::format("PicoTorrent {0}", pt::BuildInfo::version()));
+    m_creator = new wxTextCtrl(optionsSizer->GetStaticBox(), wxID_ANY, fmt::format("PicoTorrent {0}", pt::BuildInfo::semver()));
 
     auto optionsGrid = new wxFlexGridSizer(2, FromDIP(7), FromDIP(25));
     optionsGrid->AddGrowableCol(1, 1);

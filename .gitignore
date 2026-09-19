@@ -17,3 +17,5 @@ tools
 *.suo
 *.sdf
 *.user
+/.idea/
+/deploy/

@@ -4,7 +4,9 @@
 #include <nlohmann/json.hpp>
 #include <wx/cmdline.h>
 #include <wx/ipc.h>
+#include <wx/msw/darkmode.h>
 #include <wx/persist.h>
+#include <wx/renderer.h>
 #include <wx/snglinst.h>
 #include <wx/taskbarbutton.h>
 
@@ -21,9 +23,81 @@
 using json = nlohmann::json;
 using pt::Application;
 
+static const char* SingleInstanceName = "584c8e47-d8a5-4e52-9165-c0650a85723a";
+
+namespace
+{
+    // wx paints the menu bar (0x6d6d6d) and the outlines of notebook tabs
+    // (0x626262) light gray, which glares next to the 0x202020 windows.
+    class DarkModeSettings : public wxDarkModeSettings
+    {
+    public:
+        wxColour GetColour(wxSystemColour index) override
+        {
+            // Only used for the notebook tab outlines.
+            if (index == wxSYS_COLOUR_MENUBAR) { return wxColour(0x3c3c3c); }
+            return wxDarkModeSettings::GetColour(index);
+        }
+
+        wxColour GetMenuColour(wxMenuColour which) override
+        {
+            switch (which)
+            {
+            case wxMenuColour::StandardBg: return wxColour(0x2b2b2b);
+            case wxMenuColour::HotBg: return wxColour(0x404040);
+            default: return wxDarkModeSettings::GetMenuColour(which);
+            }
+        }
+
+        wxPen GetBorderPen() override { return wxPen(wxColour(0x3c3c3c)); }
+    };
+
+    // The native PROGRESS theme has no dark variant and draws a white bar in
+    // every list with a progress column.
+    class DarkGaugeRenderer : public wxDelegateRendererNative
+    {
+    public:
+        void DrawGauge(wxWindow*, wxDC& dc, const wxRect& rect, int value, int max, int) override
+        {
+            wxDCPenChanger pen(dc, wxColour(0x3c3c3c));
+            wxDCBrushChanger brush(dc, wxColour(0x2b2b2b));
+            dc.DrawRectangle(rect);
+
+            if (max <= 0 || value <= 0) { return; }
+
+            wxRect fill(rect);
+            fill.Deflate(1);
+            fill.width = static_cast<int>(static_cast<long long>(fill.width) * std::min(value, max) / max);
+
+            dc.SetPen(*wxTRANSPARENT_PEN);
+            dc.SetBrush(wxColour(48, 140, 70));
+            dc.DrawRectangle(fill);
+        }
+    };
+
+    // wxBORDER_THEME - the default for lists, text fields and the property
+    // grid - draws the light EDIT theme frame even in dark mode, and the
+    // sunken 3D edge of list boxes is light too: a white outline around every
+    // one of them. A simple border is drawn in a dim gray instead.
+    void darkenThemeBorders(wxWindow* window)
+    {
+        wxBorder const border = window->GetBorder();
+
+        if (border == wxBORDER_THEME || border == wxBORDER_SUNKEN)
+        {
+            window->SetWindowStyleFlag((window->GetWindowStyleFlag() & ~wxBORDER_MASK) | wxBORDER_SIMPLE);
+        }
+
+        for (wxWindow* child : window->GetChildren())
+        {
+            darkenThemeBorders(child);
+        }
+    }
+}
+
 Application::Application()
     : wxApp(),
-    m_singleInstance(std::make_unique<wxSingleInstanceChecker>("584c8e47-d8a5-4e52-9165-c0650a85723a"))
+    m_singleInstance(std::make_unique<wxSingleInstanceChecker>(SingleInstanceName))
 {
     SetProcessDPIAware();
 }
@@ -34,6 +108,23 @@ Application::~Application()
     {
         delete plugin;
     }
+}
+
+int Application::FilterEvent(wxEvent& event)
+{
+    // Every dialog and frame passes through here right before it appears,
+    // with all its controls created.
+    if (m_darkMode
+        && event.GetEventType() == wxEVT_SHOW
+        && static_cast<wxShowEvent&>(event).IsShown())
+    {
+        if (auto tlw = wxDynamicCast(event.GetEventObject(), wxTopLevelWindow))
+        {
+            darkenThemeBorders(tlw);
+        }
+    }
+
+    return Event_Skip;
 }
 
 bool Application::OnCmdLineParsed(wxCmdLineParser& parser)
@@ -79,9 +170,9 @@ bool Application::OnInit()
         WaitForPreviousInstance(m_options.pid);
     }
 
-    if (m_singleInstance->IsAnotherRunning())
+    if (m_singleInstance->IsAnotherRunning()
+        && ActivateOtherInstance())
     {
-        ActivateOtherInstance();
         return false;
     }
 
@@ -112,7 +203,12 @@ bool Application::OnInit()
     // Load theme
     if (cfg->IsDarkMode())
     {
-        wxApp::MSWEnableDarkMode();
+        m_darkMode = wxApp::MSWEnableDarkMode(0, new DarkModeSettings());
+
+        // The renderer slot initializes itself on first use and replaces
+        // whatever was Set() before that - initialize it first.
+        wxRendererNative::Get();
+        wxRendererNative::Set(new DarkGaugeRenderer());
     }
 
     // Load plugins
@@ -198,7 +294,7 @@ void Application::OnInitCmdLine(wxCmdLineParser& parser)
     parser.SetSwitchChars("-");
 }
 
-void Application::ActivateOtherInstance()
+bool Application::ActivateOtherInstance()
 {
     json j;
     j["files"] = m_options.files;
@@ -206,17 +302,41 @@ void Application::ActivateOtherInstance()
     j["silent"] = m_options.silent;
     j["save_path"] = m_options.save_path;
 
-    wxClient client;
-    auto conn = client.MakeConnection(
-        "localhost",
-        "PicoTorrent",
-        "ApplicationOptions");
+    // The other instance holds the mutex long before its IPC server exists
+    // (the server comes with the main frame, after the database and the
+    // session have loaded) and long after it is gone (the process lingers
+    // for up to 30 seconds saving resume data on exit). A single attempt made
+    // every other launch fail with a DDE error box and quit. Keep trying,
+    // quietly, and start normally once the other instance has exited.
+    wxLogNull noDdeErrors;
 
-    if (conn)
+    for (int attempt = 0; attempt < 60; attempt++)
     {
-        conn->Execute(j.dump());
-        conn->Disconnect();
+        wxClient client;
+
+        if (auto conn = client.MakeConnection("localhost", "PicoTorrent", "ApplicationOptions"))
+        {
+            conn->Execute(j.dump());
+            conn->Disconnect();
+            delete conn;
+            return true;
+        }
+
+        // Our own handle keeps the named mutex alive - drop it before asking.
+        m_singleInstance.reset();
+        m_singleInstance = std::make_unique<wxSingleInstanceChecker>(SingleInstanceName);
+
+        if (!m_singleInstance->IsAnotherRunning())
+        {
+            return false;
+        }
+
+        wxMilliSleep(500);
     }
+
+    // ponytail: gives up silently after 30 seconds; a hung instance would
+    // need a message here.
+    return true;
 }
 
 void Application::WaitForPreviousInstance(long pid)

@@ -4,6 +4,7 @@
 #include "ids.hpp"
 #include "models/torrentlistmodel.hpp"
 #include "torrentlistview.hpp"
+#include "translator.hpp"
 #include "../core/configuration.hpp"
 
 using pt::UI::Console;
@@ -54,7 +55,7 @@ void Console::CreateFilter(std::string const& input)
 
         if (!filter && !err.empty())
         {
-            wxMessageBox(err, "Filter error", wxICON_ERROR | wxOK, GetParent());
+            wxMessageBox(err, i18n("filter_error"), wxICON_ERROR | wxOK, GetParent());
             return;
         }
 

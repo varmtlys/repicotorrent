@@ -367,14 +367,12 @@ std::unique_ptr<TorrentStatus> TorrentHandle::Update(lt::torrent_status const& t
     // torrent per second, from the UI thread.
     nts.paused = (ts.flags & lt::torrent_flags::paused) == lt::torrent_flags::paused;
     nts.peersCurrent = ts.num_peers - ts.num_seeds;
-    nts.peersTotal = ts.list_peers - ts.list_seeds;
     nts.pieces = ts.pieces;
     nts.progress = ts.progress;
     nts.queuePosition = static_cast<int>(ts.queue_position);
     nts.ratio = ratio;
     nts.savePath = ts.save_path;
     nts.seedsCurrent = ts.num_seeds;
-    nts.seedsTotal = ts.list_seeds;
 
     // The tracker's scrape counts the whole swarm but is -1 until it answers,
     // and misses peers only DHT/PeX told us about - take whichever is larger.
