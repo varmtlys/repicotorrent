@@ -18,6 +18,7 @@ namespace UI
 
         void UpdateDhtNodesCount(int64_t nodes);
         void UpdateIPFilterStatus(bool enabled);
+        void UpdateSessionTotals(int64_t downloaded, int64_t uploaded);
         void UpdateTorrentCount(int64_t torrents);
         void UpdateTransferRates(int64_t downSpeed, int64_t upSpeed);
     };

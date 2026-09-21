@@ -128,6 +128,7 @@ MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr
         {
             bool dhtEnabled = m_cfg->Get<bool>("libtorrent.enable_dht").value_or(true);
             m_statusBar->UpdateDhtNodesCount(dhtEnabled ? evt.GetData().dhtNodes : -1);
+            m_statusBar->UpdateSessionTotals(evt.GetData().totalDownloaded, evt.GetData().totalUploaded);
         });
 
     this->Bind(ptEVT_TORRENT_ADDED, [this](wxCommandEvent& evt)

@@ -26,6 +26,7 @@ namespace Models
             Name,
             Size,
             Progress,
+            Percent,
             Priority,
             _Max
         };
@@ -44,6 +45,7 @@ namespace Models
         void ClearNodes();
         std::vector<libtorrent::file_index_t> GetFileIndices(wxDataViewItemArray&);
         wxDataViewItem GetRootItem();
+        std::string GetRelativePath(wxDataViewItem const& item);
         void RebuildTree(std::shared_ptr<const libtorrent::torrent_info> ti);
         void UpdatePriorities(const std::vector<libtorrent::download_priority_t>& priorities);
         void UpdateProgress(std::vector<int64_t> const& progress);
@@ -53,6 +55,7 @@ namespace Models
         {
             std::string name;
             int64_t size;
+            int64_t done;
             libtorrent::file_index_t index;
             libtorrent::download_priority_t priority;
             float progress;

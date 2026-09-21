@@ -764,6 +764,12 @@ void Session::OnAlert()
                 stats.dhtNodes = counters[idx];
             }
 
+            static int const recvIdx = lt::find_metric_idx("net.recv_payload_bytes");
+            static int const sentIdx = lt::find_metric_idx("net.sent_payload_bytes");
+
+            if (recvIdx >= 0) { stats.totalDownloaded = counters[recvIdx]; }
+            if (sentIdx >= 0) { stats.totalUploaded = counters[sentIdx]; }
+
             SessionStatisticsEvent evt(ptEVT_SESSION_STATISTICS);
             evt.SetData(stats);
             wxPostEvent(m_parent, evt);

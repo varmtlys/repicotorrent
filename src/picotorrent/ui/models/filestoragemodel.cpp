@@ -4,6 +4,9 @@
 #include "../translator.hpp"
 
 #include <boost/algorithm/string.hpp>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
+#include <functional>
 #include <filesystem>
 #include <shellapi.h>
 
@@ -88,6 +91,18 @@ void FileStorageModel::FillIndices(Node* node, std::vector<lt::file_index_t>& in
 wxDataViewItem FileStorageModel::GetRootItem()
 {
     return wxDataViewItem(static_cast<void*>(m_root.get()));
+}
+
+std::string FileStorageModel::GetRelativePath(wxDataViewItem const& item)
+{
+    std::string path;
+
+    for (Node* node = static_cast<Node*>(item.GetID()); node && node != m_root.get(); node = node->parent.get())
+    {
+        path = path.empty() ? node->name : node->name + "\\" + path;
+    }
+
+    return path;
 }
 
 void FileStorageModel::RebuildTree(std::shared_ptr<const lt::torrent_info> ti)
@@ -215,12 +230,46 @@ void FileStorageModel::UpdateProgress(std::vector<int64_t> const& progress)
             calculatedProgress = static_cast<float>(progress.at(i)) / node->size;
         }
 
+        node->done = progress.at(i);
         node->progress = calculatedProgress;
 
         this->ValueChanged(
             wxDataViewItem(static_cast<void*>(node.get())),
             Columns::Progress);
+        this->ValueChanged(
+            wxDataViewItem(static_cast<void*>(node.get())),
+            Columns::Percent);
     }
+
+    // Folders sum up their children.
+    std::function<void(Node*)> sum = [&](Node* node)
+    {
+        if (node->children.empty()) { return; }
+
+        node->size = 0;
+        node->done = 0;
+
+        for (auto const& [_, child] : node->children)
+        {
+            sum(child.get());
+            node->size += child->size;
+            node->done += child->done;
+        }
+
+        node->progress = node->size > 0
+            ? static_cast<float>(node->done) / node->size
+            : .0f;
+
+        if (node != m_root.get())
+        {
+            wxDataViewItem item(static_cast<void*>(node));
+            this->ValueChanged(item, Columns::Size);
+            this->ValueChanged(item, Columns::Progress);
+            this->ValueChanged(item, Columns::Percent);
+        }
+    };
+
+    sum(m_root.get());
 }
 
 wxIcon FileStorageModel::GetIconForFile(std::string const& fileName) const
@@ -283,6 +332,9 @@ void FileStorageModel::GetValue(wxVariant &variant, const wxDataViewItem &item, 
         break;
     case Columns::Progress:
         variant = static_cast<long>(node->progress * 100);
+        break;
+    case Columns::Percent:
+        variant = fmt::format(L"{:.1f}%", node->progress * 100);
         break;
     case Columns::Priority:
         if (node->priority == libtorrent::dont_download)

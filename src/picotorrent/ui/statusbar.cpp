@@ -16,11 +16,12 @@ StatusBar::StatusBar(wxWindow* parent)
         -1,
         -1,
         -1,
+        -1,
         -1
     };
 
-    SetFieldsCount(4);
-    SetStatusWidths(4, widths);
+    SetFieldsCount(5);
+    SetStatusWidths(5, widths);
 }
 
 void StatusBar::UpdateDhtNodesCount(int64_t nodes)
@@ -55,4 +56,9 @@ void StatusBar::UpdateIPFilterStatus(bool enabled)
     {
         SetStatusText(i18n("ip_filter_disabled"), 3);
     }
+}
+
+void StatusBar::UpdateSessionTotals(int64_t downloaded, int64_t uploaded)
+{
+    SetStatusText(fmt::format(i18n("session_totals"), Utils::toHumanFileSize(downloaded), Utils::toHumanFileSize(uploaded)), 4);
 }

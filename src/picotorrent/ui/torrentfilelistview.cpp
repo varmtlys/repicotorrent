@@ -31,6 +31,13 @@ TorrentFileListView::TorrentFileListView(wxWindow* parent, wxWindowID id)
         wxALIGN_LEFT);
 
     AppendTextColumn(
+        i18n("percent"),
+        FileStorageModel::Columns::Percent,
+        wxDATAVIEW_CELL_INERT,
+        FromDIP(60),
+        wxALIGN_RIGHT);
+
+    AppendTextColumn(
         i18n("priority"),
         FileStorageModel::Columns::Priority,
         wxDATAVIEW_CELL_INERT,

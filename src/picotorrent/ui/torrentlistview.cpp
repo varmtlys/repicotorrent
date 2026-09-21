@@ -65,6 +65,16 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
     m_columns.push_back(
         ColumnMetadata(
             new wxDataViewColumn(
+                i18n("percent"),
+                new wxDataViewTextRenderer(),
+                TorrentListModel::Columns::Percent,
+                FromDIP(60),
+                wxALIGN_RIGHT,
+                defaultFlags)));
+
+    m_columns.push_back(
+        ColumnMetadata(
+            new wxDataViewColumn(
                 i18n("eta"),
                 new wxDataViewTextRenderer(),
                 TorrentListModel::Columns::ETA,
@@ -75,10 +85,50 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
     m_columns.push_back(
         ColumnMetadata(
             new wxDataViewColumn(
-                i18n("transfer"),
+                i18n("size"),
                 new wxDataViewTextRenderer(),
-                TorrentListModel::Columns::Transfer,
-                FromDIP(280),
+                TorrentListModel::Columns::Size,
+                FromDIP(80),
+                wxALIGN_RIGHT,
+                defaultFlags)));
+
+    m_columns.push_back(
+        ColumnMetadata(
+            new wxDataViewColumn(
+                i18n("downloaded"),
+                new wxDataViewTextRenderer(),
+                TorrentListModel::Columns::Downloaded,
+                FromDIP(80),
+                wxALIGN_RIGHT,
+                defaultFlags)));
+
+    m_columns.push_back(
+        ColumnMetadata(
+            new wxDataViewColumn(
+                i18n("dl"),
+                new wxDataViewTextRenderer(),
+                TorrentListModel::Columns::DownloadSpeed,
+                FromDIP(80),
+                wxALIGN_RIGHT,
+                defaultFlags)));
+
+    m_columns.push_back(
+        ColumnMetadata(
+            new wxDataViewColumn(
+                i18n("uploaded"),
+                new wxDataViewTextRenderer(),
+                TorrentListModel::Columns::Uploaded,
+                FromDIP(80),
+                wxALIGN_RIGHT,
+                defaultFlags)));
+
+    m_columns.push_back(
+        ColumnMetadata(
+            new wxDataViewColumn(
+                i18n("ul"),
+                new wxDataViewTextRenderer(),
+                TorrentListModel::Columns::UploadSpeed,
+                FromDIP(80),
                 wxALIGN_RIGHT,
                 defaultFlags)));
 

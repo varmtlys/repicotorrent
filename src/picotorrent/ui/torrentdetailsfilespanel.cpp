@@ -1,12 +1,16 @@
 #include "torrentdetailsfilespanel.hpp"
 
+#include <filesystem>
+
 #include <wx/sizer.h>
+#include <wx/utils.h>
 
 #include "../bittorrent/torrenthandle.hpp"
 #include "../bittorrent/torrentstatus.hpp"
 #include "models/filestoragemodel.hpp"
 #include "torrentfilelistview.hpp"
 #include "translator.hpp"
+#include "../core/utils.hpp"
 
 using pt::UI::TorrentDetailsFilesPanel;
 
@@ -32,6 +36,26 @@ TorrentDetailsFilesPanel::TorrentDetailsFilesPanel(wxWindow* parent, wxWindowID 
     this->SetSizerAndFit(mainSizer);
 
     this->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &TorrentDetailsFilesPanel::ShowFileContextMenu, this, wxID_ANY);
+
+    // Folders keep the default expand/collapse on double click.
+    m_fileList->Bind(
+        wxEVT_DATAVIEW_ITEM_ACTIVATED,
+        [this](wxDataViewEvent& evt)
+        {
+            if (!m_torrent || !evt.GetItem().IsOk() || m_filesModel->IsContainer(evt.GetItem()))
+            {
+                evt.Skip();
+                return;
+            }
+
+            std::filesystem::path path = Utils::toStdWString(m_torrent->Status().savePath);
+            path /= Utils::toStdWString(m_filesModel->GetRelativePath(evt.GetItem()));
+
+            if (std::filesystem::exists(path))
+            {
+                wxLaunchDefaultApplication(path.wstring());
+            }
+        });
 }
 
 void TorrentDetailsFilesPanel::Refresh(pt::BitTorrent::TorrentHandle* torrent)

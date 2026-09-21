@@ -234,6 +234,13 @@ int TorrentListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem&
         else{ return ascending ? 1 : -1; }
     };
 
+    auto cmp = [&](auto l, auto r) -> int
+    {
+        if (l < r) { return ascending ? -1 : 1; }
+        if (l > r) { return ascending ? 1 : -1; }
+        return hashSort(ascending, lhs, rhs);
+    };
+
     switch (column)
     {
     case Columns::Name:
@@ -255,6 +262,7 @@ int TorrentListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem&
         break;
     }
     case Columns::Progress:
+    case Columns::Percent:
     {
         if (lhs.progress < rhs.progress) { return ascending ? -1 : 1; }
         if (lhs.progress > rhs.progress) { return ascending ? 1 : -1; }
@@ -268,17 +276,16 @@ int TorrentListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem&
         if (lhs.eta == rhs.eta) { return hashSort(ascending, lhs, rhs); }
         break;
     }
-    case Columns::Transfer:
-    {
-        // In the order the values are shown: size, download rate, upload rate.
-        if (lhs.totalWanted < rhs.totalWanted) { return ascending ? -1 : 1; }
-        if (lhs.totalWanted > rhs.totalWanted) { return ascending ? 1 : -1; }
-        if (lhs.downloadPayloadRate < rhs.downloadPayloadRate) { return ascending ? -1 : 1; }
-        if (lhs.downloadPayloadRate > rhs.downloadPayloadRate) { return ascending ? 1 : -1; }
-        if (lhs.uploadPayloadRate < rhs.uploadPayloadRate) { return ascending ? -1 : 1; }
-        if (lhs.uploadPayloadRate > rhs.uploadPayloadRate) { return ascending ? 1 : -1; }
-        return hashSort(ascending, lhs, rhs);
-    }
+    case Columns::Size:
+        return cmp(lhs.totalWanted, rhs.totalWanted);
+    case Columns::Downloaded:
+        return cmp(lhs.allTimeDownload, rhs.allTimeDownload);
+    case Columns::DownloadSpeed:
+        return cmp(lhs.downloadPayloadRate, rhs.downloadPayloadRate);
+    case Columns::Uploaded:
+        return cmp(lhs.allTimeUpload, rhs.allTimeUpload);
+    case Columns::UploadSpeed:
+        return cmp(lhs.uploadPayloadRate, rhs.uploadPayloadRate);
     case Columns::Availability:
     {
         if (lhs.availability < rhs.availability) { return ascending ? -1 : 1; }
@@ -397,6 +404,19 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
     BitTorrent::TorrentHandle* torrent = findTorrent->second;
     BitTorrent::TorrentStatus const& status = torrent->Status();
 
+    // "-" for anything that is zero.
+    auto amount = [](std::int64_t bytes) -> std::wstring
+    {
+        return bytes > 0 ? Utils::toHumanFileSize(bytes) : L"-";
+    };
+
+    auto rate = [](int bytes) -> std::wstring
+    {
+        return bytes > 0
+            ? fmt::format(i18n("per_second_format"), Utils::toHumanFileSize(bytes))
+            : L"-";
+    };
+
     switch (col)
     {
     case Columns::Name:
@@ -489,6 +509,11 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
         variant = static_cast<long>(status.progress * 100);
         break;
     }
+    case Columns::Percent:
+    {
+        variant = fmt::format(L"{:.1f}%", status.progress * 100);
+        break;
+    }
     case Columns::ETA:
     {
         variant = "-";
@@ -522,32 +547,21 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
 
         break;
     }
-    case Columns::Transfer:
-    {
-        // <size> / <downloaded> (<download rate>) / <uploaded> (<upload rate>),
-        // with "-" for anything that is zero.
-        auto amount = [](std::int64_t bytes) -> std::wstring
-        {
-            return bytes > 0 ? Utils::toHumanFileSize(bytes) : L"-";
-        };
-
-        auto rate = [](int bytes) -> std::wstring
-        {
-            return bytes > 0
-                ? fmt::format(i18n("per_second_format"), Utils::toHumanFileSize(bytes))
-                : L"-";
-        };
-
-        variant = fmt::format(
-            i18n("transfer_format"),
-            amount(status.totalWanted),
-            amount(status.allTimeDownload),
-            rate(status.downloadPayloadRate),
-            amount(status.allTimeUpload),
-            rate(status.uploadPayloadRate));
-
+    case Columns::Size:
+        variant = amount(status.totalWanted);
         break;
-    }
+    case Columns::Downloaded:
+        variant = amount(status.allTimeDownload);
+        break;
+    case Columns::DownloadSpeed:
+        variant = rate(status.downloadPayloadRate);
+        break;
+    case Columns::Uploaded:
+        variant = amount(status.allTimeUpload);
+        break;
+    case Columns::UploadSpeed:
+        variant = rate(status.uploadPayloadRate);
+        break;
     case Columns::Availability:
     {
         variant = "-";
