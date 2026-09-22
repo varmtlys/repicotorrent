@@ -300,13 +300,23 @@ int TorrentListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem&
         if (lhs.ratio == rhs.ratio) { return hashSort(ascending, lhs, rhs); }
         break;
     }
-    case Columns::Swarm:
+    case Columns::Seeds:
+    case Columns::Peers:
+    case Columns::Leechers:
     {
-        // Connected seeds first, connected leechers break ties.
-        if (lhs.seedsCurrent < rhs.seedsCurrent) { return ascending ? -1 : 1; }
-        if (lhs.seedsCurrent > rhs.seedsCurrent) { return ascending ? 1 : -1; }
-        if (lhs.peersCurrent < rhs.peersCurrent) { return ascending ? -1 : 1; }
-        if (lhs.peersCurrent > rhs.peersCurrent) { return ascending ? 1 : -1; }
+        // Connected first, the swarm size breaks ties.
+        auto key = [column](BitTorrent::TorrentStatus const& s)
+        {
+            switch (column)
+            {
+            case Columns::Seeds: return std::make_pair(s.seedsCurrent, s.swarmSeeds);
+            case Columns::Peers: return std::make_pair(s.seedsCurrent + s.peersCurrent, s.swarmSeeds + s.swarmLeechers);
+            default: return std::make_pair(s.peersCurrent, s.swarmLeechers);
+            }
+        };
+
+        if (key(lhs) < key(rhs)) { return ascending ? -1 : 1; }
+        if (key(lhs) > key(rhs)) { return ascending ? 1 : -1; }
         return hashSort(ascending, lhs, rhs);
     }
     case Columns::AddedOn:
@@ -580,10 +590,12 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
         variant = fmt::format("{:.3f}", status.ratio);
         break;
     }
-    case Columns::Swarm:
+    case Columns::Seeds:
+    case Columns::Peers:
+    case Columns::Leechers:
     {
-        // <seeds> (<in swarm>) / <peers> (<in swarm>) / <leechers> (<in swarm>):
-        // connected against what the tracker scrape or the peer list knows.
+        // <connected> (<in swarm>): connected against what the tracker
+        // scrape or the peer list knows.
         variant = "-";
 
         if (status.paused)
@@ -591,14 +603,13 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
             break;
         }
 
-        variant = fmt::format(
-            i18n("swarm_format"),
-            status.seedsCurrent,
-            status.swarmSeeds,
-            status.seedsCurrent + status.peersCurrent,
-            status.swarmSeeds + status.swarmLeechers,
-            status.peersCurrent,
-            status.swarmLeechers);
+        int connected = status.peersCurrent;
+        int swarm = status.swarmLeechers;
+
+        if (col == Columns::Seeds) { connected = status.seedsCurrent; swarm = status.swarmSeeds; }
+        if (col == Columns::Peers) { connected += status.seedsCurrent; swarm += status.swarmSeeds; }
+
+        variant = fmt::format("{} ({})", connected, swarm);
 
         break;
     }

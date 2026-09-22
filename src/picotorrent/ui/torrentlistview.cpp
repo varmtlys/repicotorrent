@@ -157,10 +157,30 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
     m_columns.push_back(
         ColumnMetadata(
             new wxDataViewColumn(
-                i18n("swarm"),
+                i18n("seeds"),
                 new wxDataViewTextRenderer(),
-                TorrentListModel::Columns::Swarm,
-                FromDIP(170),
+                TorrentListModel::Columns::Seeds,
+                FromDIP(70),
+                wxALIGN_RIGHT,
+                defaultFlags)));
+
+    m_columns.push_back(
+        ColumnMetadata(
+            new wxDataViewColumn(
+                i18n("peers"),
+                new wxDataViewTextRenderer(),
+                TorrentListModel::Columns::Peers,
+                FromDIP(70),
+                wxALIGN_RIGHT,
+                defaultFlags)));
+
+    m_columns.push_back(
+        ColumnMetadata(
+            new wxDataViewColumn(
+                i18n("leechers"),
+                new wxDataViewTextRenderer(),
+                TorrentListModel::Columns::Leechers,
+                FromDIP(70),
                 wxALIGN_RIGHT,
                 defaultFlags)));
 

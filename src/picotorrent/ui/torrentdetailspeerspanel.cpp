@@ -28,7 +28,7 @@ TorrentDetailsPeersPanel::TorrentDetailsPeersPanel(wxWindow* parent, wxWindowID 
     m_peersView->AppendTextColumn(i18n("country"), PeerListModel::Column::Country, wxDATAVIEW_CELL_INERT, FromDIP(50));
     m_peersView->AppendTextColumn(i18n("type"), PeerListModel::Column::Type, wxDATAVIEW_CELL_INERT, FromDIP(60));
     m_peersView->AppendTextColumn(i18n("client"), PeerListModel::Column::Client, wxDATAVIEW_CELL_INERT, FromDIP(140));
-    m_peersView->AppendTextColumn(i18n("flags"), PeerListModel::Column::Flags, wxDATAVIEW_CELL_INERT, FromDIP(80));
+    m_peersView->AppendTextColumn(i18n("flags"), PeerListModel::Column::Flags, wxDATAVIEW_CELL_INERT, FromDIP(300));
     m_peersView->AppendTextColumn(i18n("dl"), PeerListModel::Column::DownloadRate, wxDATAVIEW_CELL_INERT, FromDIP(80), wxALIGN_RIGHT);
     m_peersView->AppendTextColumn(i18n("ul"), PeerListModel::Column::UploadRate, wxDATAVIEW_CELL_INERT, FromDIP(80), wxALIGN_RIGHT);
     m_peersView->AppendTextColumn(i18n("downloaded"), PeerListModel::Column::Downloaded, wxDATAVIEW_CELL_INERT, FromDIP(80), wxALIGN_RIGHT);

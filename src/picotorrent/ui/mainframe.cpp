@@ -5,10 +5,14 @@
 #include <regex>
 
 #include <boost/log/trivial.hpp>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 #include <libtorrent/add_torrent_params.hpp>
 #include <libtorrent/load_torrent.hpp>
 #include <libtorrent/magnet_uri.hpp>
+#include <libtorrent/read_resume_data.hpp>
 #include <libtorrent/torrent_info.hpp>
+#include <wx/dirdlg.h>
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
 #include <wx/sizer.h>
@@ -192,21 +196,16 @@ MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr
             auto torrents = evt.GetData();
             m_torrentListModel->UpdateTorrents(torrents);
 
-            std::map<lt::info_hash_t, pt::BitTorrent::TorrentHandle*> selectedUpdated;
+            // Refresh with the whole selection - passing only the updated
+            // part would show one torrent of a multi-selection.
+            bool selectedUpdated = std::any_of(
+                torrents.begin(),
+                torrents.end(),
+                [this](auto torrent) { return m_selection.count(torrent->InfoHash()) > 0; });
 
-            for (auto torrent : torrents)
+            if (selectedUpdated)
             {
-                auto infoHash = torrent->InfoHash();
-
-                if (m_selection.find(infoHash) != m_selection.end())
-                {
-                    selectedUpdated.insert({ infoHash, torrent });
-                }
-            }
-
-            if (selectedUpdated.size() > 0)
-            {
-                m_torrentDetails->Refresh(selectedUpdated);
+                m_torrentDetails->Refresh(m_selection);
             }
 
             this->CheckDiskSpace(torrents);
@@ -255,6 +254,7 @@ MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr
     this->Bind(wxEVT_MENU, &MainFrame::OnFileAddTorrent, this, ptID_EVT_ADD_TORRENT);
     this->Bind(wxEVT_MENU, &MainFrame::OnFileAddMagnetLink, this, ptID_EVT_ADD_MAGNET_LINK);
     this->Bind(wxEVT_MENU, &MainFrame::OnFileCreateTorrent, this, ptID_EVT_CREATE_TORRENT);
+    this->Bind(wxEVT_MENU, &MainFrame::OnFileImportQBittorrent, this, ptID_EVT_IMPORT_QBITTORRENT);
     this->Bind(wxEVT_MENU, [this](wxCommandEvent&) { this->Close(true); }, ptID_EVT_EXIT);
     this->Bind(wxEVT_MENU, &MainFrame::OnViewPreferences, this, ptID_EVT_VIEW_PREFERENCES);
     this->Bind(wxEVT_MENU, &MainFrame::OnViewHelp, this, ptID_EVT_VIEW_HELP);
@@ -631,6 +631,8 @@ wxMenuBar* MainFrame::CreateMainMenu()
     fileMenu->AppendSeparator();
     fileMenu->Append(ptID_EVT_CREATE_TORRENT, i18n("amp_create_torrent"));
     fileMenu->AppendSeparator();
+    fileMenu->Append(ptID_EVT_IMPORT_QBITTORRENT, i18n("amp_import_qbittorrent"));
+    fileMenu->AppendSeparator();
     fileMenu->Append(ptID_EVT_EXIT, i18n("amp_exit"));
 
     m_viewMenu = new wxMenu();
@@ -762,6 +764,86 @@ void MainFrame::OnFileCreateTorrent(wxCommandEvent&)
         {
             dlg->Destroy();
         });
+}
+
+void MainFrame::OnFileImportQBittorrent(wxCommandEvent&)
+{
+    // qBittorrent keeps one libtorrent resume file per torrent in BT_backup
+    // (<hash>.fastresume) with the torrent file next to it (<hash>.torrent).
+    // The files are only read - qBittorrent itself is left untouched.
+    wxDirDialog dlg(
+        this,
+        i18n("import_qbittorrent_select_folder"),
+        wxGetenv("LOCALAPPDATA") + wxString("\\qBittorrent\\BT_backup"),
+        wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+
+    if (dlg.ShowModal() != wxID_OK) { return; }
+
+    int imported = 0, skipped = 0, failed = 0;
+
+    auto readFile = [](fs::path const& p)
+    {
+        std::ifstream in(p, std::ios::binary);
+        return std::vector<char>(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
+    };
+
+    for (auto const& entry : fs::directory_iterator(dlg.GetPath().ToStdWstring()))
+    {
+        fs::path resumePath = entry.path();
+        if (resumePath.extension() != ".fastresume") { continue; }
+
+        lt::error_code ec;
+        std::vector<char> resumeData = readFile(resumePath);
+        lt::add_torrent_params params = lt::read_resume_data(resumeData, ec);
+
+        fs::path torrentPath = fs::path(resumePath).replace_extension(".torrent");
+
+        if (!ec && !params.ti && fs::exists(torrentPath))
+        {
+            // The resume file has no info dictionary - take it, and the root
+            // fields (comment, trackers) from the torrent file.
+            std::vector<char> torrentData = readFile(torrentPath);
+            lt::add_torrent_params tp = lt::load_torrent_buffer(torrentData, ec, lt::load_torrent_limits());
+
+            if (!ec)
+            {
+                params.ti = tp.ti;
+                if (params.comment.empty()) { params.comment = tp.comment; }
+                if (params.trackers.empty()) { params.trackers = tp.trackers; params.tracker_tiers = tp.tracker_tiers; }
+                if (params.creation_date == 0) { params.creation_date = tp.creation_date; }
+                if (params.created_by.empty()) { params.created_by = tp.created_by; }
+            }
+        }
+
+        if (ec)
+        {
+            BOOST_LOG_TRIVIAL(error) << "Failed to import " << resumePath << ": " << ec.message();
+            failed++;
+            continue;
+        }
+
+        if (m_session->HasTorrent(params.info_hashes))
+        {
+            skipped++;
+            continue;
+        }
+
+        // qBittorrent runs its own queue and turns libtorrent's off. We rely
+        // on libtorrent's, but a paused auto-managed torrent would be started
+        // by it - so paused ones stay unmanaged.
+        if (params.flags & lt::torrent_flags::paused) { params.flags &= ~lt::torrent_flags::auto_managed; }
+        else { params.flags |= lt::torrent_flags::auto_managed; }
+
+        params.userdata = lt::client_data_t(new BitTorrent::AddParams());
+        m_session->AddTorrent(params);
+        imported++;
+    }
+
+    wxMessageBox(
+        fmt::format(i18n("import_qbittorrent_result"), imported, skipped, failed),
+        i18n("amp_import_qbittorrent"),
+        wxOK | wxICON_INFORMATION,
+        this);
 }
 
 void MainFrame::OnViewHelp(wxCommandEvent&)

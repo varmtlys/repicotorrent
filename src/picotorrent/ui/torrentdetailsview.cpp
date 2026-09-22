@@ -25,6 +25,15 @@ TorrentDetailsView::TorrentDetailsView(wxWindow* parent, wxWindowID id, std::sha
     this->AddPage(m_peers,    i18n("peers"));
     this->AddPage(m_trackers, i18n("trackers"));
     this->ReloadConfiguration();
+
+    // Updates only arrive for torrents whose state changed, so an idle
+    // torrent would leave the newly shown page empty until it did.
+    this->Bind(wxEVT_NOTEBOOK_PAGE_CHANGED,
+        [this](wxBookCtrlEvent& evt)
+        {
+            evt.Skip();
+            if (evt.GetEventObject() == this) { this->Refresh(m_torrents); }
+        });
 }
 
 TorrentDetailsView::~TorrentDetailsView()
@@ -33,6 +42,8 @@ TorrentDetailsView::~TorrentDetailsView()
 
 void TorrentDetailsView::Refresh(std::map<lt::info_hash_t, pt::BitTorrent::TorrentHandle*> const& torrents)
 {
+    m_torrents = torrents;
+
     if (torrents.size() != 1)
     {
         this->Reset();
@@ -69,6 +80,7 @@ void TorrentDetailsView::ReloadConfiguration()
 
 void TorrentDetailsView::Reset()
 {
+    m_torrents.clear();
     m_overview->Reset();
     m_files->Reset();
     m_peers->Reset();

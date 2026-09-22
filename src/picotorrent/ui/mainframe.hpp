@@ -76,6 +76,7 @@ namespace Models
         void OnFileAddMagnetLink(wxCommandEvent&);
         void OnFileAddTorrent(wxCommandEvent&);
         void OnFileCreateTorrent(wxCommandEvent&);
+        void OnFileImportQBittorrent(wxCommandEvent&);
         void OnHelpAbout(wxCommandEvent&);
         void OnViewHelp(wxCommandEvent&);
         void OnIconize(wxIconizeEvent&);

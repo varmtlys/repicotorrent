@@ -2,6 +2,8 @@
 
 #include <fmt/format.h>
 #include <fmt/xchar.h>
+#include <regex>
+
 #include <wx/clipbrd.h>
 #include <wx/dcbuffer.h>
 #include <wx/sizer.h>
@@ -82,7 +84,43 @@ public:
 
                 PopupMenu(&menu);
             });
+
+        this->Bind(wxEVT_LEFT_UP,
+            [this](wxMouseEvent&)
+            {
+                if (!m_url.empty()) { wxLaunchDefaultBrowser(m_url); }
+            });
     }
+
+    // Shows the text and, when it holds an http(s) link, styles the label
+    // as a link that opens it in the default browser.
+    void SetLinkLabel(wxString const& text, bool isDarkMode)
+    {
+        std::wsmatch match;
+        std::wstring str = text.ToStdWstring();
+        static std::wregex const url(L"https?://\\S+");
+
+        wxString link = std::regex_search(str, match, url) ? wxString(match.str()) : wxString();
+
+        // Refreshed every second - restyling each time makes the tooltip flicker.
+        if (link == m_url) { this->SetLabel(text); return; }
+
+        m_url = link;
+
+        wxFont font = this->GetParent()->GetFont();
+        font.SetUnderlined(!m_url.empty());
+        this->SetFont(font);
+        this->SetForegroundColour(
+            m_url.empty()
+                ? wxNullColour
+                : isDarkMode ? wxColour(110, 170, 255) : wxColour(0, 102, 204));
+        this->SetCursor(m_url.empty() ? wxNullCursor : wxCursor(wxCURSOR_HAND));
+        this->SetToolTip(m_url);
+        this->SetLabel(text);
+    }
+
+private:
+    wxString m_url;
 };
 
 TorrentDetailsOverviewPanel::TorrentDetailsOverviewPanel(wxWindow* parent, wxWindowID id, bool isDarkMode, int cols, bool showPieceProgress)
@@ -218,10 +256,11 @@ void TorrentDetailsOverviewPanel::Refresh(pt::BitTorrent::TorrentHandle* torrent
     {
         // The comment came through the add-torrent pipeline; torrent_info
         // no longer exposes it in the 2.1 ABI.
-        m_comment->SetLabel(
+        static_cast<CopyableStaticText*>(m_comment)->SetLinkLabel(
             status.comment.empty()
                 ? wxString("-")
-                : wxString(status.comment));
+                : wxString::FromUTF8(status.comment),
+            m_isDarkMode);
 
         m_priv->SetLabel(
             tf->priv()
@@ -258,7 +297,7 @@ void TorrentDetailsOverviewPanel::Reset()
     m_infoHashV2->SetLabel("-");
     m_savePath->SetLabel("-");
     m_pieces->SetLabel("-");
-    m_comment->SetLabel("-");
+    static_cast<CopyableStaticText*>(m_comment)->SetLinkLabel("-", m_isDarkMode);
     m_size->SetLabel("-");
     m_priv->SetLabel("-");
     m_ratio->SetLabel("-");

@@ -445,6 +445,8 @@ void Session::AddTorrent(lt::add_torrent_params const& params)
         m_metadataRemoving.insert(res);
     }
 
+    if (auto add = params.userdata.get<AddParams>()) { add->comment = params.comment; }
+
     m_session->async_add_torrent(params);
 }
 
@@ -623,10 +625,10 @@ void Session::OnAlert()
             AddParams* add = ata->params.userdata.get<AddParams>();
             if (add && add->labelId > 0) { handle->SetLabel(add->labelId, add->labelName, true); }
 
-            // The comment is part of the torrent file root dictionary, which
-            // libtorrent 2.1 hands over in params.comment - load_torrent_file()
-            // fills it for .torrent adds, read_resume_data() on restore.
-            if (!ata->params.comment.empty()) { handle->SetComment(ata->params.comment); }
+            // load_torrent_file() and read_resume_data() fill params.comment,
+            // but the alert does not carry it - AddTorrent() and
+            // LoadTorrents() copy it into AddParams.
+            if (add && !add->comment.empty()) { handle->SetComment(add->comment); }
 
             m_torrents.insert({ ata->handle.info_hashes(), handle });
 
@@ -1178,7 +1180,7 @@ void Session::LoadTorrents()
             }
         }
 
-        params.userdata = lt::client_data_t(new AddParams());
+        params.userdata = lt::client_data_t(new AddParams{ 0, "", params.comment });
 
         if (label_id > 0)
         {

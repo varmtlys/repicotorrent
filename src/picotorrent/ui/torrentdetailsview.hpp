@@ -33,6 +33,7 @@ namespace pt::UI
 
     private:
         std::shared_ptr<Core::Configuration> m_cfg;
+        std::map<libtorrent::info_hash_t, BitTorrent::TorrentHandle*> m_torrents;
 
         TorrentDetailsOverviewPanel* m_overview;
         TorrentDetailsFilesPanel* m_files;

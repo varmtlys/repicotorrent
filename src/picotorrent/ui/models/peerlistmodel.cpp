@@ -113,88 +113,41 @@ void PeerListModel::GetValueByRow(wxVariant &variant, unsigned int row, unsigned
         break;
     case Column::Flags:
     {
-        std::stringstream flags;
+        // Spelled out rather than the classic one-letter codes
+        // (D d U u O S I K ? X H E e P L), which nobody remembers.
+        std::vector<std::string> keys;
 
         if (peer.flags & lt::peer_info::interesting)
         {
-            if (peer.flags & lt::peer_info::remote_choked)
-            {
-                flags << "d ";
-            }
-            else
-            {
-                flags << "D ";
-            }
+            keys.push_back(peer.flags & lt::peer_info::remote_choked ? "peer_flag_download_choked" : "peer_flag_downloading");
         }
 
         if (peer.flags & lt::peer_info::remote_interested)
         {
-            if (peer.flags & lt::peer_info::choked)
-            {
-                flags << "u ";
-            }
-            else
-            {
-                flags << "U ";
-            }
+            keys.push_back(peer.flags & lt::peer_info::choked ? "peer_flag_upload_choked" : "peer_flag_uploading");
         }
 
-        if (peer.flags & lt::peer_info::optimistic_unchoke)
+        if (peer.flags & lt::peer_info::optimistic_unchoke) { keys.push_back("peer_flag_optimistic"); }
+        if (peer.flags & lt::peer_info::snubbed) { keys.push_back("peer_flag_snubbed"); }
+        if (!(peer.flags & lt::peer_info::outgoing_connection)) { keys.push_back("peer_flag_incoming"); }
+        if (!(peer.flags & lt::peer_info::remote_choked) && !(peer.flags & lt::peer_info::interesting)) { keys.push_back("peer_flag_not_interested"); }
+        if (!(peer.flags & lt::peer_info::choked) && !(peer.flags & lt::peer_info::remote_interested)) { keys.push_back("peer_flag_not_interesting"); }
+        if (peer.source & lt::peer_info::pex) { keys.push_back("peer_flag_pex"); }
+        if (peer.source & lt::peer_info::dht) { keys.push_back("peer_flag_dht"); }
+        if (peer.flags & lt::peer_info::rc4_encrypted) { keys.push_back("peer_flag_encrypted"); }
+        if (peer.flags & lt::peer_info::plaintext_encrypted) { keys.push_back("peer_flag_header_encrypted"); }
+        if (peer.flags & lt::peer_info::utp_socket) { keys.push_back("peer_flag_utp"); }
+        if (peer.source & lt::peer_info::lsd) { keys.push_back("peer_flag_lsd"); }
+
+        std::wstring flags;
+
+        for (auto const& key : keys)
         {
-            flags << "O ";
+            if (!flags.empty()) { flags += L", "; }
+            flags += i18n(key);
         }
 
-        if (peer.flags & lt::peer_info::snubbed)
-        {
-            flags << "S ";
-        }
-
-        if (!(peer.flags & lt::peer_info::outgoing_connection))
-        {
-            flags << "I ";
-        }
-
-        if (!(peer.flags & lt::peer_info::remote_choked) && !(peer.flags & lt::peer_info::interesting))
-        {
-            flags << "K ";
-        }
-
-        if (!(peer.flags & lt::peer_info::choked) && !(peer.flags & lt::peer_info::remote_interested))
-        {
-            flags << "? ";
-        }
-
-        if (peer.source & lt::peer_info::pex)
-        {
-            flags << "X ";
-        }
-
-        if (peer.source & lt::peer_info::dht)
-        {
-            flags << "H ";
-        }
-
-        if (peer.flags & lt::peer_info::rc4_encrypted)
-        {
-            flags << "E ";
-        }
-
-        if (peer.flags & lt::peer_info::plaintext_encrypted)
-        {
-            flags << "e ";
-        }
-
-        if (peer.flags & lt::peer_info::utp_socket)
-        {
-            flags << "P ";
-        }
-
-        if (peer.source & lt::peer_info::lsd)
-        {
-            flags << "L ";
-        }
-
-        variant = flags.str();
+        variant = flags;
 
         break;
     }
