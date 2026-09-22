@@ -18,6 +18,7 @@
 #include "../../core/database.hpp"
 #include "../../core/utils.hpp"
 #include "../clientdata.hpp"
+#include "../fastwheel.hpp"
 #include "../models/filestoragemodel.hpp"
 #include "../translator.hpp"
 
@@ -103,6 +104,7 @@ AddTorrentDialog::AddTorrentDialog(wxWindow* parent, wxWindowID id, lt::add_torr
 
     auto contentsSizer = new wxStaticBoxSizer(wxVERTICAL, filesPanel, i18n("contents"));
     m_filesView = new wxDataViewCtrl(contentsSizer->GetStaticBox(), ptID_FILE_LIST, wxDefaultPosition, wxDefaultSize, wxDV_MULTIPLE);
+    EnableFastWheel(m_filesView);
     m_torrentName = new wxStaticText(contentsSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_END | wxST_NO_AUTORESIZE);
     m_torrentSize = new wxStaticText(contentsSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_END | wxST_NO_AUTORESIZE);
     m_torrentInfoHash = new wxStaticText(contentsSizer->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_END | wxST_NO_AUTORESIZE);

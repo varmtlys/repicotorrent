@@ -9,6 +9,7 @@
 
 #include "../bittorrent/torrenthandle.hpp"
 #include "../bittorrent/torrentstatus.hpp"
+#include "fastwheel.hpp"
 #include "dialogs/addtrackerdialog.hpp"
 #include "models/trackerlistmodel.hpp"
 #include "translator.hpp"
@@ -22,6 +23,7 @@ TorrentDetailsTrackersPanel::TorrentDetailsTrackersPanel(wxWindow* parent, wxWin
     m_trackersView(new wxDataViewCtrl(this, wxID_ANY)),
     m_torrent(nullptr)
 {
+    EnableFastWheel(m_trackersView);
     m_trackersView->AppendTextColumn(
         i18n("url"),
         TrackerListModel::Column::Url,

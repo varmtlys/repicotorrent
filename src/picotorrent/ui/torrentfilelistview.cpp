@@ -1,6 +1,7 @@
 #include "torrentfilelistview.hpp"
 
 #include "models/filestoragemodel.hpp"
+#include "fastwheel.hpp"
 #include "translator.hpp"
 
 using pt::UI::TorrentFileListView;
@@ -47,6 +48,7 @@ TorrentFileListView::TorrentFileListView(wxWindow* parent, wxWindowID id)
     AppendColumn(new wxDataViewColumn(wxEmptyString, new wxDataViewTextRenderer(), FileStorageModel::Columns::_Max, 0));
 
     nameCol->GetRenderer()->EnableEllipsize(wxELLIPSIZE_END);
+    EnableFastWheel(this);
 }
 
 TorrentFileListView::~TorrentFileListView()

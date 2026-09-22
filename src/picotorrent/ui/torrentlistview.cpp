@@ -3,6 +3,7 @@
 #include <wx/persist.h>
 
 #include "../bittorrent/torrenthandle.hpp"
+#include "fastwheel.hpp"
 #include "models/torrentlistmodel.hpp"
 #include "persistence/persistenttorrentlistview.hpp"
 #include "translator.hpp"
@@ -17,6 +18,7 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
     this->AssociateModel(m_model);
     m_model->DecRef();
     m_model->SetStateIconSize(FromDIP(16));
+    EnableFastWheel(this);
 
     auto defaultFlags = wxDATAVIEW_COL_REORDERABLE | wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE;
 

@@ -10,6 +10,7 @@
 
 #include "../bittorrent/torrenthandle.hpp"
 #include "../bittorrent/torrentstatus.hpp"
+#include "fastwheel.hpp"
 #include "models/peerlistmodel.hpp"
 #include "translator.hpp"
 
@@ -22,6 +23,7 @@ TorrentDetailsPeersPanel::TorrentDetailsPeersPanel(wxWindow* parent, wxWindowID 
     m_peersModel(new PeerListModel(geoip)),
     m_summary(new wxStaticText(this, wxID_ANY, wxEmptyString))
 {
+    EnableFastWheel(m_peersView);
     m_peersView->AppendTextColumn(i18n("ip"), PeerListModel::Column::IP, wxDATAVIEW_CELL_INERT, FromDIP(110));
     m_peersView->AppendTextColumn(i18n("country"), PeerListModel::Column::Country, wxDATAVIEW_CELL_INERT, FromDIP(50));
     m_peersView->AppendTextColumn(i18n("type"), PeerListModel::Column::Type, wxDATAVIEW_CELL_INERT, FromDIP(60));
