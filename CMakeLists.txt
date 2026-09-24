@@ -61,6 +61,33 @@ if(NOT PICO_COMMITS_SINCE_TAG EQUAL 0)
 endif()
 
 message(STATUS "RePicoTorrent version: ${GITVERSION_VAR_SEMVER} (${GITVERSION_VAR_SHORTSHA})")
+
+# Reconfigure when a commit, checkout or tag changes the version, so a
+# plain rebuild never carries a stale one.
+execute_process(
+    COMMAND ${GIT_EXECUTABLE} rev-parse --absolute-git-dir --symbolic-full-name HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE PICO_GIT_PATHS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET)
+
+if(PICO_GIT_PATHS)
+    string(REPLACE "\n" ";" PICO_GIT_PATHS "${PICO_GIT_PATHS}")
+    list(GET PICO_GIT_PATHS 0 PICO_GIT_DIR)
+    list(LENGTH PICO_GIT_PATHS PICO_GIT_PATHS_LENGTH)
+
+    set(PICO_GIT_WATCH HEAD packed-refs refs/tags)
+    if(PICO_GIT_PATHS_LENGTH GREATER 1)
+        list(GET PICO_GIT_PATHS 1 PICO_GIT_REF) # refs/heads/<branch>
+        list(APPEND PICO_GIT_WATCH ${PICO_GIT_REF})
+    endif()
+
+    foreach(f ${PICO_GIT_WATCH})
+        if(EXISTS "${PICO_GIT_DIR}/${f}")
+            set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${PICO_GIT_DIR}/${f}")
+        endif()
+    endforeach()
+endif()
 # -----------------------
 
 # --------- antlr4 options
