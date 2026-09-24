@@ -51,7 +51,7 @@ std::shared_ptr<Environment> Environment::Create()
 
 fs::path Environment::GetApplicationDataPath()
 {
-    // Still PicoTorrent: data written before the rename stays where it is.
+    // Still PicoTorrent: an installed PicoTorrent's data stays where it is.
     if (IsInstalled() || IsAppContainerProcess())
     {
         return fs::path(GetKnownFolderPath(KnownFolder::LocalAppData)) / "PicoTorrent";
@@ -102,7 +102,24 @@ std::string Environment::GetCurrentLocale()
 
 fs::path Environment::GetDatabaseFilePath()
 {
-    return GetApplicationDataPath() / "PicoTorrent.sqlite";
+    fs::path const db = GetApplicationDataPath() / "RePicoTorrent.sqlite";
+    fs::path const old = GetApplicationDataPath() / "PicoTorrent.sqlite";
+
+    // Take over a PicoTorrent database (and its WAL files) on first start.
+    std::error_code ec;
+
+    if (!fs::exists(db, ec) && fs::exists(old, ec))
+    {
+        for (auto suffix : { L"", L"-wal", L"-shm" })
+        {
+            fs::path from = old.wstring() + suffix;
+            if (fs::exists(from, ec)) { fs::rename(from, db.wstring() + suffix, ec); }
+        }
+
+        BOOST_LOG_TRIVIAL(info) << "Renamed " << old << " to " << db;
+    }
+
+    return db;
 }
 
 fs::path Environment::GetKnownFolderPath(Environment::KnownFolder knownFolder)
@@ -148,7 +165,7 @@ fs::path Environment::GetLogFilePath()
     char frmt[100] = { 0 };
     snprintf(frmt,
         ARRAYSIZE(frmt),
-        "PicoTorrent.%d%02d%02d%02d%02d%02d.log",
+        "RePicoTorrent.%d%02d%02d%02d%02d%02d.log",
         t.tm_year + 1900,
         t.tm_mon + 1,
         t.tm_mday,

@@ -3,6 +3,16 @@
 Versions follow [Semantic Versioning](https://semver.org). A release is a
 `vX.Y.Z` tag; its notes are the matching section below.
 
+## 0.26.2
+
+### Changed
+
+- New icon: the drop in purple, inside an update ring.
+- The database is now `RePicoTorrent.sqlite`. An existing
+  `PicoTorrent.sqlite` next to the exe is renamed on the first start, so
+  moving from PicoTorrent is just copying it into the RePicoTorrent
+  folder. Log files are named `RePicoTorrent.<date>.log`.
+
 ## 0.26.1
 
 ### Downloads
