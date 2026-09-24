@@ -87,7 +87,9 @@ AboutDialog::AboutDialog(wxWindow* parent, wxWindowID id)
     desc->AppendText(i18n("picotorrent_description"));
 
     auto footerSizer = new wxBoxSizer(wxHORIZONTAL);
-    footerSizer->Add(new wxStaticText(this, wxID_ANY, i18n("copyright_text")));
+    // The year of the build: __DATE__ is "Mmm dd yyyy".
+    footerSizer->Add(new wxStaticText(this, wxID_ANY,
+        wxString(wxUniChar(0xA9)) + wxString::Format(" 2015-%s PicoTorrent, RePicoTorrent contributors", &__DATE__[7])));
     footerSizer->AddStretchSpacer();
     footerSizer->Add(new wxHyperlinkCtrl(this, wxID_ANY, "github.com/varmtlys/repicotorrent", "https://github.com/varmtlys/repicotorrent"));
 

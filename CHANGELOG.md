@@ -3,6 +3,16 @@
 Versions follow [Semantic Versioning](https://semver.org). A release is a
 `vX.Y.Z` tag; its notes are the matching section below.
 
+## 0.26.3
+
+### Changed
+
+- The About box shows the copyright up to the year of the build and
+  names RePicoTorrent's contributors next to PicoTorrent's.
+- LICENSE and README credit the RePicoTorrent authors; the README
+  describes the current features, updates, moving from PicoTorrent or
+  qBittorrent, and what the program connects to.
+
 ## 0.26.2
 
 ### Changed
