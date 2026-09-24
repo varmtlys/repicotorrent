@@ -43,14 +43,25 @@ jobs:
         shell: bash
         run: echo "commit=$(git rev-parse HEAD:vendor/vcpkg)" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/cache@v4
+      - uses: actions/cache/restore@v4
+        id: cache
         with:
           path: vcpkg-cache
           key: vcpkg-${{ matrix.arch }}-${{ steps.vcpkg.outputs.commit }}-${{ hashFiles('vcpkg.json', 'vendor/vcpkg-overlays/**') }}
           restore-keys: vcpkg-${{ matrix.arch }}-${{ steps.vcpkg.outputs.commit }}-
 
+      # CMake 4 (on the ARM runner) rejects the vendored wxWidgets' old
+      # cmake_minimum_required without the policy floor.
       - name: Configure
-        run: cmake -S . -B build -G "Visual Studio 17 2022" -A ${{ matrix.platform }} -DVCPKG_TARGET_TRIPLET=${{ matrix.arch }}-windows-static-md-rel
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A ${{ matrix.platform }} -DVCPKG_TARGET_TRIPLET=${{ matrix.arch }}-windows-static-md-rel -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+
+      # Saved right after vcpkg ran, so a failing build does not throw
+      # away the compiled dependencies.
+      - uses: actions/cache/save@v4
+        if: always() && steps.cache.outputs.cache-hit != 'true'
+        with:
+          path: vcpkg-cache
+          key: ${{ steps.cache.outputs.cache-primary-key }}
 
       - name: Build
         run: cmake --build build --config Release --parallel --target PicoTorrent Plugin_Updater PicoTorrent-tests
