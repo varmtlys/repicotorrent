@@ -19,9 +19,8 @@ longer developed, on libtorrent 2.1 with fixes and new features.
 - Imports torrents from qBittorrent with their progress and statistics.
 - Portable: settings and torrents are kept next to the exe.
 - Updates itself from the GitHub releases, verified by SHA-256.
-- Identifies to trackers as PicoTorrent, so client whitelists keep
-  working: peer ID `-PI-` (e.g. `-PI0260-` for 0.26.0), user agent
-  `PicoTorrent/x.y.z`.
+- Peer ID `-RP-` (e.g. `-RP0262-` for 0.26.2), user agent
+  `RePicoTorrent/x.y.z`.
 
 
 ## Download

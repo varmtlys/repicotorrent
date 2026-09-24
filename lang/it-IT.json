@@ -58,7 +58,7 @@
     "preferences": "Impostazioni",
     "advanced": "Avanzate",
     "experimental": "Sperimentale",
-    "use_picotorrent_peer_id": "Usa il peer id e l'user-agent di PicoTorrent",
+    "use_picotorrent_peer_id": "Usa il peer id e l'user-agent di RePicoTorrent",
     "limits": "Limiti",
     "dl_limit": "Limite DL",
     "dl_limit_help": "(KB/s, 0: illimitato)",

@@ -74,7 +74,7 @@
     "preferences": "Preferensi",
     "advanced": "Lanjutan",
     "experimental": "Eksperimental",
-    "use_picotorrent_peer_id": "Gunakan id rekan dan agen pengguna PicoTorrent",
+    "use_picotorrent_peer_id": "Gunakan id rekan dan agen pengguna RePicoTorrent",
     "limits": "Batasan",
     "dl_limit": "Batas UD",
     "dl_limit_help": "(KB/s, 0: tidak terbatas)",

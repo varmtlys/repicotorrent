@@ -63,7 +63,7 @@
     "preferences": "설정",
     "advanced": "고급",
     "experimental": "실험 기능",
-    "use_picotorrent_peer_id": "PicoTorrent 피어 ID 맟 유저 에이전트 사용",
+    "use_picotorrent_peer_id": "RePicoTorrent 피어 ID 맟 유저 에이전트 사용",
     "limits": "제한",
     "dl_limit": "다운로드 제한",
     "dl_limit_help": "(KB/s, 0: 무제한)",

@@ -63,7 +63,7 @@
     "preferences": "Preferencje",
     "advanced": "Zaawansowane",
     "experimental": "Eksperymentalne",
-    "use_picotorrent_peer_id": "Użyj identyfikatora i agenta PicoTorrent",
+    "use_picotorrent_peer_id": "Użyj identyfikatora i agenta RePicoTorrent",
     "limits": "Limity",
     "dl_limit": "Limit pobierania",
     "dl_limit_help": "(KB/s, 0: nielimitowane)",

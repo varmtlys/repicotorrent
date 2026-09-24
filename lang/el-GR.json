@@ -64,7 +64,7 @@
     "preferences": "Προτιμήσεις",
     "advanced": "Για προχωρημένους",
     "experimental": "Πειραματικές",
-    "use_picotorrent_peer_id": "Χρήση αναγνωριστικού ομοτίμου PicoTorrent και πελάτη χρήστη",
+    "use_picotorrent_peer_id": "Χρήση αναγνωριστικού ομοτίμου RePicoTorrent και πελάτη χρήστη",
     "limits": "Όρια",
     "dl_limit": "Όριο μεταφόρτωσης",
     "dl_limit_help": "(KB/s, 0: απεριόριστο)",

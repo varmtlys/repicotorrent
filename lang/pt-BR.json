@@ -55,7 +55,7 @@
     "invalid_listen_port": "Porta de escuta inválida. Deve ser um número entre 1024 e 65535.",
     "preferences": "Preferências",
     "advanced": "Avançado",
-    "use_picotorrent_peer_id": "Usar o id de pares e agente de usuário do PicoTorrent",
+    "use_picotorrent_peer_id": "Usar o id de pares e agente de usuário do RePicoTorrent",
     "limits": "Limites",
     "dl_limit": "Limite de Download",
     "dl_limit_help": "(KB/s, 0: ilimitado)",

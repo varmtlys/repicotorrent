@@ -68,7 +68,7 @@
     "preferences": "Parametrai",
     "advanced": "Kiti",
     "experimental": "Eksperimentiniai",
-    "use_picotorrent_peer_id": "Naudoti „PicoTorrent“ siuntėjo id ir kliento eilutę",
+    "use_picotorrent_peer_id": "Naudoti „RePicoTorrent“ siuntėjo id ir kliento eilutę",
     "limits": "Ribos",
     "dl_limit": "Riboti parsiuntimo greitį",
     "dl_limit_help": "(KB/s, 0 – neriboti)",

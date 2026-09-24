@@ -74,7 +74,7 @@
     "preferences": "Настройки",
     "advanced": "Дополнительно",
     "experimental": "Экспериментально",
-    "use_picotorrent_peer_id": "PicoTorrent \"peer id\" и \"user agent\"",
+    "use_picotorrent_peer_id": "RePicoTorrent \"peer id\" и \"user agent\"",
     "limits": "Ограничения",
     "dl_limit": "Загрузка",
     "dl_limit_help": "(КБ/с, 0: неограниченно)",

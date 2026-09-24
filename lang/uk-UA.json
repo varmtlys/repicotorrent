@@ -74,7 +74,7 @@
     "preferences": "Налаштування",
     "advanced": "Розширені",
     "experimental": "Експериментальні",
-    "use_picotorrent_peer_id": "Використовувати ідентифікатор PicoTorrent",
+    "use_picotorrent_peer_id": "Використовувати ідентифікатор RePicoTorrent",
     "limits": "Обмеження трафіку",
     "dl_limit": "Макс. швидкість завантаження",
     "dl_limit_help": "(КБ/с, 0: необмежено)",

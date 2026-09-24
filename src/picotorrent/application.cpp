@@ -17,6 +17,7 @@
 #include "core/database.hpp"
 #include "core/environment.hpp"
 #include "core/utils.hpp"
+#include "ipc/server.hpp"
 #include "ui/mainframe.hpp"
 #include "ui/translator.hpp"
 #include "updateinstaller.hpp"
@@ -24,7 +25,6 @@
 using json = nlohmann::json;
 using pt::Application;
 
-static const char* SingleInstanceName = "0f45f639-a5b4-4a80-b559-3dcad02adb18";
 
 namespace
 {
@@ -98,7 +98,7 @@ namespace
 
 Application::Application()
     : wxApp(),
-    m_singleInstance(std::make_unique<wxSingleInstanceChecker>(SingleInstanceName))
+    m_singleInstance(std::make_unique<wxSingleInstanceChecker>(IPC::Server::InstanceName()))
 {
     SetProcessDPIAware();
 }
@@ -316,7 +316,7 @@ bool Application::ActivateOtherInstance()
     {
         wxClient client;
 
-        if (auto conn = client.MakeConnection("localhost", "RePicoTorrent", "ApplicationOptions"))
+        if (auto conn = client.MakeConnection("localhost", IPC::Server::InstanceName(), "ApplicationOptions"))
         {
             conn->Execute(j.dump());
             conn->Disconnect();
@@ -326,7 +326,7 @@ bool Application::ActivateOtherInstance()
 
         // Our own handle keeps the named mutex alive - drop it before asking.
         m_singleInstance.reset();
-        m_singleInstance = std::make_unique<wxSingleInstanceChecker>(SingleInstanceName);
+        m_singleInstance = std::make_unique<wxSingleInstanceChecker>(IPC::Server::InstanceName());
 
         if (!m_singleInstance->IsAnotherRunning())
         {

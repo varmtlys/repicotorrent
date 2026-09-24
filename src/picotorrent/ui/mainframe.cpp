@@ -21,6 +21,7 @@
 
 #include "../applicationoptions.hpp"
 #include "../bittorrent/addparams.hpp"
+#include "../buildinfo.hpp"
 #include "../bittorrent/session.hpp"
 #include "../bittorrent/sessionstatistics.hpp"
 #include "../bittorrent/torrenthandle.hpp"
@@ -52,12 +53,10 @@
 namespace fs = std::filesystem;
 using pt::UI::MainFrame;
 
-const char* WindowTitle = "RePicoTorrent";
-
 #define LABEL_ICON_SIZE 16
 
 MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr<pt::Core::Database> db, std::shared_ptr<pt::Core::Configuration> cfg, pt::CommandLineOptions const& options)
-    : wxFrame(nullptr, wxID_ANY, WindowTitle, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, "MainFrame"),
+    : wxFrame(nullptr, wxID_ANY, wxString::Format("RePicoTorrent %s", pt::BuildInfo::semver()), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, "MainFrame"),
     m_env(env),
     m_db(db),
     m_cfg(cfg),

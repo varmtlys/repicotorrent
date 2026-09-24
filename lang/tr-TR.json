@@ -57,7 +57,7 @@
     "preferences": "Tercihler",
     "advanced": "Gelişmiş",
     "experimental": "Deneysel",
-    "use_picotorrent_peer_id": "PicoTorrent Peer ID ve User Agent kullan",
+    "use_picotorrent_peer_id": "RePicoTorrent Peer ID ve User Agent kullan",
     "limits": "Limit",
     "dl_limit": "İndirme limiti",
     "dl_limit_help": "(KB/s, 0: Limitsiz)",

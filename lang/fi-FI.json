@@ -67,7 +67,7 @@
     "preferences": "Lisäasetukset",
     "advanced": "Lisäasetukset",
     "experimental": "Kokeellinen",
-    "use_picotorrent_peer_id": "Käytä PicoTorrentin peer id:tä ja user agenttia",
+    "use_picotorrent_peer_id": "Käytä RePicoTorrentin peer id:tä ja user agenttia",
     "limits": "Rajoitukset",
     "dl_limit": "Latausnopeus",
     "dl_limit_help": "(Kt/s, 0: rajoittamaton)",

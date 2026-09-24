@@ -8,6 +8,12 @@ Versions follow [Semantic Versioning](https://semver.org). A release is a
 ### Changed
 
 - New icon: the drop in purple, inside an update ring.
+- The client identifies as RePicoTorrent: peer id `-RP0262-`, user agent
+  `RePicoTorrent/0.26.2` (was PicoTorrent's `-PI`). Private trackers with
+  a client whitelist may not know it yet.
+- The window title shows the version.
+- Copies in different folders run side by side, each with its own
+  single instance.
 - The database is now `RePicoTorrent.sqlite`. An existing
   `PicoTorrent.sqlite` next to the exe is renamed on the first start, so
   moving from PicoTorrent is just copying it into the RePicoTorrent

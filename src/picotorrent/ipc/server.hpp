@@ -23,6 +23,10 @@ namespace IPC
 
         virtual wxConnectionBase* OnAcceptConnection(const wxString& topic) wxOVERRIDE;
 
+        // One instance per program folder: copies in different folders
+        // (a live one and a screenshot one, say) run side by side.
+        static wxString InstanceName();
+
     private:
         UI::MainFrame* m_frame;
     };

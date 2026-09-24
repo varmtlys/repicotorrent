@@ -74,7 +74,7 @@
     "preferences": "Paramètres",
     "advanced": "Avancé",
     "experimental": "Expérimental",
-    "use_picotorrent_peer_id": "Utiliser l'identifiant et l'agent utilisateur de PicoTorrent",
+    "use_picotorrent_peer_id": "Utiliser l'identifiant et l'agent utilisateur de RePicoTorrent",
     "limits": "Limites",
     "dl_limit": "Limite de réception",
     "dl_limit_help": "(Ko/s, 0 : illimité)",

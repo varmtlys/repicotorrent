@@ -56,7 +56,7 @@
     "preferences": "Voorkeuren",
     "advanced": "Geavanceerd",
     "experimental": "Experimenteel",
-    "use_picotorrent_peer_id": "Gebruik PicoTorrent peer id en user agent",
+    "use_picotorrent_peer_id": "Gebruik RePicoTorrent peer id en user agent",
     "limits": "Begrenzingen",
     "dl_limit": "DL-limiet",
     "dl_limit_help": "(KB/s, 0: onbeperkt)",

@@ -62,7 +62,7 @@
     "preferences": "Konfigurācija",
     "advanced": "Papildus",
     "experimental": "Eksperimentāli",
-    "use_picotorrent_peer_id": "Lietot PicoTorrent ID un lietotāju",
+    "use_picotorrent_peer_id": "Lietot RePicoTorrent ID un lietotāju",
     "limits": "Limiti",
     "dl_limit": "Lejupiel. limits",
     "dl_limit_help": "(KB/s, 0: neierobežots)",

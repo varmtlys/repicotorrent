@@ -64,7 +64,7 @@
     "preferences": "Beállítások",
     "advanced": "Haladó",
     "experimental": "Kísérleti",
-    "use_picotorrent_peer_id": "PicoTorrent-Peer-ID és -Useragent használata",
+    "use_picotorrent_peer_id": "RePicoTorrent-Peer-ID és -Useragent használata",
     "limits": "Korlátok",
     "dl_limit": "Letöltési korlát",
     "dl_limit_help": "(KB/s, 0: nincs korlát)",

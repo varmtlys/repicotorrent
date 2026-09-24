@@ -61,7 +61,7 @@
     "invalid_listen_port": "Port d'escolta no vàlid. Ha de ser un nombre entre 1024 i 65535.",
     "preferences": "Preferències",
     "advanced": "Avançat",
-    "use_picotorrent_peer_id": "Fes servir l'identificador de parells i l'agent d'usuari de PicoTorrent",
+    "use_picotorrent_peer_id": "Fes servir l'identificador de parells i l'agent d'usuari de RePicoTorrent",
     "limits": "Límits",
     "dl_limit": "Límit de baixada",
     "dl_limit_help": "(KB/s, 0: il·limitat)",

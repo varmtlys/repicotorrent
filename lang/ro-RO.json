@@ -59,7 +59,7 @@
     "invalid_listen_port": "Port de ascultare invalid. Trebuie să fie un număr între 1024 și 65535.",
     "preferences": "Preferințe",
     "advanced": "Avansat",
-    "use_picotorrent_peer_id": "Utilizați identificatorul de perechi și agentul de utilizator al PicoTorrent",
+    "use_picotorrent_peer_id": "Utilizați identificatorul de perechi și agentul de utilizator al RePicoTorrent",
     "limits": "Limite",
     "dl_limit": "Limită de descărcare",
     "dl_limit_help": "(KB/s, 0: nelimitat)",

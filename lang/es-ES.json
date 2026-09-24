@@ -60,7 +60,7 @@
     "invalid_listen_port": "Puerto de escucha no valido. Tiene que ser un número entre 1024 y 65535.",
     "preferences": "Preferencias",
     "advanced": "Avanzado",
-    "use_picotorrent_peer_id": "Usar id de pares y agente de usuario de PicoTorrent",
+    "use_picotorrent_peer_id": "Usar id de pares y agente de usuario de RePicoTorrent",
     "limits": "Límites",
     "dl_limit": "Límite de descarga",
     "dl_limit_help": "(KB/s, 0: ilimitado)",

@@ -65,7 +65,7 @@
     "preferences": "პარამეტრები",
     "advanced": "დამატებითი",
     "experimental": "ექსპერიმენტული",
-    "use_picotorrent_peer_id": "PicoTorrent-ის პირის id-ის და მომხმარებლის აგენტის გამოყენება",
+    "use_picotorrent_peer_id": "RePicoTorrent-ის პირის id-ის და მომხმარებლის აგენტის გამოყენება",
     "limits": "ზღვრები",
     "dl_limit": "ჩამ. ლიმიტი",
     "dl_limit_help": "(კბ/წ, 0: ულიმიტო)",

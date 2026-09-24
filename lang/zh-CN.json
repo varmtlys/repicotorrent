@@ -65,7 +65,7 @@
     "preferences": "设置",
     "advanced": "高级",
     "experimental": "试验性",
-    "use_picotorrent_peer_id": "使用PicoTorrent的id和用户标识",
+    "use_picotorrent_peer_id": "使用RePicoTorrent的id和用户标识",
     "limits": "限速",
     "dl_limit": "下载限速",
     "dl_limit_help": "(KB/s, 0: 不限制)",
