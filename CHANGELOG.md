@@ -12,6 +12,8 @@ Versions follow [Semantic Versioning](https://semver.org). A release is a
   `RePicoTorrent/0.26.2` (was PicoTorrent's `-PI`). Private trackers with
   a client whitelist may not know it yet.
 - The window title shows the version.
+- Sizes (KB, MB, GB) follow the language picked in the program instead
+  of the Windows language.
 - Copies in different folders run side by side, each with its own
   single instance.
 - The database is now `RePicoTorrent.sqlite`. An existing

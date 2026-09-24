@@ -403,5 +403,7 @@
     "import_qbittorrent_select_folder": "Выберите папку BT_backup qBittorrent",
     "import_qbittorrent_result": "Импортировано: {0}\nУже были добавлены: {1}\nОшибок: {2}\n\nНе запускайте qBittorrent с этими же раздачами одновременно.",
     "update_install": "Скачать и установить",
-    "update_failed": "Не удалось установить обновление: {0}"
+    "update_failed": "Не удалось установить обновление: {0}",
+    "size_units": "байт,КБ,МБ,ГБ,ТБ,ПБ",
+    "decimal_point": ","
 }
