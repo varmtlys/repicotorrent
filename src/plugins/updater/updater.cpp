@@ -1,5 +1,6 @@
 #include <libpico.h>
 
+#include <cstring>
 #include <string>
 #include <Windows.h>
 #include <CommCtrl.h>
@@ -62,7 +63,7 @@ void show_available_update(libpico_mainwnd_t* wnd, libpico_config_t* config, con
     tdf.pszMainIcon = TD_INFORMATION_ICON;
     tdf.pszMainInstruction = main_format;
     tdf.pszVerificationText = verification;
-    tdf.pszWindowTitle = TEXT("PicoTorrent");
+    tdf.pszWindowTitle = TEXT("RePicoTorrent");
 
     int pnButton = -1;
     int pnRadioButton = -1;
@@ -112,7 +113,7 @@ void show_no_update(libpico_mainwnd_t* wnd)
     tdf.hwndParent = hWnd;
     tdf.pszMainIcon = TD_INFORMATION_ICON;
     tdf.pszMainInstruction = main;
-    tdf.pszWindowTitle = L"PicoTorrent";
+    tdf.pszWindowTitle = L"RePicoTorrent";
 
     TaskDialogIndirect(&tdf, nullptr, nullptr, nullptr);
 }
@@ -148,7 +149,28 @@ libpico_result_t parse_response(
 
             const sajson::value& root = doc.get_root();
 
-            std::string version = root.get_value_of_key(sajson::literal("version")).as_string();
+            auto str = [&root](const char* key)
+            {
+                sajson::value v = root.get_value_of_key(sajson::string(key, strlen(key)));
+                return v.get_type() == sajson::TYPE_STRING ? v.as_string() : std::string();
+            };
+
+            // Either {version, url} or a GitHub latest release
+            // ({tag_name: "vX.Y.Z", html_url}).
+            std::string version = str("version");
+            std::string url = str("url");
+
+            if (version.empty())
+            {
+                version = str("tag_name");
+                url = str("html_url");
+                if (!version.empty() && version[0] == 'v') { version.erase(0, 1); }
+            }
+
+            if (version.empty())
+            {
+                break;
+            }
 
             char ignoredVersion[100];
             size_t ignoredVersionLen = 100;
@@ -169,8 +191,6 @@ libpico_result_t parse_response(
 
             if (parsedVersion > currentVersion)
             {
-                std::string url = root.get_value_of_key(sajson::literal("url")).as_string();
-
                 show_available_update(
                     data->wnd,
                     data->config,

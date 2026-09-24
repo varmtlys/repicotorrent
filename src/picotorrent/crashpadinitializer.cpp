@@ -65,14 +65,16 @@ void CrashpadInitializer::Initialize(std::shared_ptr<pt::Core::Environment> env)
         return;
     }
 
-    if (!database->GetSettings()->SetUploadsEnabled(true))
+    // Dumps are always written locally; they are only uploaded when a
+    // report URL is configured.
+    if (!database->GetSettings()->SetUploadsEnabled(!env->GetCrashpadReportUrl().empty()))
     {
         BOOST_LOG_TRIVIAL(error) << "Failed to set uploads in Crashpad database";
         return;
     }
 
     std::string environment = "Production";
-    std::string release = "PicoTorrent-" + std::string(pt::BuildInfo::version());
+    std::string release = "RePicoTorrent-" + std::string(pt::BuildInfo::version());
 
     if (strcmp(pt::BuildInfo::branch(), "master") != 0)
     {

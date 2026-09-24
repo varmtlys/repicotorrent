@@ -44,13 +44,14 @@ std::shared_ptr<Environment> Environment::Create()
     boost::log::add_common_attributes();
     boost::log::core::get()->add_global_attribute("Uptime", boost::log::attributes::timer());
 
-    BOOST_LOG_TRIVIAL(info) << "PicoTorrent starting up...";
+    BOOST_LOG_TRIVIAL(info) << "RePicoTorrent starting up...";
 
     return std::shared_ptr<Environment>(env);
 }
 
 fs::path Environment::GetApplicationDataPath()
 {
+    // Still PicoTorrent: data written before the rename stays where it is.
     if (IsInstalled() || IsAppContainerProcess())
     {
         return fs::path(GetKnownFolderPath(KnownFolder::LocalAppData)) / "PicoTorrent";
@@ -75,7 +76,8 @@ std::string Environment::GetCrashpadReportUrl()
         return url;
     }
 
-    return "https://o314884.ingest.sentry.io/api/1794272/minidump/?sentry_key=722163e5427c4a8892d2c158b5ffe954";
+    // The upstream Sentry project is not ours to send dumps to.
+    return "";
 }
 
 fs::path Environment::GetCoreDbFilePath()

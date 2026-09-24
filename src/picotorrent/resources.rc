@@ -36,6 +36,7 @@ ICO_TERMINAL_DARK_THEME ICON "..\\..\\res\\terminal-dark-theme.ico"
 20260918120000_insert_geoip_settings            DBMIGRATION "..\\..\\res\\dbmigrations\\20260918120000_insert_geoip_settings.sql"
 20260918130000_stage2_network_defaults          DBMIGRATION "..\\..\\res\\dbmigrations\\20260918130000_stage2_network_defaults.sql"
 20260918210000_insert_webtorrent_settings        DBMIGRATION "..\\..\\res\\dbmigrations\\20260918210000_insert_webtorrent_settings.sql"
+20260924120000_update_checks_github        DBMIGRATION "..\\..\\res\\dbmigrations\\20260924120000_update_checks_github.sql"
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION        VER_FILE_VERSION
