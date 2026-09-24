@@ -74,7 +74,14 @@ set(wxUSE_EXCEPTIONS      OFF   CACHE BOOL   "" FORCE)
 # --------------------
 
 # vendor libs
-add_subdirectory(vendor/sentry-crashpad)
+# The vendored Crashpad predates ARM64 support; ARM64 builds go without
+# crash dumps.
+if(CMAKE_CXX_COMPILER_ARCHITECTURE_ID STREQUAL "ARM64")
+    set(PICO_WITH_CRASHPAD OFF)
+else()
+    set(PICO_WITH_CRASHPAD ON)
+    add_subdirectory(vendor/sentry-crashpad)
+endif()
 add_subdirectory(vendor/wx)
 
 # pico components
@@ -274,11 +281,6 @@ target_link_libraries(
     wininet
     winhttp
 
-    # Crashpad
-    crashpad_client
-    crashpad_util
-    mini_chromium
-
     # fmt
     fmt::fmt
 
@@ -326,13 +328,19 @@ target_compile_definitions(Plugin_Updater PRIVATE -D_WIN32 -DUNICODE -DWIN32_LEA
 target_include_directories(Plugin_Updater PRIVATE include)
 target_link_libraries(Plugin_Updater PRIVATE PicoTorrent Comctl32)
 
-# Copy Crashpad handler
-add_custom_command(
-    TARGET PicoTorrent POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        $<TARGET_FILE:crashpad_handler>
-        $<TARGET_FILE_DIR:PicoTorrent>
-)
+if(PICO_WITH_CRASHPAD)
+    target_link_libraries(PicoTorrent PRIVATE crashpad_client crashpad_util mini_chromium)
+
+    # Copy Crashpad handler
+    add_custom_command(
+        TARGET PicoTorrent POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:crashpad_handler>
+            $<TARGET_FILE_DIR:PicoTorrent>
+    )
+else()
+    target_compile_definitions(PicoTorrent PRIVATE -DPICO_NO_CRASHPAD)
+endif()
 
 # Generate coredb
 add_custom_command(

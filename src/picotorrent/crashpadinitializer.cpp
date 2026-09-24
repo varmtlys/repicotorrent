@@ -10,12 +10,15 @@
 #include <CommCtrl.h>
 
 #include <boost/log/trivial.hpp>
+
+#ifndef PICO_NO_CRASHPAD
 #pragma warning(push)
 #pragma warning(disable: 4100)
 #include <client/crash_report_database.h>
 #include <client/settings.h>
 #include <client/crashpad_client.h>
 #pragma warning(pop)
+#endif
 
 #include "buildinfo.hpp"
 #include "core/environment.hpp"
@@ -24,6 +27,12 @@
 namespace fs = std::filesystem;
 using pt::CrashpadInitializer;
 
+#ifdef PICO_NO_CRASHPAD
+void CrashpadInitializer::Initialize(std::shared_ptr<pt::Core::Environment>)
+{
+    BOOST_LOG_TRIVIAL(info) << "Built without Crashpad, crash dumps are not written";
+}
+#else
 void CrashpadInitializer::Initialize(std::shared_ptr<pt::Core::Environment> env)
 {
     auto databasePath = env->GetApplicationDataPath() / "Crashpad" / "db";
@@ -115,3 +124,4 @@ void CrashpadInitializer::Initialize(std::shared_ptr<pt::Core::Environment> env)
 
     BOOST_LOG_TRIVIAL(info) << "Crashpad handler started";
 }
+#endif

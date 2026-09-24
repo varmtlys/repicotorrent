@@ -13,15 +13,21 @@ permissions:
 jobs:
   build:
     name: Windows ${{ matrix.arch }}
-    runs-on: windows-2022
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - arch: x64
             platform: x64
+            runner: windows-2022
           - arch: x86
             platform: Win32
+            runner: windows-2022
+          # Native, so the post-build coredb generator can run.
+          - arch: arm64
+            platform: ARM64
+            runner: windows-11-arm
 
     env:
       VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}\vcpkg-cache,readwrite
@@ -59,7 +65,9 @@ jobs:
           $name = "RePicoTorrent-$version-${{ matrix.arch }}"
 
           $dir = New-Item -ItemType Directory "dist\$name"
-          Copy-Item build\Release\RePicoTorrent.exe, build\Release\coredb.sqlite, build\Release\crashpad_handler.exe, build\Release\Plugin_Updater.dll $dir
+          # No crashpad_handler.exe on ARM64 (built without Crashpad).
+          Copy-Item build\Release\RePicoTorrent.exe, build\Release\coredb.sqlite, build\Release\Plugin_Updater.dll $dir
+          if (Test-Path build\Release\crashpad_handler.exe) { Copy-Item build\Release\crashpad_handler.exe $dir }
 
           # Ship the VC++ runtime next to the exe so the zip runs on a clean
           # Windows without the redistributable installed.
