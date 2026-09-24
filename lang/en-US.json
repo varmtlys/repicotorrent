@@ -324,5 +324,7 @@
     "peer_flag_lsd": "local (LSD)",
     "amp_import_qbittorrent": "&Import from qBittorrent...",
     "import_qbittorrent_select_folder": "Select the qBittorrent BT_backup folder",
-    "import_qbittorrent_result": "Imported: {0}\nAlready added: {1}\nFailed: {2}\n\nDo not run qBittorrent with the same torrents at the same time."
+    "import_qbittorrent_result": "Imported: {0}\nAlready added: {1}\nFailed: {2}\n\nDo not run qBittorrent with the same torrents at the same time.",
+    "update_install": "Download and install",
+    "update_failed": "The update could not be installed: {0}"
 }

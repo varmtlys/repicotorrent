@@ -151,6 +151,7 @@ add_executable(
     src/picotorrent/crashpadinitializer
     src/picotorrent/main
     src/picotorrent/persistencemanager
+    src/picotorrent/updateinstaller
     src/picotorrent/resources.rc
 
     # API

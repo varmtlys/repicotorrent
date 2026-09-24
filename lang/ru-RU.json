@@ -95,7 +95,7 @@
     "url": "Ссылка",
     "next_announce": "Следующий анонс",
     "scrape": "Scrape-запрос",
-    "picotorrent_v_available": "RePicoTorrent {0} доступен",
+    "picotorrent_v_available": "Доступен RePicoTorrent %s",
     "no_update_available": "Нет доступных обновлений",
     "show_on_github": "Открыть на GitHub",
     "new_version_available": "Доступна новая версия RePicoTorrent.",
@@ -401,5 +401,7 @@
     "peer_flag_lsd": "локальная сеть (LSD)",
     "amp_import_qbittorrent": "&Импорт из qBittorrent...",
     "import_qbittorrent_select_folder": "Выберите папку BT_backup qBittorrent",
-    "import_qbittorrent_result": "Импортировано: {0}\nУже были добавлены: {1}\nОшибок: {2}\n\nНе запускайте qBittorrent с этими же раздачами одновременно."
+    "import_qbittorrent_result": "Импортировано: {0}\nУже были добавлены: {1}\nОшибок: {2}\n\nНе запускайте qBittorrent с этими же раздачами одновременно.",
+    "update_install": "Скачать и установить",
+    "update_failed": "Не удалось установить обновление: {0}"
 }

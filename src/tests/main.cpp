@@ -10,6 +10,8 @@
 
 #include "../picotorrent/bittorrent/infohash.hpp"
 #include "../picotorrent/bittorrent/ipfilterparser.hpp"
+#include "../picotorrent/updateinstaller.hpp"
+#include "../plugins/updater/versioncompare.hpp"
 
 namespace lt = libtorrent;
 
@@ -139,12 +141,45 @@ static void testParseIPFilterLine()
     CHECK(!parseIPFilterLine("1.2.3.4-1.2.3.5,99999999999999999999,x", start, end, access));
 }
 
+static void testIsNewer()
+{
+    using pt::Updater::isNewer;
+
+    CHECK(isNewer("0.26.1", "0.26.0"));
+    CHECK(isNewer("0.27.0", "0.26.9"));
+    CHECK(isNewer("1.0.0", "0.99.99"));
+    CHECK(isNewer("0.26.1", "0.26.1-dev.3"));
+    CHECK(isNewer("0.26.0", "0.0.1"));
+
+    CHECK(!isNewer("0.26.0", "0.26.0"));
+    CHECK(!isNewer("0.26.0", "0.26.1-dev.3"));
+    CHECK(!isNewer("0.25.9", "0.26.0"));
+    CHECK(!isNewer("0.26.10", "0.26.10"));
+}
+
+static void testFindChecksum()
+{
+    using pt::UpdateInstaller;
+
+    std::string const a(64, 'a');
+    std::string const b(64, 'B');
+    std::string const sums = a + "  RePicoTorrent-0.26.1-x64.zip\n" + b + " *RePicoTorrent-0.26.1-x86.zip\n";
+
+    CHECK(UpdateInstaller::FindChecksum(sums, "RePicoTorrent-0.26.1-x64.zip") == a);
+    CHECK(UpdateInstaller::FindChecksum(sums, "RePicoTorrent-0.26.1-x86.zip") == std::string(64, 'b'));
+    CHECK(UpdateInstaller::FindChecksum(sums, "RePicoTorrent-0.26.1-arm64.zip").empty());
+    CHECK(UpdateInstaller::FindChecksum("", "x.zip").empty());
+    CHECK(UpdateInstaller::FindChecksum("abc  x.zip", "x.zip").empty());
+}
+
 int main()
 {
     testFindInfoHash();
     testInfoHashKey();
     testParseIPv4Address();
     testParseIPFilterLine();
+    testIsNewer();
+    testFindChecksum();
 
     if (failures == 0)
     {

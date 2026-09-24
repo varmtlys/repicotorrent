@@ -105,4 +105,9 @@ LIBPICO_API_FUNCTION libpico_result_t libpico_register_hook(libpico_plugin_t* ap
 LIBPICO_API_FUNCTION libpico_result_t libpico_torrent_stats_get(libpico_torrent_t* torrent, libpico_torrent_stats_t* stats);
 
 LIBPICO_API_FUNCTION const char* libpico_version();
+
+/*
+Update
+*/
+LIBPICO_API_FUNCTION libpico_result_t libpico_update_install(libpico_mainwnd_t* wnd, const char* zip_url, const char* sums_url);
 #endif

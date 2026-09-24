@@ -12,6 +12,7 @@
 #include "../core/environment.hpp"
 #include "../core/utils.hpp"
 #include "../http/httpclient.hpp"
+#include "../updateinstaller.hpp"
 #include "../ui/mainframe.hpp"
 #include "../ui/translator.hpp"
 
@@ -249,5 +250,12 @@ libpico_result_t libpico_torrent_stats_get(libpico_torrent_t* torrent, libpico_t
 
 const char* libpico_version()
 {
-    return pt::BuildInfo::version();
+    // With the -dev.N suffix, so a build is offered the release it precedes.
+    return pt::BuildInfo::semver();
+}
+
+libpico_result_t libpico_update_install(libpico_mainwnd_t* wnd, const char* zip_url, const char* sums_url)
+{
+    pt::UpdateInstaller::Install(reinterpret_cast<pt::UI::MainFrame*>(wnd), zip_url, sums_url);
+    return libpico_ok;
 }

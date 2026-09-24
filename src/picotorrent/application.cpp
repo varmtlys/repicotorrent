@@ -19,6 +19,7 @@
 #include "core/utils.hpp"
 #include "ui/mainframe.hpp"
 #include "ui/translator.hpp"
+#include "updateinstaller.hpp"
 
 using json = nlohmann::json;
 using pt::Application;
@@ -177,6 +178,7 @@ bool Application::OnInit()
     }
 
     auto env = pt::Core::Environment::Create();
+    pt::UpdateInstaller::CleanUp();
     pt::CrashpadInitializer::Initialize(env);
 
     auto db = std::make_shared<pt::Core::Database>(env);
@@ -343,6 +345,7 @@ void Application::WaitForPreviousInstance(long pid)
 {
     HANDLE hProc = OpenProcess(SYNCHRONIZE, FALSE, pid);
     if (hProc == NULL) { return; }
-    WaitForSingleObject(hProc, 10000);
+    // Saving resume data on exit can take up to 30 seconds.
+    WaitForSingleObject(hProc, 60000);
     CloseHandle(hProc);
 }

@@ -18,6 +18,7 @@ longer developed, on libtorrent 2.1 with fixes and new features.
 - Supports DHT, PeX, LSD, UPnP, WebTorrent.
 - Imports torrents from qBittorrent with their progress and statistics.
 - Portable: settings and torrents are kept next to the exe.
+- Updates itself from the GitHub releases, verified by SHA-256.
 - Identifies to trackers as PicoTorrent, so client whitelists keep
   working: peer ID `-PI-` (e.g. `-PI0260-` for 0.26.0), user agent
   `PicoTorrent/x.y.z`.
@@ -27,7 +28,8 @@ longer developed, on libtorrent 2.1 with fixes and new features.
 
 Get the latest zip for your Windows from
 [Releases](https://github.com/varmtlys/repicotorrent/releases/latest):
-`x64` for 64-bit Windows (also runs on Windows on ARM), `x86` for 32-bit.
+`x64` for 64-bit Windows, `arm64` for Windows on ARM, `x86` for 32-bit.
+New releases are offered in the app and install with one click.
 See [CHANGELOG.md](CHANGELOG.md) for what changed and how to move from
 PicoTorrent.
 
@@ -44,7 +46,9 @@ cmake -S . -B build-x64 -G "Visual Studio 17 2022" -A x64 -DVCPKG_TARGET_TRIPLET
 cmake --build build-x64 --config Release --target PicoTorrent Plugin_Updater
 ```
 
-For 32-bit use `-A Win32` and the `x86-windows-static-md-rel` triplet.
+For 32-bit use `-A Win32` and the `x86-windows-static-md-rel` triplet,
+for ARM64 `-A ARM64` and `arm64-windows-static-md-rel` (built on an ARM64
+machine, without Crashpad).
 The first build compiles the dependencies and takes a while.
 
 

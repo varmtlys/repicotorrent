@@ -6,11 +6,12 @@
 #include <CommCtrl.h>
 #include <shellapi.h>
 
+#include "versioncompare.hpp"
+
 #pragma warning(push)
 #pragma warning(disable: 4200)
 #pragma warning(disable: 4996)
 #include "sajson.h"
-#include "semver.hpp"
 #pragma warning(pop)
 
 #define DEFAULT_I18N_BUFFER_SIZE 256
@@ -22,7 +23,16 @@ struct updater_request_data_t
     libpico_mainwnd_t* wnd;
 };
 
-void show_available_update(libpico_mainwnd_t* wnd, libpico_config_t* config, const char* version, const char* url)
+// The release zip for this build's architecture.
+#if defined(_M_ARM64)
+#define UPDATER_ASSET_SUFFIX "-arm64.zip"
+#elif defined(_M_X64)
+#define UPDATER_ASSET_SUFFIX "-x64.zip"
+#else
+#define UPDATER_ASSET_SUFFIX "-x86.zip"
+#endif
+
+void show_available_update(libpico_mainwnd_t* wnd, libpico_config_t* config, const char* version, const char* url, std::string const& zipUrl, std::string const& sumsUrl)
 {
     HWND hWnd = nullptr;
     libpico_mainwnd_native_handle(wnd, reinterpret_cast<void**>(&hWnd));
@@ -49,17 +59,27 @@ void show_available_update(libpico_mainwnd_t* wnd, libpico_config_t* config, con
     size_t show_len = DEFAULT_I18N_BUFFER_SIZE;
     libpico_i18n("show_on_github", show, &show_len);
 
+    wchar_t install[DEFAULT_I18N_BUFFER_SIZE];
+    size_t install_len = DEFAULT_I18N_BUFFER_SIZE;
+    libpico_i18n("update_install", install, &install_len);
+
+    // Installing needs the zip for this architecture and the checksums
+    // to verify it; otherwise only the release page is offered.
+    bool canInstall = !zipUrl.empty() && !sumsUrl.empty();
+
     const TASKDIALOG_BUTTON pButtons[] =
     {
+        { 1001, install },
         { 1000, show },
     };
 
     TASKDIALOGCONFIG tdf = { sizeof(TASKDIALOGCONFIG) };
-    tdf.cButtons = ARRAYSIZE(pButtons);
+    tdf.cButtons = canInstall ? 2 : 1;
+    tdf.pszContent = content;
     tdf.dwCommonButtons = TDCBF_CLOSE_BUTTON;
     tdf.dwFlags = TDF_POSITION_RELATIVE_TO_WINDOW | TDF_USE_COMMAND_LINKS;
     tdf.hwndParent = hWnd;
-    tdf.pButtons = pButtons;
+    tdf.pButtons = canInstall ? pButtons : pButtons + 1;
     tdf.pszMainIcon = TD_INFORMATION_ICON;
     tdf.pszMainInstruction = main_format;
     tdf.pszVerificationText = verification;
@@ -71,7 +91,11 @@ void show_available_update(libpico_mainwnd_t* wnd, libpico_config_t* config, con
 
     TaskDialogIndirect(&tdf, &pnButton, &pnRadioButton, &pfVerificationFlagChecked);
 
-    if (pnButton == 1000)
+    if (pnButton == 1001)
+    {
+        libpico_update_install(wnd, zipUrl.c_str(), sumsUrl.c_str());
+    }
+    else if (pnButton == 1000)
     {
         wchar_t urlw[255];
         libpico_string_towide(url, urlw, 255);
@@ -172,6 +196,36 @@ libpico_result_t parse_response(
                 break;
             }
 
+            std::string zipUrl;
+            std::string sumsUrl;
+            sajson::value assets = root.get_value_of_key(sajson::literal("assets"));
+
+            if (assets.get_type() == sajson::TYPE_ARRAY)
+            {
+                std::string const suffix = UPDATER_ASSET_SUFFIX;
+
+                for (size_t i = 0; i < assets.get_length(); i++)
+                {
+                    sajson::value asset = assets.get_array_element(i);
+                    if (asset.get_type() != sajson::TYPE_OBJECT) { continue; }
+
+                    sajson::value name = asset.get_value_of_key(sajson::literal("name"));
+                    sajson::value link = asset.get_value_of_key(sajson::literal("browser_download_url"));
+                    if (name.get_type() != sajson::TYPE_STRING || link.get_type() != sajson::TYPE_STRING) { continue; }
+
+                    std::string n = name.as_string();
+
+                    if (n == "SHA256SUMS.txt")
+                    {
+                        sumsUrl = link.as_string();
+                    }
+                    else if (n.size() > suffix.size() && n.compare(n.size() - suffix.size(), suffix.size(), suffix) == 0)
+                    {
+                        zipUrl = link.as_string();
+                    }
+                }
+            }
+
             char ignoredVersion[100];
             size_t ignoredVersionLen = 100;
 
@@ -186,16 +240,15 @@ libpico_result_t parse_response(
                 break;
             }
 
-            semver::version parsedVersion(version);
-            semver::version currentVersion(libpico_version());
-
-            if (parsedVersion > currentVersion)
+            if (pt::Updater::isNewer(version, libpico_version()))
             {
                 show_available_update(
                     data->wnd,
                     data->config,
                     version.c_str(),
-                    url.c_str());
+                    url.c_str(),
+                    zipUrl,
+                    sumsUrl);
             }
             else if (data->force)
             {

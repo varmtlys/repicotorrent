@@ -3,6 +3,31 @@
 Versions follow [Semantic Versioning](https://semver.org). A release is a
 `vX.Y.Z` tag; its notes are the matching section below.
 
+## 0.26.1
+
+### Downloads
+
+- `RePicoTorrent-0.26.1-x64.zip` for 64-bit Windows 10/11.
+- `RePicoTorrent-0.26.1-x86.zip` for 32-bit Windows.
+- `RePicoTorrent-0.26.1-arm64.zip` for Windows on ARM (new). This build
+  has no crash dump handler: the bundled Crashpad does not support ARM64.
+
+### New
+
+- Updates install from the app: when a new release is out, **Download
+  and install** fetches the zip for your Windows from GitHub, checks it
+  against `SHA256SUMS.txt`, replaces the program files and restarts.
+  Settings and torrents are kept. Replaced files stay as `*.old` until
+  the next start.
+- Native Windows on ARM64 build.
+
+### Fixed
+
+- The Russian "new version available" title showed `{0}` instead of the
+  version.
+- Restarting after a settings change failed when the program folder had
+  a space in its path.
+
 ## 0.26.0
 
 The first RePicoTorrent release: PicoTorrent 0.25 restarted on

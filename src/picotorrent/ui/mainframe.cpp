@@ -893,7 +893,7 @@ void MainFrame::OnViewPreferences(wxCommandEvent&)
             GetModuleFileName(NULL, path, ARRAYSIZE(path));
 
             std::wstringstream proc;
-            proc << path << L" --wait-for-pid=" << std::to_wstring(GetCurrentProcessId());
+            proc << L"\"" << path << L"\" --wait-for-pid=" << std::to_wstring(GetCurrentProcessId());
 
             wxExecute(proc.str(), wxEXEC_ASYNC);
             Close(true);
