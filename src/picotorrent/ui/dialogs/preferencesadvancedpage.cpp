@@ -95,7 +95,7 @@ static std::map<std::string, std::map<std::string, Property>> properties =
         }
     },
     {
-        "PicoTorrent",
+        "RePicoTorrent",
         {
             MAKE_PROP(Int,  Integer, int,  "save_resume_data_interval",   "save_resume_data_interval"),
             MAKE_PROP(Int,  Integer, int,  "ui.torrent_overview.columns", "torrent_overview_columns"),

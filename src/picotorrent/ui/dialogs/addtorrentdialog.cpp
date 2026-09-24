@@ -498,7 +498,7 @@ void AddTorrentDialog::OnOk(wxCommandEvent&)
     catch (std::exception const& ex)
     {
         BOOST_LOG_TRIVIAL(error) << "Failed to add torrent: " << ex.what();
-        wxMessageBox(ex.what(), "PicoTorrent", wxICON_ERROR | wxOK, this);
+        wxMessageBox(ex.what(), "RePicoTorrent", wxICON_ERROR | wxOK, this);
     }
 }
 

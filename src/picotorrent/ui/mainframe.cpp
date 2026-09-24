@@ -52,7 +52,7 @@
 namespace fs = std::filesystem;
 using pt::UI::MainFrame;
 
-const char* WindowTitle = "PicoTorrent";
+const char* WindowTitle = "RePicoTorrent";
 
 #define LABEL_ICON_SIZE 16
 
@@ -383,7 +383,7 @@ void MainFrame::AddTorrents(std::vector<lt::add_torrent_params>& params, bool us
             auto err = i18n("some_torrents_already_in_session");
             if (params.empty()) err = i18n("all_torrents_already_in_session");
 
-            wxMessageBox(err, "PicoTorrent", wxOK, this);
+            wxMessageBox(err, "RePicoTorrent", wxOK, this);
         }
     }
 

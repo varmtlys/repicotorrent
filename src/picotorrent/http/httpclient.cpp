@@ -28,7 +28,7 @@ using pt::Http::HttpClient;
 HttpClient::HttpClient()
 {
     m_session = WinHttpOpen(
-        L"PicoTorrent/1.0",
+        L"RePicoTorrent/1.0",
         WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
         WINHTTP_NO_PROXY_NAME,
         WINHTTP_NO_PROXY_BYPASS,

@@ -264,7 +264,8 @@ static lt::settings_pack getSettingsPack(std::shared_ptr<pt::Core::Configuration
         ? cfg->Get<int>("libtorrent.upload_rate_limit").value_or(0) * 1024
         : 0);
 
-    // Calculate user agent
+    // Calculate user agent. Trackers keep client whitelists keyed on the
+    // PicoTorrent user agent and peer id, so the fork keeps announcing as it.
     std::stringstream user_agent;
     user_agent << "PicoTorrent/" << pt::BuildInfo::semver();
 

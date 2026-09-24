@@ -1,0 +1,106 @@
+name: Build
+
+on:
+  push:
+    branches: [master, dev]
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Windows ${{ matrix.arch }}
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            platform: x64
+          - arch: x86
+            platform: Win32
+
+    env:
+      VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}\vcpkg-cache,readwrite
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the version comes from the latest vX.Y.Z tag
+          submodules: recursive
+
+      - name: vcpkg cache key
+        id: vcpkg
+        shell: bash
+        run: echo "commit=$(git rev-parse HEAD:vendor/vcpkg)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        with:
+          path: vcpkg-cache
+          key: vcpkg-${{ matrix.arch }}-${{ steps.vcpkg.outputs.commit }}-${{ hashFiles('vcpkg.json', 'vendor/vcpkg-overlays/**') }}
+          restore-keys: vcpkg-${{ matrix.arch }}-${{ steps.vcpkg.outputs.commit }}-
+
+      - name: Configure
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A ${{ matrix.platform }} -DVCPKG_TARGET_TRIPLET=${{ matrix.arch }}-windows-static-md-rel
+
+      - name: Build
+        run: cmake --build build --config Release --parallel --target PicoTorrent Plugin_Updater PicoTorrent-tests
+
+      - name: Test
+        run: build\Release\PicoTorrent-tests.exe
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $version = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME.TrimStart('v') } else { "dev-$($env:GITHUB_SHA.Substring(0, 7))" }
+          $name = "RePicoTorrent-$version-${{ matrix.arch }}"
+
+          $dir = New-Item -ItemType Directory "dist\$name"
+          Copy-Item build\Release\RePicoTorrent.exe, build\Release\coredb.sqlite, build\Release\crashpad_handler.exe, build\Release\Plugin_Updater.dll $dir
+
+          # Ship the VC++ runtime next to the exe so the zip runs on a clean
+          # Windows without the redistributable installed.
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
+          $crt = Get-ChildItem "$vs\VC\Redist\MSVC\*\${{ matrix.arch }}\Microsoft.VC14*.CRT" -Directory | Sort-Object FullName | Select-Object -Last 1
+          Copy-Item "$crt\*.dll" $dir
+
+          Compress-Archive -Path $dir -DestinationPath "dist\$name.zip"
+          Compress-Archive -Path build\Release\RePicoTorrent.pdb, build\Release\Plugin_Updater.pdb -DestinationPath "dist\$name.symbols.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RePicoTorrent-${{ matrix.arch }}
+          path: dist/*.zip
+          if-no-files-found: error
+
+  release:
+    name: Release
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums
+        run: cd dist && sha256sum *.zip > SHA256SUMS.txt
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          # The notes are this version's section of CHANGELOG.md.
+          awk -v v="$version" '/^## /{found = ($2 == v)} found' CHANGELOG.md | tail -n +2 > notes.md
+          [ -s notes.md ] || { echo "No CHANGELOG.md section for $version"; exit 1; }
+          gh release create "$GITHUB_REF_NAME" dist/* --title "RePicoTorrent $version" --notes-file notes.md

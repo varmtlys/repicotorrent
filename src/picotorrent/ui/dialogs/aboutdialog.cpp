@@ -67,7 +67,7 @@ AboutDialog::AboutDialog(wxWindow* parent, wxWindowID id)
     lv->SetItem(lv->GetItemCount() - 1, 1, "-");
     lv->SetItem(lv->GetItemCount() - 1, 2, "-");
 
-    lv->InsertItem(lv->GetItemCount(), "PicoTorrent");
+    lv->InsertItem(lv->GetItemCount(), "RePicoTorrent");
     lv->SetItem(lv->GetItemCount() - 1, 1, BuildInfo::semver());
     lv->SetItem(lv->GetItemCount() - 1, 2, BuildInfo::commitish());
 
@@ -89,7 +89,7 @@ AboutDialog::AboutDialog(wxWindow* parent, wxWindowID id)
     auto footerSizer = new wxBoxSizer(wxHORIZONTAL);
     footerSizer->Add(new wxStaticText(this, wxID_ANY, i18n("copyright_text")));
     footerSizer->AddStretchSpacer();
-    footerSizer->Add(new wxHyperlinkCtrl(this, wxID_ANY, "https://picotorrent.org", "https://picotorrent.org?app"));
+    footerSizer->Add(new wxHyperlinkCtrl(this, wxID_ANY, "github.com/varmtlys/repicotorrent", "https://github.com/varmtlys/repicotorrent"));
 
     // Required by the DB-IP Lite license (CC BY 4.0) the country column uses.
     auto geoipAttribution = new wxHyperlinkCtrl(this, wxID_ANY, "IP Geolocation by DB-IP", "https://db-ip.com");

@@ -228,7 +228,7 @@ int GeoIP::Download(wchar_t const* url, std::string& body)
     std::wstring path(uc.lpszUrlPath, uc.dwUrlPathLength);
 
     HINTERNET session = WinHttpOpen(
-        L"PicoTorrent",
+        L"RePicoTorrent",
         WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
         WINHTTP_NO_PROXY_NAME,
         WINHTTP_NO_PROXY_BYPASS,

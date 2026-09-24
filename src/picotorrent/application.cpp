@@ -23,7 +23,7 @@
 using json = nlohmann::json;
 using pt::Application;
 
-static const char* SingleInstanceName = "584c8e47-d8a5-4e52-9165-c0650a85723a";
+static const char* SingleInstanceName = "0f45f639-a5b4-4a80-b559-3dcad02adb18";
 
 namespace
 {
@@ -186,7 +186,7 @@ bool Application::OnInit()
     {
         wxMessageBox(
             "Failed to run database migrations. Please check log file.",
-            "PicoTorrent",
+            "RePicoTorrent",
             wxICON_ERROR);
         return false;
     }
@@ -314,7 +314,7 @@ bool Application::ActivateOtherInstance()
     {
         wxClient client;
 
-        if (auto conn = client.MakeConnection("localhost", "PicoTorrent", "ApplicationOptions"))
+        if (auto conn = client.MakeConnection("localhost", "RePicoTorrent", "ApplicationOptions"))
         {
             conn->Execute(j.dump());
             conn->Disconnect();

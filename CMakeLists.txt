@@ -6,9 +6,62 @@ cmake_policy(SET CMP0115 OLD) # Source file extensions must be explicit.
 set(VCPKG_OVERLAY_TRIPLETS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/vcpkg-overlays/triplets)
 set(CMAKE_TOOLCHAIN_FILE   ${CMAKE_CURRENT_SOURCE_DIR}/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "Vcpkg toolchain file")
 
-project("PicoTorrent")
+project("RePicoTorrent")
 
 set(CMAKE_CXX_STANDARD 17)
+
+# --------- version
+# Taken from the latest vX.Y.Z tag at configure time. A build on the tag is
+# that release; a build N commits later is the next patch with a -dev.N
+# suffix, so trackers and the updater never mistake it for a release.
+find_package(Git QUIET)
+
+execute_process(
+    COMMAND ${GIT_EXECUTABLE} describe --tags --long --match "v[0-9]*.[0-9]*.[0-9]*"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE PICO_GIT_DESCRIBE
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET)
+
+execute_process(
+    COMMAND ${GIT_EXECUTABLE} rev-parse --short=7 HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GITVERSION_VAR_SHORTSHA
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET)
+
+execute_process(
+    COMMAND ${GIT_EXECUTABLE} rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GITVERSION_VAR_BRANCHNAME
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET)
+
+if(PICO_GIT_DESCRIBE MATCHES "^v([0-9]+)\\.([0-9]+)\\.([0-9]+)-([0-9]+)-g[0-9a-f]+$")
+    set(GITVERSION_VAR_VERSION_MAJOR ${CMAKE_MATCH_1})
+    set(GITVERSION_VAR_VERSION_MINOR ${CMAKE_MATCH_2})
+    set(GITVERSION_VAR_VERSION_PATCH ${CMAKE_MATCH_3})
+    set(PICO_COMMITS_SINCE_TAG ${CMAKE_MATCH_4})
+else()
+    set(GITVERSION_VAR_VERSION_MAJOR 0)
+    set(GITVERSION_VAR_VERSION_MINOR 0)
+    set(GITVERSION_VAR_VERSION_PATCH 0)
+    set(PICO_COMMITS_SINCE_TAG 1)
+endif()
+
+if(NOT PICO_COMMITS_SINCE_TAG EQUAL 0)
+    math(EXPR GITVERSION_VAR_VERSION_PATCH "${GITVERSION_VAR_VERSION_PATCH} + 1")
+endif()
+
+set(GITVERSION_VAR_VERSION "${GITVERSION_VAR_VERSION_MAJOR}.${GITVERSION_VAR_VERSION_MINOR}.${GITVERSION_VAR_VERSION_PATCH}")
+set(GITVERSION_VAR_SEMVER ${GITVERSION_VAR_VERSION})
+
+if(NOT PICO_COMMITS_SINCE_TAG EQUAL 0)
+    set(GITVERSION_VAR_SEMVER "${GITVERSION_VAR_VERSION}-dev.${PICO_COMMITS_SINCE_TAG}")
+endif()
+
+message(STATUS "RePicoTorrent version: ${GITVERSION_VAR_SEMVER} (${GITVERSION_VAR_SHORTSHA})")
+# -----------------------
 
 # --------- antlr4 options
 option(WITH_STATIC_CRT "" Off)
@@ -246,6 +299,7 @@ target_link_libraries(
 )
 
 set_property(TARGET PicoTorrent PROPERTY ENABLE_EXPORTS 1)
+set_property(TARGET PicoTorrent PROPERTY OUTPUT_NAME RePicoTorrent)
 
 # Self-checks for the pure logic in src/picotorrent/bittorrent (no wx, no UI).
 enable_testing()
