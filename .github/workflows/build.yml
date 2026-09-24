@@ -14,6 +14,8 @@ jobs:
   build:
     name: Windows ${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
+    # A full vcpkg rebuild takes about 90 minutes; anything far beyond is a hang.
+    timeout-minutes: 150
     strategy:
       fail-fast: false
       matrix:
@@ -34,6 +36,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        # A submodule clone once hung for 90 minutes.
+        timeout-minutes: 20
         with:
           fetch-depth: 0 # the version comes from the latest vX.Y.Z tag
           submodules: recursive
