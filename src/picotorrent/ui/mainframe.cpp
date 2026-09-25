@@ -12,7 +12,9 @@
 #include <libtorrent/magnet_uri.hpp>
 #include <libtorrent/read_resume_data.hpp>
 #include <libtorrent/torrent_info.hpp>
+#include <sqlite3.h>
 #include <wx/dirdlg.h>
+#include <wx/filedlg.h>
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
 #include <wx/sizer.h>
@@ -254,6 +256,7 @@ MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr
     this->Bind(wxEVT_MENU, &MainFrame::OnFileAddMagnetLink, this, ptID_EVT_ADD_MAGNET_LINK);
     this->Bind(wxEVT_MENU, &MainFrame::OnFileCreateTorrent, this, ptID_EVT_CREATE_TORRENT);
     this->Bind(wxEVT_MENU, &MainFrame::OnFileImportQBittorrent, this, ptID_EVT_IMPORT_QBITTORRENT);
+    this->Bind(wxEVT_MENU, &MainFrame::OnFileImportPicoTorrent, this, ptID_EVT_IMPORT_PICOTORRENT);
     this->Bind(wxEVT_MENU, [this](wxCommandEvent&) { this->Close(true); }, ptID_EVT_EXIT);
     this->Bind(wxEVT_MENU, &MainFrame::OnViewPreferences, this, ptID_EVT_VIEW_PREFERENCES);
     this->Bind(wxEVT_MENU, &MainFrame::OnViewHelp, this, ptID_EVT_VIEW_HELP);
@@ -630,6 +633,7 @@ wxMenuBar* MainFrame::CreateMainMenu()
     fileMenu->AppendSeparator();
     fileMenu->Append(ptID_EVT_CREATE_TORRENT, i18n("amp_create_torrent"));
     fileMenu->AppendSeparator();
+    fileMenu->Append(ptID_EVT_IMPORT_PICOTORRENT, i18n("amp_import_picotorrent"));
     fileMenu->Append(ptID_EVT_IMPORT_QBITTORRENT, i18n("amp_import_qbittorrent"));
     fileMenu->AppendSeparator();
     fileMenu->Append(ptID_EVT_EXIT, i18n("amp_exit"));
@@ -763,6 +767,134 @@ void MainFrame::OnFileCreateTorrent(wxCommandEvent&)
         {
             dlg->Destroy();
         });
+}
+
+void MainFrame::OnFileImportPicoTorrent(wxCommandEvent&)
+{
+    // PicoTorrent keeps its torrents in PicoTorrent.sqlite, in the same
+    // tables this program uses. The file is only read.
+    wxFileDialog dlg(
+        this,
+        i18n("import_picotorrent_select_file"),
+        (fs::path(wxString(wxGetenv("LOCALAPPDATA")).ToStdWstring()) / "PicoTorrent").wstring(),
+        "PicoTorrent.sqlite",
+        "PicoTorrent (*.sqlite)|*.sqlite",
+        wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+    if (dlg.ShowModal() != wxID_OK) { return; }
+
+    std::error_code ec;
+    if (fs::equivalent(dlg.GetPath().ToStdWstring(), m_env->GetDatabaseFilePath(), ec))
+    {
+        wxMessageBox(i18n("import_picotorrent_own_database"), "RePicoTorrent", wxOK | wxICON_WARNING, this);
+        return;
+    }
+
+    sqlite3* db = nullptr;
+
+    if (sqlite3_open_v2(dlg.GetPath().utf8_str(), &db, SQLITE_OPEN_READONLY, nullptr) != SQLITE_OK)
+    {
+        BOOST_LOG_TRIVIAL(error) << "Failed to open " << dlg.GetPath() << ": " << sqlite3_errmsg(db);
+        sqlite3_close(db);
+        wxMessageBox(i18n("import_picotorrent_not_a_database"), "RePicoTorrent", wxOK | wxICON_ERROR, this);
+        return;
+    }
+
+    // Databases from before labels (PicoTorrent < 0.20) have no label table.
+    bool const hasLabels = sqlite3_exec(db, "SELECT 1 FROM label LIMIT 1", nullptr, nullptr, nullptr) == SQLITE_OK;
+
+    std::string sql =
+        "SELECT t.info_hash, tmu.magnet_uri, tmu.save_path, trd.resume_data, "
+        + std::string(hasLabels ? "lbl.name, lbl.color, lbl.color_enabled " : "NULL, NULL, 0 ")
+        + "FROM torrent t "
+        "LEFT JOIN torrent_magnet_uri tmu ON t.info_hash = tmu.info_hash "
+        "LEFT JOIN torrent_resume_data trd ON t.info_hash = trd.info_hash "
+        + std::string(hasLabels ? "LEFT JOIN label lbl ON lbl.id = t.label_id " : "")
+        + "ORDER BY t.queue_position ASC";
+
+    sqlite3_stmt* stmt = nullptr;
+
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK)
+    {
+        BOOST_LOG_TRIVIAL(error) << "Failed to read " << dlg.GetPath() << ": " << sqlite3_errmsg(db);
+        sqlite3_close(db);
+        wxMessageBox(i18n("import_picotorrent_not_a_database"), "RePicoTorrent", wxOK | wxICON_ERROR, this);
+        return;
+    }
+
+    auto text = [stmt](int col)
+    {
+        auto p = reinterpret_cast<const char*>(sqlite3_column_text(stmt, col));
+        return p ? std::string(p) : std::string();
+    };
+
+    int imported = 0, skipped = 0, failed = 0;
+    bool labelsAdded = false;
+
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto blob = static_cast<const char*>(sqlite3_column_blob(stmt, 3));
+        std::vector<char> resumeData(blob, blob + sqlite3_column_bytes(stmt, 3));
+
+        lt::add_torrent_params params;
+
+        if (!BitTorrent::Session::ParamsFromStored(text(1), text(2), resumeData, params))
+        {
+            BOOST_LOG_TRIVIAL(error) << "Failed to import " << text(0) << " from PicoTorrent";
+            failed++;
+            continue;
+        }
+
+        if (m_session->HasTorrent(params.info_hashes))
+        {
+            skipped++;
+            continue;
+        }
+
+        auto add = new BitTorrent::AddParams();
+
+        // Labels are matched by name; missing ones are created.
+        if (std::string labelName = text(4); !labelName.empty())
+        {
+            auto findLabel = [this, &labelName]()
+            {
+                for (auto const& l : m_cfg->GetLabels()) { if (l.name == labelName) { return l.id; } }
+                return -1;
+            };
+
+            if (findLabel() < 0)
+            {
+                Core::Configuration::Label label;
+                label.name = labelName;
+                label.color = text(5);
+                label.colorEnabled = sqlite3_column_int(stmt, 6) != 0;
+                m_cfg->UpsertLabel(label);
+                labelsAdded = true;
+            }
+
+            add->labelId = findLabel();
+            add->labelName = labelName;
+        }
+
+        params.userdata = lt::client_data_t(add);
+        m_session->AddTorrent(params);
+        imported++;
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+
+    if (labelsAdded)
+    {
+        this->CreateLabelMenuItems();
+        this->UpdateLabels();
+    }
+
+    wxMessageBox(
+        fmt::format(i18n("import_picotorrent_result"), imported, skipped, failed),
+        i18n("amp_import_picotorrent"),
+        wxOK | wxICON_INFORMATION,
+        this);
 }
 
 void MainFrame::OnFileImportQBittorrent(wxCommandEvent&)

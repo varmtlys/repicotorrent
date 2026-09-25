@@ -3,6 +3,14 @@
 Versions follow [Semantic Versioning](https://semver.org). A release is a
 `vX.Y.Z` tag; its notes are the matching section below.
 
+## Unreleased
+
+### New
+
+- **File > Import from PicoTorrent** adds the torrents of a PicoTorrent
+  database (`PicoTorrent.sqlite`) with their progress, save paths and
+  labels; labels missing here are created. The database is only read.
+
 ## 0.26.3
 
 ### Changed

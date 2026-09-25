@@ -1153,31 +1153,9 @@ void Session::LoadTorrents()
 
         lt::add_torrent_params params;
 
-        // Always parse magnet uri if it is not empty
-        if (!magnet_uri.empty() && !save_path.empty())
+        if (!ParamsFromStored(magnet_uri, save_path, resume_data, params))
         {
-            params = lt::parse_magnet_uri(magnet_uri);
-            params.save_path = save_path;
-        }
-
-        if (resume_data.size() > 0)
-        {
-            lt::error_code ec;
-            lt::bdecode_node node = lt::bdecode(resume_data, ec);
-
-            if (ec)
-            {
-                BOOST_LOG_TRIVIAL(warning) << "Failed to decode resume data: " << ec;
-                continue;
-            }
-
-            params = lt::read_resume_data(node, ec);
-
-            if (ec)
-            {
-                BOOST_LOG_TRIVIAL(warning) << "Failed to read resume data: " << ec;
-                continue;
-            }
+            continue;
         }
 
         params.userdata = lt::client_data_t(new AddParams{ 0, "", params.comment });
@@ -1190,6 +1168,50 @@ void Session::LoadTorrents()
 
         m_session->async_add_torrent(params);
     }
+}
+
+bool Session::ParamsFromStored(
+    std::string const& magnetUri,
+    std::string const& savePath,
+    std::vector<char> const& resumeData,
+    lt::add_torrent_params& params)
+{
+    // Always parse magnet uri if it is not empty
+    if (!magnetUri.empty() && !savePath.empty())
+    {
+        lt::error_code ec;
+        params = lt::parse_magnet_uri(magnetUri, ec);
+
+        if (ec)
+        {
+            BOOST_LOG_TRIVIAL(warning) << "Failed to parse magnet uri: " << ec;
+            return false;
+        }
+
+        params.save_path = savePath;
+    }
+
+    if (resumeData.size() > 0)
+    {
+        lt::error_code ec;
+        lt::bdecode_node node = lt::bdecode(resumeData, ec);
+
+        if (ec)
+        {
+            BOOST_LOG_TRIVIAL(warning) << "Failed to decode resume data: " << ec;
+            return false;
+        }
+
+        params = lt::read_resume_data(node, ec);
+
+        if (ec)
+        {
+            BOOST_LOG_TRIVIAL(warning) << "Failed to read resume data: " << ec;
+            return false;
+        }
+    }
+
+    return !params.info_hashes.v1.is_all_zeros() || !params.info_hashes.v2.is_all_zeros() || params.ti;
 }
 
 void Session::PauseAfterRecheck(pt::BitTorrent::TorrentHandle* th)

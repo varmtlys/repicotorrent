@@ -404,5 +404,10 @@
     "update_install": "Скачать и установить",
     "update_failed": "Не удалось установить обновление: {0}",
     "size_units": "байт,КБ,МБ,ГБ,ТБ,ПБ",
-    "decimal_point": ","
+    "decimal_point": ",",
+    "amp_import_picotorrent": "Импорт из &PicoTorrent...",
+    "import_picotorrent_select_file": "Выберите базу PicoTorrent (PicoTorrent.sqlite)",
+    "import_picotorrent_own_database": "Это собственная база RePicoTorrent. Выберите PicoTorrent.sqlite от PicoTorrent.",
+    "import_picotorrent_not_a_database": "Не удалось прочитать файл как базу PicoTorrent.",
+    "import_picotorrent_result": "Импортировано: {0}\nУже были добавлены: {1}\nОшибок: {2}\n\nНе запускайте PicoTorrent с этими же раздачами одновременно."
 }

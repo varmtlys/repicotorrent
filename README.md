@@ -60,10 +60,13 @@ stay. What changed is in [CHANGELOG.md](CHANGELOG.md).
 
 ## Moving from PicoTorrent or qBittorrent
 
-- **PicoTorrent**: copy `PicoTorrent.sqlite` next to `RePicoTorrent.exe`
-  (from the folder of a portable PicoTorrent, or `%LOCALAPPDATA%\PicoTorrent`
-  of an installed one). It is renamed to `RePicoTorrent.sqlite` on the
-  first start and its torrents, labels and settings are picked up.
+- **PicoTorrent**: **File > Import from PicoTorrent** and pick its
+  `PicoTorrent.sqlite` (next to a portable PicoTorrent, or in
+  `%LOCALAPPDATA%\PicoTorrent` of an installed one). Torrents and their
+  labels are added; the file is only read. To take over everything,
+  settings included, copy `PicoTorrent.sqlite` next to `RePicoTorrent.exe`
+  before the first start instead: it is renamed to `RePicoTorrent.sqlite`
+  and used as is.
 - **qBittorrent**: **File > Import from qBittorrent** and pick its
   `BT_backup` folder (`%LOCALAPPDATA%\qBittorrent\BT_backup`). qBittorrent's
   files are only read. Do not seed the same torrents from both clients at

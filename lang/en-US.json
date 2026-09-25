@@ -327,5 +327,10 @@
     "update_install": "Download and install",
     "update_failed": "The update could not be installed: {0}",
     "size_units": "B,KB,MB,GB,TB,PB",
-    "decimal_point": "."
+    "decimal_point": ".",
+    "amp_import_picotorrent": "Import from &PicoTorrent...",
+    "import_picotorrent_select_file": "Select the PicoTorrent database (PicoTorrent.sqlite)",
+    "import_picotorrent_own_database": "This is RePicoTorrent's own database. Select the PicoTorrent.sqlite of PicoTorrent.",
+    "import_picotorrent_not_a_database": "The file could not be read as a PicoTorrent database.",
+    "import_picotorrent_result": "Imported: {0}\nAlready added: {1}\nFailed: {2}\n\nDo not run PicoTorrent with the same torrents at the same time."
 }

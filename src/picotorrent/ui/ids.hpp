@@ -28,6 +28,8 @@ namespace UI
         ptID_EVT_SHOW_DETAILS,
         ptID_EVT_SHOW_STATUS_BAR,
         ptID_EVT_VIEW_PREFERENCES,
+        // Appended, so ptID_EVT_EXIT keeps its value.
+        ptID_EVT_IMPORT_PICOTORRENT,
 
         ptID_KEY_ADD_TORRENT,
         ptID_KEY_ADD_MAGNET_LINK,

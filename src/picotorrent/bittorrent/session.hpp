@@ -7,8 +7,10 @@
 
 #include <map>
 #include <memory>
+#include <string>
 #include <thread>
 #include <unordered_set>
+#include <vector>
 
 #include <libtorrent/fwd.hpp>
 #include <libtorrent/info_hash.hpp>
@@ -86,6 +88,15 @@ namespace BitTorrent
         void AddMetadataSearch(std::vector<libtorrent::info_hash_t> const& hashes);
         void AddTorrent(libtorrent::add_torrent_params const& params);
         bool HasTorrent(libtorrent::info_hash_t const& hash);
+
+        // Add params from what a (Re)PicoTorrent database stores for a
+        // torrent: resume data when there is any, else a magnet link and
+        // its save path. False when neither can be read.
+        static bool ParamsFromStored(
+            std::string const& magnetUri,
+            std::string const& savePath,
+            std::vector<char> const& resumeData,
+            libtorrent::add_torrent_params& params);
         void ReloadSettings();
         void RemoveMetadataSearch(std::vector<libtorrent::info_hash_t> const& hashes);
         void RemoveTorrent(TorrentHandle* handle, libtorrent::remove_flags_t flags = {});
