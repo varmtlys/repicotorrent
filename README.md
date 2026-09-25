@@ -11,7 +11,7 @@ which is no longer developed. It restarts it on current libraries, fixes
 its crashes and data loss, and adds what was missing.
 
 <p align="center">
-    <img src="res/screenshot1.png?raw=true" width="614" />
+    <img src="res/screenshot1.png" width="614" />
 </p>
 
 
