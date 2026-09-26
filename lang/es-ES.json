@@ -256,7 +256,6 @@
     "last_activity_unknown": "Ninguna",
     "status_ready": "Listo",
     "status_adding_files": "Agregar archivos al almacenamiento",
-    "documentation": "Documentación",
     "cancel": "Cancelar",
     "add_to_session": "Agregar a la sesión",
     "no_such_file_or_directory": "El archivo o directorio no existe",

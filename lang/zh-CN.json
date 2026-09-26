@@ -264,7 +264,6 @@
     "status_saving_torrent": "正在保存种子",
     "cancel": "取消",
     "restore_defaults": "恢复初始设置",
-    "documentation": "文档",
     "restore_defaults_description": "此操作会恢复大部分设置为初始值，是否确认？",
     "labels": "标签",
     "view_help": "查看帮助(&H)",

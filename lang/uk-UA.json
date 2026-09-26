@@ -277,7 +277,6 @@
     "no_such_file_or_directory": "Немає такого файлу чи теки",
     "cancel": "Скасування",
     "restore_defaults": "Відновити стандартні значення",
-    "documentation": "Документація",
     "restore_defaults_description": "Ця дія відновить стандартні значення більшості налаштувань. Ви впевнені?",
     "use_label_color_as_background_in_torrent_list": "Використовувати колір мітки як тло у списку торрентів",
     "labels": "Мітки",

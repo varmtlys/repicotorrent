@@ -10,6 +10,18 @@ Versions follow [Semantic Versioning](https://semver.org). A release is a
 - **File > Import from PicoTorrent** adds the torrents of a PicoTorrent
   database (`PicoTorrent.sqlite`) with their progress, save paths and
   labels; labels missing here are created. The database is only read.
+- Documentation with screenshots in every language of the program:
+  [DOC.md](DOC.md). **Help > View help** (F1) and the Create torrent dialog
+  open it in the current language.
+
+### Fixed
+
+- Check marks were black on black in the dark theme.
+
+### Changed
+
+- The link to the old PicoTorrent documentation site is gone from the
+  preferences.
 
 ## 0.26.3
 

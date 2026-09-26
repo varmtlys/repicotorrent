@@ -181,7 +181,6 @@
     "no_such_file_or_directory": "Nema takve datoteke ili direktorija",
     "cancel": "Poništi",
     "restore_defaults": "Vrati zadano",
-    "documentation": "Dokumentacija",
     "restore_defaults_description": "Ovo će vratiti sve postavke na zadano, Jeste li sigurni?",
     "use_label_color_as_background_in_torrent_list": "Koristi boju naljepnicu za podlogu u listi torrenta",
     "labels": "Naljepnice",

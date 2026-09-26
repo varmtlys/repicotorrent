@@ -144,6 +144,15 @@ std::wstring Translator::Translate(std::string const& key)
     return translation->second;
 }
 
+std::string Translator::DocumentationUrl()
+{
+    std::string const base = "https://github.com/varmtlys/repicotorrent/blob/master/";
+
+    return m_selectedLocale.empty() || m_selectedLocale == "en-US"
+        ? base + "DOC.md"
+        : base + "doc/DOC." + m_selectedLocale + ".md";
+}
+
 void Translator::SetLocale(std::string const& locale)
 {
     // a locale can be en-SV (english language but swedish format on dates etc)

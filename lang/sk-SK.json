@@ -174,7 +174,6 @@
     "no_such_file_or_directory": "Súbor alebo priečinok neexistuje",
     "cancel": "Zrušiť",
     "restore_defaults": "obnoviť pôvodné",
-    "documentation": "Dokumentácia",
     "restore_defaults_description": "Týmto sa obnoví predvolená hodnota väčšiny nastavení. Ste si istý?",
     "use_label_color_as_background_in_torrent_list": "Použite farbu štítku ako pozadie v zozname torrentov",
     "labels": "Štítky",

@@ -230,7 +230,6 @@
     "add_to_session": "Добавяне към сесията",
     "cancel": "Отказ",
     "restore_defaults": "Стандартни настройки",
-    "documentation": "Документация",
     "labels": "Етикети",
     "label_details": "Информация за етикет",
     "invalid_download_rate_limit": "Недействително ограничение при изтегляне.",

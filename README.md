@@ -37,6 +37,12 @@ its crashes and data loss, and adds what was missing.
   against the release's SHA-256 checksums.
 
 
+## Documentation
+
+[DOC.md](DOC.md) shows how to use the program, with screenshots, in every
+language the program has.
+
+
 ## Download
 
 Windows 10 or 11. Get the zip for your Windows from

@@ -31,6 +31,8 @@ namespace UI
 
         std::string GetLocale();
         std::vector<Language> Languages();
+        // DOC.md on GitHub in the current language.
+        std::string DocumentationUrl();
         void LoadDatabase(std::filesystem::path const& filePath);
         void SetLocale(std::string const& localeName);
         std::wstring Translate(std::string const& key);

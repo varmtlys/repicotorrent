@@ -248,7 +248,6 @@
     "dl_s_ul_s": "Download: {0}/s, Upload: {1}/s",
     "kb_s": "KB/s",
     "add_magnet_link_s_description": "Links magnéticos ou info hashes (um por linha)",
-    "documentation": "Documentação",
     "use_label_color_as_background_in_torrent_list": "Usar a cor de etiqueta como fundo na lista de torrents",
     "labels": "Etiqueta",
     "label_details": "Detalhes da etiqueta",

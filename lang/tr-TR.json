@@ -250,7 +250,6 @@
     "status_adding_files": "Depolama alanına dosya ekleme",
     "restore_defaults_description": "Bu, çoğu ayarı varsayılan değerlerine geri yükleyecektir. Emin misiniz?",
     "add_to_session": "Oturuma ekle",
-    "documentation": "Dokümantasyon",
     "export": "Dışa aktar",
     "torrent_file_s": "Torrent dosyaları",
     "exported_magnet_link_s": "Dışa aktarılan mıknatıs bağlantıları",

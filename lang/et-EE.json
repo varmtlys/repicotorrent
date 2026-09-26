@@ -120,7 +120,6 @@
     "trackers_input_per_line": "Jälitajad (üks rea kohta)",
     "how_to_create_torrents": "Kuidas luua torrenteid",
     "status_saving_torrent": "Salvestan torrentit",
-    "documentation": "Dokumentatsioon",
     "restore_defaults_description": "See taastab enamus sätteid tava peale. Kas olete kindel?",
     "export": "Ekspordi",
     "select_ip_filter_file": "Vali IP filtri fail",

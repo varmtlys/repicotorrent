@@ -58,6 +58,10 @@ namespace
     class DarkGaugeRenderer : public wxDelegateRendererNative
     {
     public:
+        // The default constructor delegates to the generic renderer, which
+        // draws the owner-drawn dark check boxes black on black.
+        DarkGaugeRenderer() : wxDelegateRendererNative(wxRendererNative::GetDefault()) { }
+
         void DrawGauge(wxWindow*, wxDC& dc, const wxRect& rect, int value, int max, int) override
         {
             wxDCPenChanger pen(dc, wxColour(0x3c3c3c));

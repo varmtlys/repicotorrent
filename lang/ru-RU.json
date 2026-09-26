@@ -279,7 +279,6 @@
     "no_such_file_or_directory": "Файл или папка не существует",
     "cancel": "Отмена",
     "restore_defaults": "Восстановить настройки по умолчанию",
-    "documentation": "Документация",
     "restore_defaults_description": "Это восстановит большинство настроек до значений по умолчанию. Вы уверены?",
     "use_label_color_as_background_in_torrent_list": "Использовать цвет метки в качестве фона в списке торрентов",
     "labels": "Метки",

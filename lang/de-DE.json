@@ -282,7 +282,6 @@
     "last_activity_just_now": "gerade eben",
     "compatibility": "Kompatibilität",
     "status_saving_torrent": "Torrent wird gespeichert",
-    "documentation": "Dokumentation",
     "restore_defaults_description": "Dies wird die meisten Einstellungen auf Standardwerte zurücksetzen. Sind Sie sicher?",
     "contents": "Inhalt",
     "build_info_format": "Branch: {0}\nSHA1: {1}",

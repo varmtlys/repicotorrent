@@ -979,7 +979,7 @@ void MainFrame::OnFileImportQBittorrent(wxCommandEvent&)
 
 void MainFrame::OnViewHelp(wxCommandEvent&)
 {
-    wxLaunchDefaultBrowser("https://docs.picotorrent.org");
+    wxLaunchDefaultBrowser(Translator::GetInstance().DocumentationUrl());
 }
 
 void MainFrame::OnHelpAbout(wxCommandEvent&)
