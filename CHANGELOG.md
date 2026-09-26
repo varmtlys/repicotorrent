@@ -3,7 +3,7 @@
 Versions follow [Semantic Versioning](https://semver.org). A release is a
 `vX.Y.Z` tag; its notes are the matching section below.
 
-## Unreleased
+## 0.27.0
 
 ### New
 
