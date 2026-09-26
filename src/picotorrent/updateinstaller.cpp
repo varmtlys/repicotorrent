@@ -10,11 +10,13 @@
 #include <fmt/xchar.h>
 #include <libtorrent/hasher.hpp>
 #include <wx/mstream.h>
+#include <wx/progdlg.h>
 #include <wx/utils.h>
 #include <wx/wfstream.h>
 #include <wx/wx.h>
 #include <wx/zipstrm.h>
 
+#include "core/utils.hpp"
 #include "http/httpclient.hpp"
 #include "ui/translator.hpp"
 
@@ -28,9 +30,10 @@ static fs::path AppDir()
     return fs::path(exe).parent_path();
 }
 
-static void Fail(wxFrame* frame, std::string const& reason)
+static void Fail(wxFrame* frame, wxProgressDialog* progress, std::string const& reason)
 {
     BOOST_LOG_TRIVIAL(error) << "Update failed: " << reason;
+    progress->Destroy();
 
     wxMessageBox(
         fmt::format(i18n("update_failed"), wxString::FromUTF8(reason).ToStdWstring()),
@@ -106,7 +109,13 @@ void UpdateInstaller::Install(wxFrame* frame, std::string const& zipUrl, std::st
     // response callback would be destroyed while handling that event.
     static Http::HttpClient* http = new Http::HttpClient();
 
-    wxBeginBusyCursor();
+    // Scaled to 1000 steps: the range is an int and the zip size may not be.
+    auto progress = new wxProgressDialog(
+        "RePicoTorrent",
+        fmt::format(i18n("update_downloading"), L"0", L"?"),
+        1000,
+        frame,
+        wxPD_APP_MODAL | wxPD_AUTO_HIDE);
 
     http->Get(sumsUrl, [=](int status, std::string const& sums)
     {
@@ -114,18 +123,28 @@ void UpdateInstaller::Install(wxFrame* frame, std::string const& zipUrl, std::st
 
         if (status != 200 || expected.empty())
         {
-            wxEndBusyCursor();
-            return Fail(frame, "no checksum for " + zipName);
+            return Fail(frame, progress, "no checksum for " + zipName);
         }
+
+        auto onProgress = [=](int64_t received, int64_t total)
+        {
+            std::wstring const message = fmt::format(
+                i18n("update_downloading"),
+                Utils::toHumanFileSize(received),
+                total > 0 ? Utils::toHumanFileSize(total) : L"?");
+
+            if (total > 0) { progress->Update(static_cast<int>(std::min<int64_t>(999, received * 1000 / total)), message); }
+            else { progress->Pulse(message); }
+        };
 
         http->Get(zipUrl, [=](int status, std::string const& zipData)
         {
-            wxEndBusyCursor();
-
             if (status != 200 || zipData.empty())
             {
-                return Fail(frame, "download failed (HTTP " + std::to_string(status) + ")");
+                return Fail(frame, progress, "download failed (HTTP " + std::to_string(status) + ")");
             }
+
+            progress->Update(999, i18n("update_installing"));
 
             libtorrent::hasher256 hasher;
             hasher.update(zipData.data(), static_cast<int>(zipData.size()));
@@ -134,12 +153,12 @@ void UpdateInstaller::Install(wxFrame* frame, std::string const& zipUrl, std::st
 
             if (actual.str() != expected)
             {
-                return Fail(frame, "checksum mismatch for " + zipName);
+                return Fail(frame, progress, "checksum mismatch for " + zipName);
             }
 
             if (std::string error = Apply(zipData); !error.empty())
             {
-                return Fail(frame, error);
+                return Fail(frame, progress, error);
             }
 
             BOOST_LOG_TRIVIAL(info) << "Update installed, restarting";
@@ -149,8 +168,9 @@ void UpdateInstaller::Install(wxFrame* frame, std::string const& zipUrl, std::st
             GetModuleFileNameW(nullptr, exe, MAX_PATH);
             wxExecute(fmt::format(L"\"{}\" --wait-for-pid={}", exe, GetCurrentProcessId()), wxEXEC_ASYNC);
 
+            progress->Destroy();
             frame->Close(true);
-        });
+        }, onProgress);
     });
 }
 

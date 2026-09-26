@@ -2,8 +2,10 @@
 
 #include <cwchar>
 #include <sstream>
+#include <tuple>
 
 wxDEFINE_EVENT(ptEVT_HTTP_RESPONSE, wxCommandEvent);
+wxDEFINE_EVENT(ptEVT_HTTP_PROGRESS, wxThreadEvent);
 
 struct State
 {
@@ -15,12 +17,15 @@ struct State
 
     pt::Http::HttpClient* client;
     std::function<void(int, std::string const&)> callback;
+    pt::Http::HttpClient::ProgressCallback progress;
     HINTERNET hConnect;
     HINTERNET hRequest;
     std::stringstream response;
     DWORD dataSize = 0;
     DWORD totalSize = 0;
     int statusCode = 0;
+    int64_t received = 0;
+    int64_t contentLength = 0;
 };
 
 using pt::Http::HttpClient;
@@ -48,6 +53,16 @@ HttpClient::HttpClient()
             state->callback(state->statusCode, state->response.str());
             delete state;
         });
+
+    // Progress events are posted before the response event of the same
+    // request, so the state is still alive when they are handled.
+    this->Bind(
+        ptEVT_HTTP_PROGRESS,
+        [](wxThreadEvent const& evt)
+        {
+            auto const [state, received, total] = evt.GetPayload<std::tuple<State*, int64_t, int64_t>>();
+            state->progress(received, total);
+        });
 }
 
 HttpClient::~HttpClient()
@@ -55,7 +70,7 @@ HttpClient::~HttpClient()
     WinHttpCloseHandle(m_session);
 }
 
-void HttpClient::Get(wxString const& url, std::function<void(int, std::string const&)> const& callback)
+void HttpClient::Get(wxString const& url, std::function<void(int, std::string const&)> const& callback, ProgressCallback const& progress)
 {
     // Crack URI
     URL_COMPONENTS uc = { sizeof(URL_COMPONENTS) };
@@ -88,6 +103,7 @@ void HttpClient::Get(wxString const& url, std::function<void(int, std::string co
 
     auto state = new State();
     state->callback = callback;
+    state->progress = progress;
     state->client = this;
     state->hConnect = hConnect;
     state->hRequest = hRequest;
@@ -175,6 +191,7 @@ void HttpClient::StatusCallbackProxy(HINTERNET, DWORD_PTR dwContext, DWORD dwInt
         // std::stoi throws on a header we cannot parse, and this runs on a
         // WinHTTP worker thread where nothing would catch it.
         state->statusCode = static_cast<int>(std::wcstol(status_str.c_str(), nullptr, 10));
+        state->contentLength = std::wcstoll(ReadHeader(state->hRequest, WINHTTP_QUERY_CONTENT_LENGTH).c_str(), nullptr, 10);
 
         WinHttpQueryDataAvailable(state->hRequest, NULL);
         break;
@@ -195,6 +212,14 @@ void HttpClient::StatusCallbackProxy(HINTERNET, DWORD_PTR dwContext, DWORD dwInt
         delete[] buf;
 
         state->totalSize += state->dataSize;
+        state->received += dwStatusInformationLength;
+
+        if (state->progress)
+        {
+            wxThreadEvent evt(ptEVT_HTTP_PROGRESS);
+            evt.SetPayload(std::make_tuple(state, state->received, state->contentLength));
+            wxQueueEvent(state->client, evt.Clone());
+        }
 
         WinHttpQueryDataAvailable(state->hRequest, NULL);
         break;

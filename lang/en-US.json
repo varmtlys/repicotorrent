@@ -325,6 +325,8 @@
     "import_qbittorrent_result": "Imported: {0}\nAlready added: {1}\nFailed: {2}\n\nDo not run qBittorrent with the same torrents at the same time.",
     "update_install": "Download and install",
     "update_failed": "The update could not be installed: {0}",
+    "update_downloading": "Downloading the update: {0} of {1}",
+    "update_installing": "Installing the update and restarting…",
     "size_units": "B,KB,MB,GB,TB,PB",
     "decimal_point": ".",
     "amp_import_picotorrent": "Import from &PicoTorrent...",

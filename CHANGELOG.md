@@ -3,6 +3,13 @@
 Versions follow [Semantic Versioning](https://semver.org). A release is a
 `vX.Y.Z` tag; its notes are the matching section below.
 
+## Unreleased
+
+### Changed
+
+- **Download and install** in the update dialog shows how much of the
+  update has been downloaded, then installs it and restarts the program.
+
 ## 0.27.0
 
 ### New

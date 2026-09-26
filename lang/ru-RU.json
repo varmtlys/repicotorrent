@@ -402,6 +402,8 @@
     "import_qbittorrent_result": "Импортировано: {0}\nУже были добавлены: {1}\nОшибок: {2}\n\nНе запускайте qBittorrent с этими же раздачами одновременно.",
     "update_install": "Скачать и установить",
     "update_failed": "Не удалось установить обновление: {0}",
+    "update_downloading": "Скачивание обновления: {0} из {1}",
+    "update_installing": "Установка обновления и перезапуск…",
     "size_units": "байт,КБ,МБ,ГБ,ТБ,ПБ",
     "decimal_point": ",",
     "amp_import_picotorrent": "Импорт из &PicoTorrent...",
