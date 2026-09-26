@@ -76,6 +76,7 @@ namespace BitTorrent
 
         void BuildStatus(libtorrent::torrent_status const& ts);
         std::unique_ptr<TorrentStatus> Update(libtorrent::torrent_status const& ts);
+        std::int64_t CompletedFilesSize(libtorrent::torrent_status const& ts);
 
         Session* m_session;
         std::unique_ptr<libtorrent::torrent_handle> m_th;
@@ -89,6 +90,10 @@ namespace BitTorrent
         int m_labelId = -1;
         std::string m_labelName;
         std::string m_comment;
+
+        // CompletedFilesSize() is only recomputed when the piece count changes.
+        int m_completedPieces = -1;
+        std::int64_t m_completedSize = 0;
     };
 }
 }

@@ -5,6 +5,7 @@
 #include <libtorrent/announce_entry.hpp>
 #include <libtorrent/session.hpp>
 #include <libtorrent/torrent_handle.hpp>
+#include <libtorrent/torrent_info.hpp>
 #include <libtorrent/torrent_status.hpp>
 
 #include "session.hpp"
@@ -348,6 +349,7 @@ std::unique_ptr<TorrentStatus> TorrentHandle::Update(lt::torrent_status const& t
     nts.allTimeDownload = ts.all_time_download;
     nts.allTimeUpload = ts.all_time_upload;
     nts.availability = ts.distributed_copies;
+    nts.completedFilesSize = CompletedFilesSize(ts);
     nts.completedOn = ts.completed_time > 0 ? wxDateTime(ts.completed_time) : wxDateTime();
     nts.downloadPayloadRate = ts.download_payload_rate;
     nts.error = error;
@@ -385,6 +387,44 @@ std::unique_ptr<TorrentStatus> TorrentHandle::Update(lt::torrent_status const& t
     nts.uploadPayloadRate = ts.upload_payload_rate;
 
     return std::make_unique<TorrentStatus>(nts);
+}
+
+std::int64_t TorrentHandle::CompletedFilesSize(lt::torrent_status const& ts)
+{
+    if (ts.num_pieces == m_completedPieces) { return m_completedSize; }
+
+    auto ti = ts.torrent_file.lock();
+    if (!ti) { return 0; }
+
+    auto const& fs = ti->layout();
+    if (ts.pieces.size() != fs.num_pieces()) { return 0; }
+
+    // A file is complete when every piece it touches is. The pieces come
+    // with the status anyway, so no round-trip to the session thread.
+    // ponytail: skipped files fully covered by pieces of wanted ones count
+    // too; filter by file priority if that ever shows.
+    std::int64_t total = 0;
+
+    for (lt::file_index_t f : fs.file_range())
+    {
+        std::int64_t const size = fs.file_size(f);
+        if (size == 0 || fs.pad_file_at(f)) { continue; }
+
+        lt::piece_index_t const first = fs.map_file(f, 0, 1).piece;
+        lt::piece_index_t const last = fs.map_file(f, size - 1, 1).piece;
+        bool complete = true;
+
+        for (lt::piece_index_t p = first; p <= last; ++p)
+        {
+            if (!ts.pieces.get_bit(p)) { complete = false; break; }
+        }
+
+        if (complete) { total += size; }
+    }
+
+    m_completedPieces = ts.num_pieces;
+    m_completedSize = total;
+    return total;
 }
 
 lt::torrent_handle& TorrentHandle::WrappedHandle()

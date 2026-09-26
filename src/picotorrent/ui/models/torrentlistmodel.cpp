@@ -279,7 +279,7 @@ int TorrentListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem&
     case Columns::Size:
         return cmp(lhs.totalWanted, rhs.totalWanted);
     case Columns::Downloaded:
-        return cmp(lhs.allTimeDownload, rhs.allTimeDownload);
+        return cmp(lhs.completedFilesSize, rhs.completedFilesSize);
     case Columns::DownloadSpeed:
         return cmp(lhs.downloadPayloadRate, rhs.downloadPayloadRate);
     case Columns::Uploaded:
@@ -561,7 +561,7 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
         variant = amount(status.totalWanted);
         break;
     case Columns::Downloaded:
-        variant = amount(status.allTimeDownload);
+        variant = amount(status.completedFilesSize);
         break;
     case Columns::DownloadSpeed:
         variant = rate(status.downloadPayloadRate);

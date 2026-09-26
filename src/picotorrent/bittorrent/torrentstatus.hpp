@@ -41,6 +41,8 @@ namespace BitTorrent
         std::int64_t                                          allTimeDownload      = 0;
         std::int64_t                                          allTimeUpload        = 0;
         float                                                 availability         = 0;
+        // Only files with every piece downloaded, so partial files do not count.
+        std::int64_t                                          completedFilesSize   = 0;
         wxDateTime                                            completedOn;
         int                                                   downloadPayloadRate  = 0;
         bool                                                  forced               = false;

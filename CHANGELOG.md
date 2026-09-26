@@ -22,6 +22,9 @@ Versions follow [Semantic Versioning](https://semver.org). A release is a
 
 - The link to the old PicoTorrent documentation site is gone from the
   preferences.
+- The **Downloaded** column counts only files that are downloaded in full;
+  pieces of unfinished files no longer add to it. The total traffic is
+  still under **Total download** in the details.
 
 ## 0.26.3
 
