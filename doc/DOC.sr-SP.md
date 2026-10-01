@@ -253,6 +253,7 @@ programa i ponovo ga pokreće. Podešavanja i torenti ostaju.
 | Ctrl+A | izaberi sve torente |
 | Del | ukloni izabrane torente, zadrži podatke |
 | Shift+Del | ukloni izabrane torente sa podacima |
+| Razmak | pauziraj ili nastavi izabrane torente |
 | F1 | otvori ovu dokumentaciju |
 
 

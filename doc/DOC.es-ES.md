@@ -261,6 +261,7 @@ mantienen.
 | Ctrl+A | seleccionar todos los torrents |
 | Supr | quitar los torrents seleccionados, conservar los datos |
 | Mayús+Supr | quitar los torrents seleccionados y sus datos |
+| Espacio | pausar o reanudar los torrents seleccionados |
 | F1 | abrir esta documentación |
 
 

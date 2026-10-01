@@ -258,6 +258,7 @@ taaskäivitab selle. Seaded ja torrentid jäävad alles.
 | Ctrl+A | vali kõik torrentid |
 | Del | eemalda valitud torrentid, jäta andmed alles |
 | Shift+Del | eemalda valitud torrentid koos andmetega |
+| Tühik | peata või jätka valitud torrenteid |
 | F1 | ava see dokumentatsioon |
 
 

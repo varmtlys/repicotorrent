@@ -254,6 +254,7 @@ programu a reštartuje ho. Nastavenia a torrenty zostanú.
 | Ctrl+A | vybrať všetky torrenty |
 | Del | odstrániť vybrané torrenty, ponechať dáta |
 | Shift+Del | odstrániť vybrané torrenty aj s dátami |
+| Medzerník | pozastaviť alebo obnoviť vybrané torrenty |
 | F1 | otvoriť túto dokumentáciu |
 
 

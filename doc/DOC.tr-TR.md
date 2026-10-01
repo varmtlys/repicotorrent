@@ -256,6 +256,7 @@ torrentler kalır.
 | Ctrl+A | tüm torrentleri seç |
 | Del | seçili torrentleri kaldır, verileri koru |
 | Shift+Del | seçili torrentleri verileriyle birlikte kaldır |
+| Boşluk | seçili torrentleri duraklat veya sürdür |
 | F1 | bu belgeleri aç |
 
 

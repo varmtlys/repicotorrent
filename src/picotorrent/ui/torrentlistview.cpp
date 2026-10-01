@@ -1,8 +1,11 @@
 #include "torrentlistview.hpp"
 
+#include <algorithm>
+
 #include <wx/persist.h>
 
 #include "../bittorrent/torrenthandle.hpp"
+#include "../bittorrent/torrentstatus.hpp"
 #include "fastwheel.hpp"
 #include "models/torrentlistmodel.hpp"
 #include "persistence/persistenttorrentlistview.hpp"
@@ -299,6 +302,52 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
                 wxCommandEvent(wxEVT_DATAVIEW_SELECTION_CHANGED, this->GetId()));
         },
         ptID_KEY_SELECT_ALL);
+
+    // Space pauses the selection if any of it runs, otherwise resumes it -
+    // for one torrent, a toggle. Not an accelerator: wx never translates a
+    // plain printable key for a window that takes characters, as the list does.
+    GetMainWindow()->Bind(
+        wxEVT_KEY_DOWN,
+        [this](wxKeyEvent& evt)
+        {
+            if (evt.GetKeyCode() != WXK_SPACE || evt.HasAnyModifiers()) { return evt.Skip(); }
+
+            wxCommandEvent toggle(wxEVT_MENU, ptID_KEY_TOGGLE_PAUSE);
+            ProcessWindowEvent(toggle);
+        });
+
+    this->Bind(
+        wxEVT_MENU,
+        [&](wxCommandEvent&)
+        {
+            wxDataViewItemArray items;
+            this->GetSelections(items);
+
+            std::vector<BitTorrent::TorrentHandle*> torrents;
+
+            for (wxDataViewItem& item : items)
+            {
+                if (auto torrent = m_model->GetTorrentFromItem(item)) { torrents.push_back(torrent); }
+            }
+
+            bool const anyRunning = std::any_of(
+                torrents.begin(),
+                torrents.end(),
+                [](auto t)
+                {
+                    // Status().paused is also set for torrents waiting in the queue.
+                    auto const state = t->Status().state;
+                    return state != BitTorrent::TorrentStatus::State::DownloadingPaused
+                        && state != BitTorrent::TorrentStatus::State::UploadingPaused;
+                });
+
+            for (auto torrent : torrents)
+            {
+                if (anyRunning) { torrent->Pause(); }
+                else { torrent->Resume(); }
+            }
+        },
+        ptID_KEY_TOGGLE_PAUSE);
 }
 
 TorrentListView::~TorrentListView()

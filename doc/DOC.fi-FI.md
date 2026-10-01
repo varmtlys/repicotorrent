@@ -264,6 +264,7 @@ säilyvät.
 | Ctrl+A | valitse kaikki torrentit |
 | Del | poista valitut torrentit, säilytä tiedot |
 | Vaihto+Del | poista valitut torrentit tietoineen |
+| Välilyönti | keskeytä tai jatka valittuja torrentteja |
 | F1 | avaa nämä ohjeet |
 
 

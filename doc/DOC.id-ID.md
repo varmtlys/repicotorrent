@@ -257,6 +257,7 @@ program, lalu memulai ulang. Pengaturan dan torrent tetap ada.
 | Ctrl+A | pilih semua torrent |
 | Del | hapus torrent terpilih, simpan datanya |
 | Shift+Del | hapus torrent terpilih beserta datanya |
+| Spasi | jeda atau lanjutkan torrent terpilih |
 | F1 | buka dokumentasi ini |
 
 

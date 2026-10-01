@@ -259,6 +259,7 @@ file del programma e lo riavvia. Impostazioni e torrent restano.
 | Ctrl+A | seleziona tutti i torrent |
 | Canc | rimuovi i torrent selezionati, mantieni i dati |
 | Maiusc+Canc | rimuovi i torrent selezionati e i loro dati |
+| Spazio | mettere in pausa o riprendere i torrent selezionati |
 | F1 | apri questa documentazione |
 
 

@@ -258,6 +258,7 @@ rămân.
 | Ctrl+A | selectează toate torrentele |
 | Del | elimină torrentele selectate, păstrează datele |
 | Shift+Del | elimină torrentele selectate cu tot cu date |
+| Spațiu | întrerupe sau reia torrentele selectate |
 | F1 | deschide această documentație |
 
 

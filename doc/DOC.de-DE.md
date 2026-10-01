@@ -264,6 +264,7 @@ startet neu. Einstellungen und Torrents bleiben.
 | Strg+A | alle Torrents auswählen |
 | Entf | ausgewählte Torrents entfernen, Daten behalten |
 | Umschalt+Entf | ausgewählte Torrents samt Daten entfernen |
+| Leertaste | ausgewählte Torrents anhalten oder fortsetzen |
 | F1 | diese Dokumentation öffnen |
 
 

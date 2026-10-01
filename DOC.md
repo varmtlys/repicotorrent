@@ -248,6 +248,7 @@ files and restarts. Settings and torrents stay.
 | Ctrl+A | select all torrents |
 | Del | remove the selected torrents, keep the data |
 | Shift+Del | remove the selected torrents and their data |
+| Space | pause or resume the selected torrents |
 | F1 | open this documentation |
 
 

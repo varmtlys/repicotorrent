@@ -262,6 +262,7 @@ do programa e reinicia-o. Definições e torrents mantêm-se.
 | Ctrl+A | selecionar todos os torrents |
 | Del | remover os torrents selecionados, manter os dados |
 | Shift+Del | remover os torrents selecionados e os seus dados |
+| Espaço | pausar ou retomar os torrents selecionados |
 | F1 | abrir esta documentação |
 
 

@@ -253,6 +253,7 @@ uruchamia go ponownie. Ustawienia i torrenty zostają.
 | Ctrl+A | zaznacz wszystkie torrenty |
 | Del | usuń zaznaczone torrenty, zachowaj dane |
 | Shift+Del | usuń zaznaczone torrenty razem z danymi |
+| Spacja | wstrzymaj lub wznów zaznaczone torrenty |
 | F1 | otwórz tę dokumentację |
 
 

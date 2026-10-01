@@ -258,6 +258,7 @@ un to restartē. Iestatījumi un torrenti paliek.
 | Ctrl+A | atlasīt visus torrentus |
 | Del | noņemt atlasītos torrentus, datus paturot |
 | Shift+Del | noņemt atlasītos torrentus kopā ar datiem |
+| Atstarpe | apturēt vai atsākt atlasītos torrentus |
 | F1 | atvērt šo dokumentāciju |
 
 

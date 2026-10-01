@@ -256,6 +256,7 @@ failus ir ją paleidžia iš naujo. Nustatymai ir torentai lieka.
 | Ctrl+A | pažymėti visus torentus |
 | Del | pašalinti pažymėtus torentus, paliekant duomenis |
 | Shift+Del | pašalinti pažymėtus torentus kartu su duomenimis |
+| Tarpas | pristabdyti arba tęsti pažymėtus torentus |
 | F1 | atverti šią dokumentaciją |
 
 

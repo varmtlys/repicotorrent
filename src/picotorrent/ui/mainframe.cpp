@@ -1000,6 +1000,14 @@ void MainFrame::OnIconize(wxIconizeEvent& ev)
 
 void MainFrame::OnTaskBarLeftDown(wxTaskBarIconEvent&)
 {
+    // A click on the tray icon toggles: a window on screen goes to the tray.
+    if (this->IsShown() && !this->IsIconized())
+    {
+        this->Hide();
+        if (auto button = this->MSWGetTaskBarButton()) { button->Hide(); }
+        return;
+    }
+
     if (auto button = this->MSWGetTaskBarButton()) { button->Show(); }
 
     if (this->IsIconized())

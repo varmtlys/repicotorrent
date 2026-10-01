@@ -265,6 +265,7 @@ fájljait és újraindítja. A beállítások és a torrentek megmaradnak.
 | Ctrl+A | az összes torrent kijelölése |
 | Del | a kijelölt torrentek eltávolítása, az adatok megtartásával |
 | Shift+Del | a kijelölt torrentek eltávolítása az adataikkal együtt |
+| Szóköz | a kijelölt torrentek szüneteltetése vagy folytatása |
 | F1 | ennek a dokumentációnak a megnyitása |
 
 

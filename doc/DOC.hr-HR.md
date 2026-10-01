@@ -254,6 +254,7 @@ datoteke programa i ponovno ga pokreće. Postavke i torrenti ostaju.
 | Ctrl+A | odaberi sve torrente |
 | Del | ukloni odabrane torrente, zadrži podatke |
 | Shift+Del | ukloni odabrane torrente s podacima |
+| Razmaknica | pauziraj ili nastavi odabrane torrente |
 | F1 | otvori ovu dokumentaciju |
 
 

@@ -253,6 +253,7 @@ trình và khởi động lại. Cài đặt và torrent vẫn giữ nguyên.
 | Ctrl+A | chọn tất cả torrent |
 | Del | xóa các torrent đã chọn, giữ dữ liệu |
 | Shift+Del | xóa các torrent đã chọn cùng dữ liệu |
+| Phím cách | tạm dừng hoặc tiếp tục các torrent đã chọn |
 | F1 | mở tài liệu này |
 
 

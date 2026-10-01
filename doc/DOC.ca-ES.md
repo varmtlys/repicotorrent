@@ -261,6 +261,7 @@ mantenen.
 | Ctrl+A | seleccionar tots els torrents |
 | Supr | treure els torrents seleccionats, conservar les dades |
 | Maj+Supr | treure els torrents seleccionats i les seves dades |
+| Espai | posar en pausa o reprendre els torrents seleccionats |
 | F1 | obrir aquesta documentació |
 
 

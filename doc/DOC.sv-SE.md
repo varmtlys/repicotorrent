@@ -258,6 +258,7 @@ programfilerna och startar om. Inställningar och torrenter finns kvar.
 | Ctrl+A | markera alla torrenter |
 | Del | ta bort markerade torrenter, behåll data |
 | Skift+Del | ta bort markerade torrenter och deras data |
+| Blanksteg | pausa eller återuppta markerade torrenter |
 | F1 | öppna denna dokumentation |
 
 

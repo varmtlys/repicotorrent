@@ -260,6 +260,7 @@ programmabestanden en herstart. Instellingen en torrents blijven.
 | Ctrl+A | alle torrents selecteren |
 | Del | geselecteerde torrents verwijderen, gegevens houden |
 | Shift+Del | geselecteerde torrents met hun gegevens verwijderen |
+| Spatie | geselecteerde torrents pauzeren of hervatten |
 | F1 | deze documentatie openen |
 
 

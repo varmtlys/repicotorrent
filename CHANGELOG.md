@@ -9,6 +9,10 @@ Versions follow [Semantic Versioning](https://semver.org). A release is a
 
 - **Download and install** in the update dialog shows how much of the
   update has been downloaded, then installs it and restarts the program.
+- A click on the notification area icon hides the window there when it is
+  on screen and brings it back when it is not.
+- Space pauses the selected torrents, or resumes them when all of them are
+  paused.
 
 ## 0.27.0
 

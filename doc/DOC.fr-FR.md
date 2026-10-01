@@ -264,6 +264,7 @@ fichiers du programme et redémarre. Réglages et torrents sont conservés.
 | Ctrl+A | sélectionner tous les torrents |
 | Suppr | retirer les torrents sélectionnés, garder les données |
 | Maj+Suppr | retirer les torrents sélectionnés et leurs données |
+| Espace | mettre en pause ou reprendre les torrents sélectionnés |
 | F1 | ouvrir cette documentation |
 
 

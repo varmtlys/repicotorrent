@@ -260,6 +260,7 @@ værende.
 | Ctrl+A | merk alle torrenter |
 | Del | fjern valgte torrenter, behold dataene |
 | Shift+Del | fjern valgte torrenter og dataene deres |
+| Mellomrom | sett valgte torrenter på pause eller fortsett |
 | F1 | åpne denne dokumentasjonen |
 
 

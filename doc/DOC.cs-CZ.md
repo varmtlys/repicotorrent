@@ -254,6 +254,7 @@ restartuje ho. Nastavení a torrenty zůstanou.
 | Ctrl+A | vybrat všechny torrenty |
 | Del | odebrat vybrané torrenty, ponechat data |
 | Shift+Del | odebrat vybrané torrenty i s daty |
+| Mezerník | pozastavit nebo obnovit vybrané torrenty |
 | F1 | otevřít tuto dokumentaci |
 
 
