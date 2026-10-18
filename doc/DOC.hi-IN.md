@@ -170,6 +170,7 @@ dl > 500kbps
   सेटिंग का पालन करती है)।
 - **छोड़ें 'धार जोड़ें' संवाद**, **Windows के साथ RePicoTorrent शुरू करें**, विंडो की
   **प्रारंभ स्थान**।
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **सूचना क्षेत्र में RePicoTorrent दिखाएं**, और क्या विंडो को छोटा करने या
   बंद करने पर वह वहाँ छिप जाए।
 

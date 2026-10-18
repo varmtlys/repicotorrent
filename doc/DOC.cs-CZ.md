@@ -172,6 +172,7 @@ program ho nabídne.
   řídí nastavením Windows).
 - **Přeskočit 'Přidat torrent' dialog**, **Spustit RePicoTorrent s Windows**,
   **Startovací pozice** okna.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Zobrazit RePicoTorrent v panelu nástrojů** a zda minimalizace nebo
   zavření okna ho tam schová.
 

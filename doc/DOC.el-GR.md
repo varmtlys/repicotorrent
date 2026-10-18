@@ -180,6 +180,7 @@ dl > 500kbps
   ακολουθεί τη ρύθμιση των Windows).
 - **Παράκαμψη διαλόγου 'Προσθήκη torrent'**, **Εκκίνηση RePicoTorrent με τα Windows**,
   **Τύπος εκκίνησης** του παραθύρου.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Προβολή RePicoTorrent στην περιοχή ειδοποιήσεων**, και αν η ελαχιστοποίηση ή
   το κλείσιμο του παραθύρου το στέλνει εκεί.
 

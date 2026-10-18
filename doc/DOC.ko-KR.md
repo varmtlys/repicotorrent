@@ -140,6 +140,7 @@ dl > 500kbps
 
 - **언어** 및 **Theme**(시스템 또는 밝게. 어두운 테마는 Windows 설정을 따릅니다).
 - **Skip 'Add torrent' dialog**, **Picotorrent 자동 시작**, 창의 **시작 위치**.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **RePicoTorrent 알림 영역에 보이기**, 그리고 창을 최소화하거나 닫을 때 그곳으로 숨길지 여부.
 
 ### 다운로드

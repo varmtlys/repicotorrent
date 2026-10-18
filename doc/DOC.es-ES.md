@@ -178,6 +178,7 @@ reiniciar; el programa lo ofrece.
   configuración de Windows).
 - **Omitir cuadro de diálogo "Agregar torrent"**, **Iniciar RePicoTorrent con Windows**,
   **Posición de inicio** de la ventana.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Mostrar RePicoTorrent en el área de notificación**, y si minimizar o cerrar la
   ventana la envía allí.
 

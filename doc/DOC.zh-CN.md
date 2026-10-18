@@ -141,6 +141,7 @@ dl > 500kbps
 
 - **语言** 和 **Theme**（跟随系统或浅色；深色主题跟随 Windows 设置）。
 - **跳过'添加种子'对话框**、**随系统启动RePicoTorrent**、窗口的 **启动后位置**。
+- **Open .torrent files with RePicoTorrent**、**Open magnet links with RePicoTorrent**
 - **在通知区域显示RePicoTorrent**，以及最小化或关闭窗口时是否隐藏到那里。
 
 ### 下载

@@ -176,6 +176,7 @@ programm pakub seda ise.
   Windowsi seadet).
 - **Skip 'Add torrent' dialog**, **Käivita RePicoTorrent koos Windowsiga**, akna
   **Stardi positsioon**.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Show RePicoTorrent in notification area** ning kas akna minimeerimine
   või sulgemine peidab selle sinna.
 

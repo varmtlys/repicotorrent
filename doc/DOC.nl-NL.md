@@ -178,6 +178,7 @@ herstart; het programma biedt die aan.
   volgt de instelling van Windows).
 - **'Torrent toevoegen' overslaan**, **RePicoTorrent automatisch starten met Windows**,
   **Startpositie** van het venster.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **RePicoTorrent in systeemvak weergeven**, en of minimaliseren of
   sluiten het venster daarheen verplaatst.
 

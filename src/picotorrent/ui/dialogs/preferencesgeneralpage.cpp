@@ -1,6 +1,11 @@
 #include "preferencesgeneralpage.hpp"
 
+#include <Shlwapi.h>
+#include <ShlObj.h>
+#include <shellapi.h>
 #include <strsafe.h>
+
+#include <vector>
 
 #include <boost/log/trivial.hpp>
 
@@ -78,6 +83,128 @@ private:
     HKEY m_key;
 };
 
+// Per-user registration (HKCU, no admin) of .torrent files or magnet links.
+// It makes Windows list RePicoTorrent in "Open with" and in Default apps; it
+// becomes the default only while the user has not picked another program
+// there - Windows does not let programs take a picked default over.
+struct Association
+{
+    // ext: ".torrent" or "magnet"
+    explicit Association(std::wstring ext)
+        : m_ext(std::move(ext)),
+        m_isProtocol(m_ext == L"magnet"),
+        m_progId(m_isProtocol ? L"RePicoTorrent.magnet" : L"RePicoTorrent.torrent")
+    {
+        wchar_t exe[MAX_PATH];
+        GetModuleFileName(NULL, exe, ARRAYSIZE(exe));
+        m_exe = exe;
+    }
+
+    // Whether Windows opens them with this copy of the program.
+    bool IsDefault()
+    {
+        wchar_t exe[MAX_PATH];
+        DWORD size = ARRAYSIZE(exe);
+
+        // 0x1000 is ASSOCF_IS_PROTOCOL (Windows 8), hidden by our _WIN32_WINNT.
+        return AssocQueryString(m_isProtocol ? 0x1000 : ASSOCF_NONE, ASSOCSTR_EXECUTABLE,
+            m_ext.c_str(), L"open", exe, &size) == S_OK
+            && _wcsicmp(exe, m_exe.c_str()) == 0;
+    }
+
+    void Register()
+    {
+        std::wstring const command = L"\"" + m_exe + L"\" \"%1\"";
+        std::wstring const icon = L"\"" + m_exe + L"\",0";
+
+        // Magnet links go to the protocol key itself as well: browsers look
+        // there when no default is picked.
+        for (auto const& key : m_isProtocol ? std::vector{ m_progId, m_ext } : std::vector{ m_progId })
+        {
+            Set(Classes + key, L"", m_isProtocol ? L"URL:Magnet link" : L"BitTorrent file");
+            if (m_isProtocol) { Set(Classes + key, L"URL Protocol", L""); }
+            Set(Classes + key + L"\\DefaultIcon", L"", icon);
+            Set(Classes + key + L"\\shell\\open\\command", L"", command);
+        }
+
+        if (!m_isProtocol)
+        {
+            Set(Classes + m_ext, L"", m_progId);
+            Set(Classes + m_ext + L"\\OpenWithProgids", m_progId, L"");
+        }
+
+        Set(Capabilities, L"ApplicationName", L"RePicoTorrent");
+        Set(Capabilities, L"ApplicationDescription", L"BitTorrent client");
+        Set(CapabilitiesList(), m_ext, m_progId);
+        Set(L"Software\\RegisteredApplications", L"RePicoTorrent", Capabilities);
+
+        SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
+    }
+
+    // Takes back what Register wrote, leaving keys of other programs alone.
+    void Unregister()
+    {
+        RegDeleteTree(HKEY_CURRENT_USER, (Classes + m_progId).c_str());
+
+        if (m_isProtocol)
+        {
+            if (Get(Classes + m_ext + L"\\shell\\open\\command") == L"\"" + m_exe + L"\" \"%1\"")
+            {
+                RegDeleteTree(HKEY_CURRENT_USER, (Classes + m_ext).c_str());
+            }
+        }
+        else
+        {
+            if (Get(Classes + m_ext) == m_progId) { RegDeleteKeyValue(HKEY_CURRENT_USER, (Classes + m_ext).c_str(), nullptr); }
+            RegDeleteKeyValue(HKEY_CURRENT_USER, (Classes + m_ext + L"\\OpenWithProgids").c_str(), m_progId.c_str());
+            SHDeleteEmptyKey(HKEY_CURRENT_USER, (Classes + m_ext + L"\\OpenWithProgids").c_str());
+            SHDeleteEmptyKey(HKEY_CURRENT_USER, (Classes + m_ext).c_str());
+        }
+
+        RegDeleteKeyValue(HKEY_CURRENT_USER, CapabilitiesList().c_str(), m_ext.c_str());
+
+        // The other kind may still be registered.
+        if (Get(Classes + L"RePicoTorrent.torrent").empty() && Get(Classes + L"RePicoTorrent.magnet").empty())
+        {
+            RegDeleteTree(HKEY_CURRENT_USER, L"Software\\RePicoTorrent");
+            RegDeleteKeyValue(HKEY_CURRENT_USER, L"Software\\RegisteredApplications", L"RePicoTorrent");
+        }
+
+        SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
+    }
+
+private:
+    static inline std::wstring const Classes = L"Software\\Classes\\";
+    static inline std::wstring const Capabilities = L"Software\\RePicoTorrent\\Capabilities";
+
+    std::wstring CapabilitiesList()
+    {
+        return Capabilities + (m_isProtocol ? L"\\URLAssociations" : L"\\FileAssociations");
+    }
+
+    static void Set(std::wstring const& key, std::wstring const& name, std::wstring const& value)
+    {
+        RegSetKeyValue(HKEY_CURRENT_USER, key.c_str(), name.empty() ? nullptr : name.c_str(), REG_SZ,
+            value.c_str(), static_cast<DWORD>((value.size() + 1) * sizeof(wchar_t)));
+    }
+
+    // The default value of a key, or "".
+    static std::wstring Get(std::wstring const& key)
+    {
+        wchar_t value[MAX_PATH * 2];
+        DWORD size = sizeof(value);
+
+        return RegGetValue(HKEY_CURRENT_USER, key.c_str(), nullptr, RRF_RT_REG_SZ, nullptr, value, &size) == ERROR_SUCCESS
+            ? value
+            : L"";
+    }
+
+    std::wstring m_ext;
+    bool m_isProtocol;
+    std::wstring m_progId;
+    std::wstring m_exe;
+};
+
 using pt::Core::Configuration;
 using pt::UI::Dialogs::PreferencesGeneralPage;
 
@@ -103,6 +230,8 @@ PreferencesGeneralPage::PreferencesGeneralPage(wxWindow* parent, std::shared_ptr
     m_skipAddTorrentDialog = new wxCheckBox(miscSizer->GetStaticBox(), wxID_ANY, i18n("skip_add_torrent_dialog"));
     m_autoStart = new wxCheckBox(miscSizer->GetStaticBox(), wxID_ANY, i18n("start_with_windows"));
     m_startPosition = new wxChoice(miscSizer->GetStaticBox(), wxID_ANY);
+    m_associateTorrents = new wxCheckBox(miscSizer->GetStaticBox(), wxID_ANY, i18n("associate_torrent_files"));
+    m_associateMagnets = new wxCheckBox(miscSizer->GetStaticBox(), wxID_ANY, i18n("associate_magnet_links"));
 
     miscGrid->AddGrowableCol(1, 1);
     miscGrid->Add(m_labelColor, 0, wxALIGN_CENTER_VERTICAL);
@@ -110,6 +239,10 @@ PreferencesGeneralPage::PreferencesGeneralPage(wxWindow* parent, std::shared_ptr
     miscGrid->Add(m_skipAddTorrentDialog, 0, wxALIGN_CENTER_VERTICAL);
     miscGrid->Add(0, 0);
     miscGrid->Add(m_autoStart, 0, wxALIGN_CENTER_VERTICAL);
+    miscGrid->Add(0, 0);
+    miscGrid->Add(m_associateTorrents, 0, wxALIGN_CENTER_VERTICAL);
+    miscGrid->Add(0, 0);
+    miscGrid->Add(m_associateMagnets, 0, wxALIGN_CENTER_VERTICAL);
     miscGrid->Add(0, 0);
     miscGrid->Add(new wxStaticText(miscSizer->GetStaticBox(), wxID_ANY, i18n("start_position")), 0, wxALIGN_CENTER_VERTICAL);
     miscGrid->Add(m_startPosition, 1, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
@@ -167,6 +300,9 @@ PreferencesGeneralPage::PreferencesGeneralPage(wxWindow* parent, std::shared_ptr
     {
         m_autoStart->SetValue(true);
     }
+
+    m_associateTorrents->SetValue(Association(L".torrent").IsDefault());
+    m_associateMagnets->SetValue(Association(L"magnet").IsDefault());
 
     m_startPosition->Append(i18n("normal"), new ClientData<Configuration::WindowState>(Configuration::WindowState::Normal));
     m_startPosition->Append(i18n("minimized"), new ClientData<Configuration::WindowState>(Configuration::WindowState::Minimized));
@@ -249,6 +385,34 @@ void PreferencesGeneralPage::Save(bool* restartRequired)
         {
             key.Create();
         }
+    }
+
+    // Only a change is applied: another copy of the program may be the
+    // registered one, and merely saving here must not take that over.
+    bool notDefault = false;
+
+    for (auto [box, ext] : { std::pair{ m_associateTorrents, L".torrent" }, std::pair{ m_associateMagnets, L"magnet" } })
+    {
+        Association assoc(ext);
+
+        if (box->GetValue() == assoc.IsDefault()) { continue; }
+
+        if (box->GetValue())
+        {
+            assoc.Register();
+            notDefault = notDefault || !assoc.IsDefault();
+        }
+        else
+        {
+            assoc.Unregister();
+        }
+    }
+
+    // Registered, but the user had picked another program in Windows.
+    if (notDefault
+        && wxMessageBox(i18n("associate_pick_in_windows"), "RePicoTorrent", wxYES_NO | wxICON_INFORMATION, this) == wxYES)
+    {
+        ShellExecute(NULL, L"open", L"ms-settings:defaultapps?registeredAppUser=RePicoTorrent", NULL, NULL, SW_SHOWNORMAL);
     }
 
     m_cfg->Set("use_label_as_list_bgcolor", m_labelColor->GetValue());

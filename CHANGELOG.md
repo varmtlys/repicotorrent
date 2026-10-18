@@ -5,6 +5,15 @@ Versions follow [Semantic Versioning](https://semver.org). A release is a
 
 ## Unreleased
 
+### New
+
+- **Preferences > General** can make RePicoTorrent open `.torrent` files
+  and magnet links. The program is registered for the current user only
+  and shows up in **Open with** and in the Windows Default apps settings.
+  If another program was already picked there, RePicoTorrent offers to
+  open those settings, because Windows does not let programs change that
+  choice themselves.
+
 ### Changed
 
 - **Download and install** in the update dialog shows how much of the

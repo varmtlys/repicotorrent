@@ -176,6 +176,7 @@ riavvio; il programma lo propone.
   l'impostazione di Windows).
 - **Salta finestra 'Aggiungi torrent'**, **Esegui RePicoTorrent all'avvio di Windows**,
   **Posizione iniziale** della finestra.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Visualizza RePicoTorrent nell'area di notifica**, e se ridurre o chiudere la
   finestra la sposta lì.
 

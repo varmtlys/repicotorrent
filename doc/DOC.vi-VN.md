@@ -173,6 +173,7 @@ chương trình sẽ đề nghị.
   cài đặt của Windows).
 - **Bỏ qua cửa sổ "Thêm file torrent"**, **Khởi động RePicoTorrent cùng Windows**,
   **Start position** của cửa sổ.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Show RePicoTorrent in notification area**, và việc thu nhỏ hoặc đóng
   cửa sổ có ẩn nó vào đó hay không.
 

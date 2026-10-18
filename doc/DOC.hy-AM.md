@@ -179,6 +179,7 @@ dl > 500kbps
   է Windows-ի կարգավորմանը)։
 - **Skip 'Add torrent' dialog**, **Մեկնարկել RePicoTorrent-ը Windows-ի հետ։**, պատուհանի
   **Սկսման դիրքը**։
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Ցույց տալ RePicoTorrent-ը ծանուցման տարածքում**, ինչպես նաև արդյոք
   պատուհանը փոքրացնելիս կամ փակելիս թաքցնել այնտեղ։
 

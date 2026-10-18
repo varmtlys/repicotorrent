@@ -181,6 +181,7 @@ uudelleenkäynnistyksen; ohjelma tarjoaa sitä.
   seuraa Windowsin asetusta).
 - **Ohita 'Lisää torrentti' -dialogi**, **Käynnistä Windowsin käynnistyessä**, ikkunan
   **Käynnistä tilaan**.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Näytä kuvake ilmoitusalueella** sekä se, piilottaako
   pienentäminen tai sulkeminen ikkunan sinne.
 

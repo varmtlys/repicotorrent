@@ -182,6 +182,7 @@ einen Neustart; das Programm bietet ihn an.
   folgt der Windows-Einstellung).
 - **Dialog 'Torrent hinzufügen' überspringen**, **RePicoTorrent mit Windows starten**,
   **Startposition** des Fensters.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **RePicoTorrent im Benachrichtigungsfeld anzeigen** und ob Minimieren oder
   Schließen das Fenster dorthin verschiebt.
 

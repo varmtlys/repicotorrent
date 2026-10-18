@@ -177,6 +177,7 @@ restartēšanu; programma to piedāvā.
   Windows iestatījumam).
 - **Skip 'Add torrent' dialog**, **Start RePicoTorrent with Windows**, loga
   **Start position**.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Show RePicoTorrent in notification area** un vai loga minimizēšana vai
   aizvēršana to tur paslēpj.
 

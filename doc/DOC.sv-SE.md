@@ -176,6 +176,7 @@ programmet erbjuder det.
   följer Windows-inställningen).
 - **Skippa 'Lägg till torrent'-dialog**, **Starta RePicoTorrent med Windows**, fönstrets
   **Startposition**.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Visa RePicoTorrent i notifikationsområdet**, och om minimering eller
   stängning av fönstret gömmer det där.
 

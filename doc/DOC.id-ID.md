@@ -176,6 +176,7 @@ mulai ulang; program akan menawarkannya.
   mengikuti pengaturan Windows).
 - **Lewati dialog 'Tambah torrent'**, **Jalankan RePicoTorrent saat Windows dinyalakan**,
   **Posisi mulai** jendela.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Tampilkan RePicoTorrent di area notifikasi**, dan apakah meminimalkan
   atau menutup jendela menyembunyikannya di sana.
 

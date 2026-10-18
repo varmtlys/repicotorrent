@@ -141,6 +141,7 @@ dl > 500kbps
 
 - **言語** と **Theme**（システムまたはライト。ダークテーマは Windows の設定に従います）。
 - **Skip 'Add torrent' dialog**、**WindowsかたわらにRePicoTorrentを起動する**、ウィンドウの **開始位置**。
+- **Open .torrent files with RePicoTorrent**、**Open magnet links with RePicoTorrent**
 - **Show RePicoTorrent in notification area**、および最小化や閉じる操作でそこに隠すかどうか。
 
 ### ダウンロード

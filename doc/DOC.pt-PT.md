@@ -180,6 +180,7 @@ o programa propõe-no.
   definição do Windows).
 - **Skip 'Add torrent' dialog**, **Start RePicoTorrent with Windows**,
   **Start position** da janela.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Show RePicoTorrent in notification area**, e se minimizar ou fechar a
   janela a envia para lá.
 

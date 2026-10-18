@@ -176,6 +176,7 @@ programul o propune.
   urmează setarea Windows).
 - **Skip 'Add torrent' dialog**, **Pornește RePicoTorrent cu Windows**,
   **Poziție de pornire** a ferestrei.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Show RePicoTorrent in notification area** și dacă minimizarea sau
   închiderea ferestrei o trimite acolo.
 

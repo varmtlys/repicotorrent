@@ -173,6 +173,7 @@ başlatma gerektirir; program bunu önerir.
   ayarını izler).
 - **'Torrent ekle' diyaloğunu atla**, **RePicoTorrent'i Windows ile beraber başlat**, pencerenin
   **Başlangıç Durumu** ayarı.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **RePicoTorrent'i bildirim alanında göster** ve pencereyi küçültmenin
   veya kapatmanın onu oraya gizleyip gizlemeyeceği.
 

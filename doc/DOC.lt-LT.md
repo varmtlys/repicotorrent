@@ -175,6 +175,7 @@ paleisti iš naujo; programa tai pasiūlo.
   Windows nustatymą).
 - **Nerodyti torento pridėjimo lango**, **Paleisti „RePicoTorrent“ kartu su „Windows“**, lango
   **Pradinė būsena**.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Rodyti „RePicoTorrent“ pranešimų srityje** ir ar lango sumažinimas ar
   uždarymas jį ten paslepia.
 

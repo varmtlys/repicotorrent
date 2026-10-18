@@ -165,6 +165,7 @@ dl > 500kbps
   אחר הגדרת Windows).
 - **דלג על חלון 'הוסף טורנט'**, **התחל RePicoTorrent עם חלונות**,
   **מיקום הפעלה** של החלון.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **הצג את RePicoTorrent באזור ההתראות**, והאם מזעור או סגירה של
   החלון מסתירים אותו שם.
 

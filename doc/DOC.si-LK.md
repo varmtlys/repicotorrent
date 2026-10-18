@@ -176,6 +176,7 @@ dl > 500kbps
   සැකසුම අනුගමනය කරයි).
 - **Skip 'Add torrent' dialog**, **Start RePicoTorrent with Windows**, කවුළුවේ
   **Start position**.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Show RePicoTorrent in notification area**, සහ කවුළුව අවම කිරීමෙන් හෝ
   වැසීමෙන් එය එහි සැඟවිය යුතු ද යන්න.
 

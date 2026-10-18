@@ -182,6 +182,7 @@ beállítást visszaállít. Egyes változások (nyelv, téma, portok)
   Windows beállítását követi).
 - **'Torrent hozzáadása' párbeszédablak kihagyása**, **RePicoTorrent indítása a Windows-szal**, az ablak
   **Indítás módja** beállítása.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **RePicoTorrent megjelenítése az értesítési területen**, és hogy a kis méret vagy a
   bezárás oda rejtse-e az ablakot.
 

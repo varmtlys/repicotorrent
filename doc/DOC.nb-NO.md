@@ -177,6 +177,7 @@ programmet tilbyr det.
   følger Windows-innstillingen).
 - **Hopp over «Legg til torrent»-oppsprett**, **Start RePicoTorrent med Windows**, vinduets
   **Startposisjon**.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Vis RePicoTorrent i merknadsområde**, og om minimering eller
   lukking av vinduet skjuler det der.
 

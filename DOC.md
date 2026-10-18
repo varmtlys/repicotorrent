@@ -167,6 +167,10 @@ program offers it.
   follows the Windows setting).
 - **Skip 'Add torrent' dialog**, **Start RePicoTorrent with Windows**,
   **Start position** of the window.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**: Windows
+  then lists RePicoTorrent in **Open with** and in its Default apps
+  settings. If another program was picked there before, the program
+  offers to open those settings to pick RePicoTorrent.
 - **Show RePicoTorrent in notification area**, and whether minimizing or
   closing the window hides it there.
 

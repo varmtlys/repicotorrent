@@ -181,6 +181,7 @@ redémarrage ; le programme le propose.
   le réglage de Windows).
 - **Ignorer la boîte de dialogue « Ajouter un torrent »**, **Démarrer RePicoTorrent avec Windows**,
   **Position de démarrage** de la fenêtre.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Afficher RePicoTorrent dans la zone de notification**, et si réduire ou fermer la
   fenêtre l'y range.
 

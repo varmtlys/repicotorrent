@@ -171,6 +171,7 @@ dl > 500kbps
   вмикається слідом за налаштуванням Windows).
 - **Пропустити вікно «Додати торрент»**, **Запускати RePicoTorrent при завантаженні Windows**,
   **Режим запуску** вікна.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Показувати RePicoTorrent у треї**, а також чи ховати туди
   вікно при згортанні або закритті.
 

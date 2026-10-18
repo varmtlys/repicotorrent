@@ -141,6 +141,7 @@ dl > 500kbps
 
 - **Language** 和 **Theme**（跟隨系統或淺色；深色佈景主題跟隨 Windows 設定）。
 - **Skip 'Add torrent' dialog**、**Start RePicoTorrent with Windows**、視窗的 **Start position**。
+- **Open .torrent files with RePicoTorrent**、**Open magnet links with RePicoTorrent**
 - **Show RePicoTorrent in notification area**，以及最小化或關閉視窗時是否隱藏到那裡。
 
 ### 下載

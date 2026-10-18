@@ -171,6 +171,7 @@ ponownego uruchomienia; program sam je zaproponuje.
   włącza się zgodnie z ustawieniem Windows).
 - **Pomiń dialog dodawania torrenta**, **Uruchom RePicoTorrent po starcie systemu**,
   **Pozycja uruchomienia** okna.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Pokaż RePicoTorrent w obszarze powiadomień** oraz czy minimalizowanie lub
   zamykanie okna chowa je tam.
 

@@ -173,6 +173,7 @@ program ga nudi.
   postavku Windowsa).
 - **Preskoči 'dodaj torrent' dijalog**, **Pokreni RePicoTorrent s Windows**,
   **Početna pozicija** prozora.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Prikaži RePicoTorrent u traci za obavijesti** te skriva li ga ondje
   minimiziranje ili zatvaranje prozora.
 

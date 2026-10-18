@@ -174,6 +174,7 @@ dl > 500kbps
   следва настройката на Windows).
 - **Пропускане на диалог „Добавяне на торент“**, **Стартиране на RePicoTorrent с Windows**,
   **Режим на стартиране** на прозореца.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Показване на RePicoTorrent в областта за известия** и дали минимизирането или
   затварянето на прозореца го скрива там.
 

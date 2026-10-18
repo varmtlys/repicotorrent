@@ -172,6 +172,7 @@ program ho ponúkne.
   riadi nastavením Windows).
 - **Preskočiť dialóg "Pridať torrent"**, **Spustiť RePicoTorrent pri štarte Windows**,
   **Štartovacia pozícia** okna.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Zobraziť RePicoTorrent v oznamovacej oblasti** a či minimalizovanie alebo
   zatvorenie okna ho tam schová.
 

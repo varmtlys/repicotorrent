@@ -177,6 +177,7 @@ dl > 500kbps
   პარამეტრს მიჰყვება).
 - **Skip 'Add torrent' dialog**, **RePicoTorrent-ის ჩართვა Windows-სთან ერთად**, ფანჯრის
   **დაწყების პოზიცია**.
+- **Open .torrent files with RePicoTorrent**, **Open magnet links with RePicoTorrent**
 - **Show RePicoTorrent in notification area** და ფანჯრის ჩაკეცვისას ან
   დახურვისას იქ დამალვა.
 
