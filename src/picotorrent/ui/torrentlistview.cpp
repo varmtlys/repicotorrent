@@ -160,6 +160,26 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
     m_columns.push_back(
         ColumnMetadata(
             new wxDataViewColumn(
+                i18n("upload_gb_per_hour"),
+                new wxDataViewTextRenderer(),
+                TorrentListModel::Columns::UploadPerHour,
+                FromDIP(80),
+                wxALIGN_RIGHT,
+                defaultFlags)));
+
+    m_columns.push_back(
+        ColumnMetadata(
+            new wxDataViewColumn(
+                i18n("upload_gb_per_day"),
+                new wxDataViewTextRenderer(),
+                TorrentListModel::Columns::UploadPerDay,
+                FromDIP(80),
+                wxALIGN_RIGHT,
+                defaultFlags)));
+
+    m_columns.push_back(
+        ColumnMetadata(
+            new wxDataViewColumn(
                 i18n("seeds"),
                 new wxDataViewTextRenderer(),
                 TorrentListModel::Columns::Seeds,

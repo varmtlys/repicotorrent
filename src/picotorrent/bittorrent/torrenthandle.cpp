@@ -374,6 +374,7 @@ std::unique_ptr<TorrentStatus> TorrentHandle::Update(lt::torrent_status const& t
     nts.queuePosition = static_cast<int>(ts.queue_position);
     nts.ratio = ratio;
     nts.savePath = ts.save_path;
+    nts.seedingTime = std::chrono::duration_cast<std::chrono::seconds>(ts.seeding_duration);
     nts.seedsCurrent = ts.num_seeds;
 
     // The tracker's scrape counts the whole swarm but is -1 until it answers,

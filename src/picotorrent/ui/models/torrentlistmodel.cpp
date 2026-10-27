@@ -17,6 +17,14 @@ using pt::UI::Models::TorrentListModel;
 
 namespace
 {
+    // GB (1024^3) uploaded per hour of seeding, -1 before any seeding time.
+    double uploadPerHour(TorrentStatus const& s)
+    {
+        return s.seedingTime.count() > 0
+            ? s.allTimeUpload / (1024.0 * 1024 * 1024) / (s.seedingTime.count() / 3600.0)
+            : -1;
+    }
+
     enum class Shape { ArrowDown, ArrowUp, Pause, Dot, Ring, Error };
 
     // Drawn rather than loaded so the icons stay crisp at any DPI and read
@@ -300,6 +308,9 @@ int TorrentListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem&
         if (lhs.ratio == rhs.ratio) { return hashSort(ascending, lhs, rhs); }
         break;
     }
+    case Columns::UploadPerHour:
+    case Columns::UploadPerDay:
+        return cmp(uploadPerHour(lhs), uploadPerHour(rhs));
     case Columns::Seeds:
     case Columns::Peers:
     case Columns::Leechers:
@@ -588,6 +599,13 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
     case Columns::Ratio:
     {
         variant = fmt::format("{:.3f}", status.ratio);
+        break;
+    }
+    case Columns::UploadPerHour:
+    case Columns::UploadPerDay:
+    {
+        double const perHour = uploadPerHour(status);
+        variant = perHour < 0 ? "-" : fmt::format("{:.2f}", col == Columns::UploadPerDay ? perHour * 24 : perHour);
         break;
     }
     case Columns::Seeds:

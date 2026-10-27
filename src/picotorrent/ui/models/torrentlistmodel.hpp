@@ -44,6 +44,8 @@ namespace pt::UI::Models
             UploadSpeed,
             Availability,
             Ratio,
+            UploadPerHour,
+            UploadPerDay,
             Seeds,
             Peers,
             Leechers,

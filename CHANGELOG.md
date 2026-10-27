@@ -13,6 +13,9 @@ Versions follow [Semantic Versioning](https://semver.org). A release is a
   If another program was already picked there, RePicoTorrent offers to
   open those settings, because Windows does not let programs change that
   choice themselves.
+- Torrent list columns **Upload GB/hour** and **Upload GB/day**: all the
+  uploaded data divided by the time the torrent has been seeding. A
+  torrent that has not seeded yet shows `-`.
 
 ### Changed
 

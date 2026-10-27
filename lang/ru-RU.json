@@ -159,6 +159,8 @@
     "seeds": "Сиды",
     "torrent_s_already_in_session": "Торрент(ы) уже в сессии",
     "ratio": "Рейтинг",
+    "upload_gb_per_hour": "Отдача ГБ/час",
+    "upload_gb_per_day": "Отдача ГБ/день",
     "pieces": "Части",
     "downloaded": "Загружено",
     "uploaded": "Отдано",

@@ -66,6 +66,7 @@ namespace BitTorrent
         int                                                   queuePosition        = -1;
         float                                                 ratio                = 0;
         std::string                                           savePath;
+        std::chrono::seconds                                  seedingTime{ 0 };
         int                                                   seedsCurrent         = 0;
         int                                                   swarmSeeds           = 0;
         int                                                   swarmLeechers        = 0;
