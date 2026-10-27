@@ -156,6 +156,8 @@
     "seeds": "Berbagi",
     "torrent_s_already_in_session": "Torrent sudah ada dalam sesi",
     "ratio": "Rasio",
+    "upload_gb_per_hour": "Unggah GB/jam",
+    "upload_gb_per_day": "Unggah GB/hari",
     "pieces": "Bagian",
     "downloaded": "Terunduh",
     "uploaded": "Terunggah",

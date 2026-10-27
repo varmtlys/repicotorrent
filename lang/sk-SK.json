@@ -97,6 +97,8 @@
     "bottom": "Spodok",
     "seeds": "Seedov",
     "ratio": "Ratio",
+    "upload_gb_per_hour": "Odosielanie GB/hod",
+    "upload_gb_per_day": "Odosielanie GB/deň",
     "pieces": "Časti",
     "downloaded": "Stiahnuté",
     "privacy": "Súkromie",

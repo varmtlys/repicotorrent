@@ -155,6 +155,8 @@
     "seeds": "Sources",
     "torrent_s_already_in_session": "Torrent(s) déjà dans la session",
     "ratio": "Ratio",
+    "upload_gb_per_hour": "Envoi Go/heure",
+    "upload_gb_per_day": "Envoi Go/jour",
     "pieces": "Pièces",
     "downloaded": "Téléchargé",
     "uploaded": "Partagé",

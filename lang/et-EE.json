@@ -159,6 +159,8 @@
     "no_such_file_or_directory": "Pole sellist faili ega kausta",
     "state_downloading_paused": "Pausitud",
     "ratio": "Suhe",
+    "upload_gb_per_hour": "Üleslaadimine GB/h",
+    "upload_gb_per_day": "Üleslaadimine GB/päev",
     "state_downloading_metadata": "Allalaaditakse metadata't",
     "start_with_windows": "Käivita RePicoTorrent koos Windowsiga",
     "status_select_file_or_directory": "Vali fail või sihtkoht",

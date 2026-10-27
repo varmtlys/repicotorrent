@@ -140,6 +140,8 @@
     "seeds": "Տվողները",
     "torrent_s_already_in_session": "Տոռենտը(ները) արդեն աշխատաշրջանում են",
     "ratio": "Համադրություն",
+    "upload_gb_per_hour": "Վերբեռնում ԳԲ/ժամ",
+    "upload_gb_per_day": "Վերբեռնում ԳԲ/օր",
     "pieces": "Մասեր",
     "downloaded": "Ներբեռնված",
     "uploaded": "Վերբեռնվեց",

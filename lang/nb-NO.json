@@ -172,6 +172,8 @@
     "active_seeds": "Aktive delere",
     "added_on": "Lagt til",
     "ratio": "Forhold",
+    "upload_gb_per_hour": "Opplasting GB/time",
+    "upload_gb_per_day": "Opplasting GB/døgn",
     "invalid_upload_rate_limit": "Ugyldig grense for opplastingstakt.",
     "error_s": "Feil: {0}",
     "add_trackers": "Legg til sporere",

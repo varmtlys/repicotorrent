@@ -1,4 +1,6 @@
 {
+    "upload_gb_per_hour": "Envio GB/hora",
+    "upload_gb_per_day": "Envio GB/dia",
     "amp_file": "&Ficheiro",
     "name": "Nome",
     "queue_position": "Posição",

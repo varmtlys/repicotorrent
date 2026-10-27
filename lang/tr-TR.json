@@ -132,6 +132,8 @@
     "seeds": "Seed",
     "torrent_s_already_in_session": "Torrent(ler) zaten listede mevcut",
     "ratio": "Seed Oranı",
+    "upload_gb_per_hour": "Gönderim GB/saat",
+    "upload_gb_per_day": "Gönderim GB/gün",
     "pieces": "Parçalar",
     "downloaded": "İndirilmiş",
     "uploaded": "Yüklenmiş",

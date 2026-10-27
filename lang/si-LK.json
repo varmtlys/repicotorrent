@@ -1,4 +1,6 @@
 {
+    "upload_gb_per_hour": "උඩුගත කිරීම GB/පැය",
+    "upload_gb_per_day": "උඩුගත කිරීම GB/දිනය",
     "queue_position": "#",
     "size": "ප්‍රමාණය",
     "color": "වර්ණය",

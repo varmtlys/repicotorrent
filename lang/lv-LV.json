@@ -1,4 +1,6 @@
 {
+    "upload_gb_per_hour": "Augšupielāde GB/h",
+    "upload_gb_per_day": "Augšupielāde GB/dienā",
     "name": "Nosaukums",
     "size": "Izmērs",
     "status": "Statuss",

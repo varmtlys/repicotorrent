@@ -135,6 +135,8 @@
     "seeds": "Semințe",
     "torrent_s_already_in_session": "Torrent(e) deja în sesiune",
     "ratio": "Rațio",
+    "upload_gb_per_hour": "Încărcare GB/oră",
+    "upload_gb_per_day": "Încărcare GB/zi",
     "pieces": "Piese",
     "downloaded": "Descărcat",
     "uploaded": "Încarcat",

@@ -142,6 +142,8 @@
     "seeds": "种子",
     "torrent_s_already_in_session": "种子已在下载列表中",
     "ratio": "比率",
+    "upload_gb_per_hour": "上传 GB/小时",
+    "upload_gb_per_day": "上传 GB/天",
     "pieces": "块",
     "downloaded": "已下载",
     "uploaded": "已上传",

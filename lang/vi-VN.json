@@ -1,4 +1,6 @@
 {
+    "upload_gb_per_hour": "Tải lên GB/giờ",
+    "upload_gb_per_day": "Tải lên GB/ngày",
     "low": "Thấp",
     "do_not_download": "Không tải tệp tin này",
     "priority": "Mức độ ưu tiên",

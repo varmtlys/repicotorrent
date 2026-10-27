@@ -124,6 +124,8 @@
     "seeds": "सीड",
     "torrent_s_already_in_session": "पहले ही सत्र में टोरेंट",
     "ratio": "अनुपात",
+    "upload_gb_per_hour": "अपलोड GB/घंटा",
+    "upload_gb_per_day": "अपलोड GB/दिन",
     "pieces": "टुकड़े",
     "uploaded": "अपलोड किए गए",
     "storage_mode": "भंडारण मोड",

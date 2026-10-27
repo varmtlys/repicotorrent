@@ -50,6 +50,8 @@
     "top": "עליון",
     "bottom": "תחתון",
     "ratio": "יחס",
+    "upload_gb_per_hour": "העלאה GB/שעה",
+    "upload_gb_per_day": "העלאה GB/יום",
     "pieces": "חלקים",
     "downloaded": "הורד",
     "privacy": "פרטיות",

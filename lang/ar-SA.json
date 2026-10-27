@@ -130,6 +130,8 @@
     "seeds": "مزروعات",
     "torrent_s_already_in_session": "البذرة موجودة مسبقا في الجلسة",
     "ratio": "النسبة",
+    "upload_gb_per_hour": "الرفع GB/ساعة",
+    "upload_gb_per_day": "الرفع GB/يوم",
     "pieces": "الأجزاء",
     "downloaded": "محمل",
     "uploaded": "مرفوع",

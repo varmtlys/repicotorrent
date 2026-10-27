@@ -1,4 +1,6 @@
 {
+    "upload_gb_per_hour": "ატვირთვა GB/სთ",
+    "upload_gb_per_day": "ატვირთვა GB/დღე",
     "name": "სახელი",
     "size": "ზომა",
     "status": "სტატუსი",

@@ -127,6 +127,8 @@
     "add_tracker": "Tracker toevoegen",
     "torrent_s_already_in_session": "Torrent(s) zitten al in sessie",
     "ratio": "Verhouding",
+    "upload_gb_per_hour": "Upload GB/uur",
+    "upload_gb_per_day": "Upload GB/dag",
     "pieces": "Delen",
     "downloaded": "Gedownload",
     "uploaded": "Geüpload",

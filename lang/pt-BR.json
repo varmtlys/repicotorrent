@@ -243,6 +243,8 @@
     "proxy_hostnames": "Proxy lida com nomes de host",
     "plugins": "Plugins",
     "ratio": "Taxa",
+    "upload_gb_per_hour": "Envio GB/hora",
+    "upload_gb_per_day": "Envio GB/dia",
     "dht_num_nodes": "DHT: {0} nó(s)",
     "num_torrents": "{0} torrent(s)",
     "dl_s_ul_s": "Download: {0}/s, Upload: {1}/s",

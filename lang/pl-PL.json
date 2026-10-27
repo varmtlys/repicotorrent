@@ -141,6 +141,8 @@
     "seeds": "Seedy",
     "torrent_s_already_in_session": "Torrent jest już w sesji",
     "ratio": "Stosunek",
+    "upload_gb_per_hour": "Wysyłanie GB/godz.",
+    "upload_gb_per_day": "Wysyłanie GB/dzień",
     "pieces": "Części",
     "downloaded": "Pobrano",
     "uploaded": "Wysłano",

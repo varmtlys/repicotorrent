@@ -156,6 +156,8 @@
     "seeds": "Роздавачі",
     "torrent_s_already_in_session": "Торрент(и) уже в сесії",
     "ratio": "Рейтинг",
+    "upload_gb_per_hour": "Роздача ГБ/год",
+    "upload_gb_per_day": "Роздача ГБ/день",
     "pieces": "Частини",
     "downloaded": "Завантажено",
     "uploaded": "Роздано",

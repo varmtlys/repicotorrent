@@ -134,6 +134,8 @@
     "seeds": "Seed",
     "torrent_s_already_in_session": "Torrent già in sessione",
     "ratio": "Rapporto",
+    "upload_gb_per_hour": "Invio GB/ora",
+    "upload_gb_per_day": "Invio GB/giorno",
     "pieces": "Segmenti",
     "downloaded": "Scaricato",
     "uploaded": "Inviato",

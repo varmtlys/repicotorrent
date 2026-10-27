@@ -145,6 +145,8 @@
     "seeds": "Jakajat",
     "torrent_s_already_in_session": "Torrentti on jo lisätty",
     "ratio": "Jakosuhde",
+    "upload_gb_per_hour": "Lähetys Gt/h",
+    "upload_gb_per_day": "Lähetys Gt/vrk",
     "pieces": "Osat",
     "downloaded": "Ladattu",
     "uploaded": "Lähetetty",

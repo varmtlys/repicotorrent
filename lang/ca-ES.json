@@ -135,6 +135,8 @@
     "seeds": "Llavors",
     "torrent_s_already_in_session": "Torrent(s) ja a la sessió",
     "ratio": "Proporció",
+    "upload_gb_per_hour": "Pujada GB/hora",
+    "upload_gb_per_day": "Pujada GB/dia",
     "pieces": "Peçes",
     "downloaded": "Descarregat",
     "uploaded": "Carregat",

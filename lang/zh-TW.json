@@ -1,4 +1,6 @@
 {
+    "upload_gb_per_hour": "上傳 GB/小時",
+    "upload_gb_per_day": "上傳 GB/天",
     "name": "名稱",
     "progress": "進度",
     "remove": "刪除",
