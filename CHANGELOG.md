@@ -3,7 +3,7 @@
 Versions follow [Semantic Versioning](https://semver.org). A release is a
 `vX.Y.Z` tag; its notes are the matching section below.
 
-## Unreleased
+## 0.28.0
 
 ### New
 
@@ -51,7 +51,7 @@ Versions follow [Semantic Versioning](https://semver.org). A release is a
 - A click on the notification area icon hides the window there when it is
   on screen and brings it back when it is not.
 - Space pauses the selected torrents, or resumes them when all of them are
-  paused.
+  paused or stopped by an error.
 
 ## 0.27.0
 

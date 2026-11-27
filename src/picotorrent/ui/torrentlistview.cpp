@@ -361,6 +361,10 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
                     // Waiting for its files: paused says whether it starts then.
                     if (state == BitTorrent::TorrentStatus::State::FilesMissing) { return !t->Status().paused; }
 
+                    // libtorrent pauses a torrent on an error; Space resumes it,
+                    // which clears the error.
+                    if (state == BitTorrent::TorrentStatus::State::Error) { return false; }
+
                     return state != BitTorrent::TorrentStatus::State::DownloadingPaused
                         && state != BitTorrent::TorrentStatus::State::UploadingPaused;
                 });
