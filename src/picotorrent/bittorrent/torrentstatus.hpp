@@ -35,7 +35,8 @@ namespace BitTorrent
             UploadingQueued,
             // The save folder or the files are gone (a drive or share went
             // away); the torrent waits for them, see Session::CheckDataPaths.
-            FilesMissing
+            FilesMissing,
+            CheckingQueued
         };
 
         // Every member is initialized here: a status built for an invalid

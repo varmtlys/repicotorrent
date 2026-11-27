@@ -85,6 +85,7 @@
     "max_uploads": "Nombre maximum de partages",
     "max_uploads_help": "(-1 : illimité)",
     "sequential_download": "Téléchargement séquentiel",
+    "state_checking_queued": "En attente de vérification",
     "download_order": "Ordre de téléchargement",
     "download_order_normal": "Normal (pièces rares d’abord)",
     "download_order_files_sequential": "Chaque fichier dans l’ordre",

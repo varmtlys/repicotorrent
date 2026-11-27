@@ -876,12 +876,14 @@ void Session::OnAlert()
         {
             lt::torrent_checked_alert* tca = lt::alert_cast<lt::torrent_checked_alert>(alert);
 
-            auto torrentToResume = m_pauseAfterRecheck.find(tca->handle.info_hashes());
+            auto it = findInfoHash(m_afterRecheck, tca->handle.info_hashes());
 
-            if (torrentToResume != m_pauseAfterRecheck.end())
+            if (it != m_afterRecheck.end())
             {
-                torrentToResume->second->Pause();
-                m_pauseAfterRecheck.erase(torrentToResume);
+                auto [torrent, stopped] = it->second;
+                if (stopped) { torrent->Pause(); }
+                else { torrent->ResumeForce(); }
+                m_afterRecheck.erase(it);
             }
 
             break;
@@ -1027,6 +1029,7 @@ void Session::OnAlert()
             wxPostEvent(m_parent, evt);
 
             m_torrents.erase(it);
+            m_afterRecheck.erase(key);
 
             std::vector<std::string> statements =
             {
@@ -1381,16 +1384,10 @@ std::vector<char> Session::ResumeDataBuffer(lt::add_torrent_params params)
     return buffer;
 }
 
-void Session::PauseAfterRecheck(pt::BitTorrent::TorrentHandle* th)
-
+void Session::RestoreAfterRecheck(pt::BitTorrent::TorrentHandle* th, bool stopped)
 {
-    if (m_pauseAfterRecheck.find(th->InfoHash()) != m_pauseAfterRecheck.end())
-    {
-        BOOST_LOG_TRIVIAL(warning) << "Torrent already rechecking (" << th->InfoHash().v1.data() << ")";
-        return;
-    }
-
-    m_pauseAfterRecheck.insert({ th->InfoHash(), th });
+    // A second recheck before the first one finished keeps the first state.
+    m_afterRecheck.insert({ th->InfoHash(), { th, stopped } });
 }
 
 void Session::SaveState()

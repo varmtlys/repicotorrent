@@ -78,6 +78,7 @@
     "max_uploads": "Lähetyspaikat",
     "max_uploads_help": "(-1: rajoittamaton)",
     "sequential_download": "Lataa osat järjestyksessä",
+    "state_checking_queued": "Jonossa tarkistukseen",
     "download_order": "Latausjärjestys",
     "download_order_normal": "Tavallinen (harvinaiset osat ensin)",
     "download_order_files_sequential": "Jokainen tiedosto järjestyksessä",

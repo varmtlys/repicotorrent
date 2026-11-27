@@ -3,6 +3,20 @@
 Versions follow [Semantic Versioning](https://semver.org). A release is a
 `vX.Y.Z` tag; its notes are the matching section below.
 
+## Unreleased
+
+### Fixed
+
+- **Force recheck** on several torrents checked them all at once when they
+  were started with **Resume (force)**. They now wait in line, one at a
+  time (Preferences > Advanced, `active_checking`), and show **Queued for
+  checking** meanwhile. Afterwards each one goes back to how it was.
+- A torrent waiting in the download queue was left paused after a recheck.
+- The update check ran only when the program started, so a copy running in
+  the notification area never heard of a new release. It now checks every
+  six hours as well, and shows the offer in its own window when the main
+  window is hidden.
+
 ## 0.28.0
 
 ### New

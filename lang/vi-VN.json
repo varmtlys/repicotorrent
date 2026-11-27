@@ -1,4 +1,5 @@
 {
+    "state_checking_queued": "Đang chờ kiểm tra",
     "download_order": "Thứ tự tải",
     "download_order_normal": "Bình thường (mảnh hiếm trước)",
     "download_order_files_sequential": "Từng tệp theo thứ tự",

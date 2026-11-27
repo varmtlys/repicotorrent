@@ -37,6 +37,13 @@ TorrentStatus::State getTorrentStatusState(lt::torrent_status const& ts)
         return TorrentStatus::State::Error;
     }
 
+    // Waiting for its turn: libtorrent checks active_checking torrents at
+    // a time.
+    if (queued && ts.state == lt::torrent_status::state_t::checking_files)
+    {
+        return TorrentStatus::State::CheckingQueued;
+    }
+
     if (paused)
     {
         if (seeding)
@@ -122,22 +129,31 @@ void TorrentHandle::ForceReannounce(int seconds, int trackerIndex)
 
 void TorrentHandle::ForceRecheck()
 {
+    bool autoManaged = static_cast<bool>(m_flags & lt::torrent_flags::auto_managed);
+    // Stopped by the user - not queued, and not stopped by an error.
+    bool stopped = (m_flags & lt::torrent_flags::paused) && !autoManaged && !m_hasError;
+
     // Checking a missing folder is asking for the data to be downloaded
-    // again - which is what a recheck is for.
+    // again - which is what a recheck is for. Afterwards it goes the way it
+    // was waiting to go.
     if (m_missing)
     {
         m_missing = false;
-        if (m_resumeWhenFound && m_autoManagedWhenFound) { m_th->set_flags(lt::torrent_flags::auto_managed); }
-        m_status = Update(m_th->status());
+        autoManaged = m_resumeWhenFound && m_autoManagedWhenFound;
+        stopped = !m_resumeWhenFound;
     }
 
-    if (Status().paused)
+    // libtorrent checks one torrent at a time (active_checking), but only
+    // auto-managed ones; the others were all checked at once. Auto-managed
+    // for the check, then back to what it was.
+    if (!autoManaged)
     {
-        m_session->PauseAfterRecheck(this);
-        Resume();
+        m_session->RestoreAfterRecheck(this, stopped);
     }
 
+    m_th->set_flags(lt::torrent_flags::auto_managed);
     m_th->force_recheck();
+    m_status = Update(m_th->status());
 }
 
 std::vector<lt::download_priority_t> TorrentHandle::GetFilePriorities() const

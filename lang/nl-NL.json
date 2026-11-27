@@ -67,6 +67,7 @@
     "max_uploads": "Maximale uploads",
     "max_uploads_help": "(-1: onbeperkt)",
     "sequential_download": "Opeenvolgend downloaden",
+    "state_checking_queued": "Wacht op controle",
     "download_order": "Downloadvolgorde",
     "download_order_normal": "Normaal (zeldzame stukken eerst)",
     "download_order_files_sequential": "Elk bestand op volgorde",

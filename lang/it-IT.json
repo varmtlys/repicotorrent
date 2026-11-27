@@ -69,6 +69,7 @@
     "max_uploads": "Numero massimo di upload",
     "max_uploads_help": "(-1: illimitato)",
     "sequential_download": "Download sequenziale",
+    "state_checking_queued": "In coda per il controllo",
     "download_order": "Ordine di scaricamento",
     "download_order_normal": "Normale (prima i pezzi rari)",
     "download_order_files_sequential": "Ogni file in ordine",

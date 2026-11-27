@@ -78,6 +78,7 @@
     "max_uploads": "მაქს. ატვირთვები",
     "max_uploads_help": "(-1: ულიმიტო)",
     "sequential_download": "თანმიმდევრული ჩამოტვირთვები",
+    "state_checking_queued": "ელოდება შემოწმებას",
     "download_order": "ჩამოტვირთვის რიგი",
     "download_order_normal": "ჩვეულებრივი (ჯერ იშვიათი ნაწილები)",
     "download_order_files_sequential": "თითოეული ფაილი თანმიმდევრულად",

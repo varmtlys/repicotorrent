@@ -71,6 +71,7 @@
     "max_uploads": "No. máximo de subidas",
     "max_uploads_help": "(-1: ilimitado)",
     "sequential_download": "Descarga secuencial",
+    "state_checking_queued": "En cola para comprobar",
     "download_order": "Orden de descarga",
     "download_order_normal": "Normal (primero las piezas raras)",
     "download_order_files_sequential": "Cada archivo en orden",

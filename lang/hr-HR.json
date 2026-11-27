@@ -207,6 +207,7 @@
     "ip_filter_enabled": "IP filter: ✔️",
     "ip_filter_disabled": "IP filter: ❌",
     "sequential_download": "Sekvencijalno preuzimanje",
+    "state_checking_queued": "Čeka provjeru",
     "download_order": "Redoslijed preuzimanja",
     "download_order_normal": "Uobičajeno (prvo rijetki dijelovi)",
     "download_order_files_sequential": "Svaka datoteka redom",

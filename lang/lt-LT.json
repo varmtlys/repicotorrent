@@ -79,6 +79,7 @@
     "max_uploads": "Riboti skleidinių kiekį",
     "max_uploads_help": "(-1: neriboti)",
     "sequential_download": "Sekvencinis parsiuntimas",
+    "state_checking_queued": "Laukia patikrinimo",
     "download_order": "Atsisiuntimo tvarka",
     "download_order_normal": "Įprasta (pirmiausia retos dalys)",
     "download_order_files_sequential": "Kiekvienas failas iš eilės",

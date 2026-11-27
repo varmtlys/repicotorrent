@@ -128,7 +128,8 @@ namespace BitTorrent
         void MigrateInfoHashKey(libtorrent::info_hash_t const& hash);
         void OnAlert();
         void OnSaveResumeDataTimer(wxTimerEvent&);
-        void PauseAfterRecheck(TorrentHandle*);
+        // After the recheck: pause the torrent (stopped) or start it forced.
+        void RestoreAfterRecheck(TorrentHandle*, bool stopped);
         void RemoveMetadataHandle(libtorrent::info_hash_t hash);
         void SaveState();
         void SaveTorrents();
@@ -151,7 +152,7 @@ namespace BitTorrent
         std::future<std::vector<std::pair<libtorrent::info_hash_t, bool>>> m_pathCheck;
         int m_pathCheckTick = 0;
 
-        std::map<libtorrent::info_hash_t, TorrentHandle*> m_pauseAfterRecheck;
+        std::map<libtorrent::info_hash_t, std::pair<TorrentHandle*, bool>> m_afterRecheck;
         std::map<libtorrent::info_hash_t, TorrentHandle*> m_torrents;
         std::unordered_set<libtorrent::info_hash_t> m_metadataRemoving;
         std::map<libtorrent::info_hash_t, libtorrent::torrent_handle> m_metadataSearches;

@@ -75,6 +75,7 @@
     "connections": "חיבורים",
     "seed_mode": "מצב העלאה",
     "sequential_download": "הורדה ברצף",
+    "state_checking_queued": "ממתין לבדיקה",
     "download_order": "סדר ההורדה",
     "download_order_normal": "רגיל (חלקים נדירים תחילה)",
     "download_order_files_sequential": "כל קובץ ברצף",

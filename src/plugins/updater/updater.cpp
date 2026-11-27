@@ -16,6 +16,10 @@
 
 #define DEFAULT_I18N_BUFFER_SIZE 256
 
+// The program runs for weeks in the tray; checking at start only never saw
+// a release that came out after it.
+#define UPDATER_CHECK_INTERVAL_MS (6 * 60 * 60 * 1000)
+
 struct updater_request_data_t
 {
     bool force;
@@ -32,10 +36,22 @@ struct updater_request_data_t
 #define UPDATER_ASSET_SUFFIX "-x86.zip"
 #endif
 
-void show_available_update(libpico_mainwnd_t* wnd, libpico_config_t* config, const char* version, const char* url, std::string const& zipUrl, std::string const& sumsUrl)
+// The version offered by a background check: the next checks keep quiet
+// about it, so the dialog does not come back every few hours.
+static std::string g_offeredVersion;
+
+// Owner for the dialogs. A window hidden in the tray would hide them with it;
+// without an owner they get their own taskbar button.
+static HWND dialog_owner(libpico_mainwnd_t* wnd)
 {
     HWND hWnd = nullptr;
     libpico_mainwnd_native_handle(wnd, reinterpret_cast<void**>(&hWnd));
+    return hWnd && IsWindowVisible(hWnd) && !IsIconic(hWnd) ? hWnd : nullptr;
+}
+
+void show_available_update(libpico_mainwnd_t* wnd, libpico_config_t* config, const char* version, const char* url, std::string const& zipUrl, std::string const& sumsUrl)
+{
+    HWND hWnd = dialog_owner(wnd);
 
     // get wide version
     wchar_t versionw[100];
@@ -124,8 +140,7 @@ void show_available_update(libpico_mainwnd_t* wnd, libpico_config_t* config, con
 
 void show_no_update(libpico_mainwnd_t* wnd)
 {
-    HWND hWnd = nullptr;
-    libpico_mainwnd_native_handle(wnd, reinterpret_cast<void**>(&hWnd));
+    HWND hWnd = dialog_owner(wnd);
 
     wchar_t main[DEFAULT_I18N_BUFFER_SIZE];
     size_t main_len = DEFAULT_I18N_BUFFER_SIZE;
@@ -242,6 +257,13 @@ libpico_result_t parse_response(
 
             if (pt::Updater::isNewer(version, libpico_version()))
             {
+                if (!data->force && version == g_offeredVersion)
+                {
+                    break;
+                }
+
+                g_offeredVersion = version;
+
                 show_available_update(
                     data->wnd,
                     data->config,
@@ -259,6 +281,9 @@ libpico_result_t parse_response(
     }
     }
 
+    // Allocated per request by make_request; a check every few hours made
+    // the leak worth closing.
+    delete data;
     return libpico_ok;
 }
 
@@ -281,6 +306,22 @@ libpico_result_t check(libpico_menuitem_t* item, libpico_param_t* param)
     updater_request_data_t* data = reinterpret_cast<updater_request_data_t*>(param);
     make_request(data->config, data->wnd, data->force);
     return libpico_ok;
+}
+
+static libpico_config_t* g_config = nullptr;
+static libpico_mainwnd_t* g_wnd = nullptr;
+
+// A thread timer: WM_TIMER reaches it through the UI thread's message loop,
+// where the HTTP callbacks and the dialogs belong.
+static void CALLBACK on_check_timer(HWND, UINT, UINT_PTR, DWORD)
+{
+    bool enabled = false;
+    libpico_config_bool_get(g_config, "update_checks.enabled", &enabled);
+
+    if (enabled)
+    {
+        make_request(g_config, g_wnd, false);
+    }
 }
 
 libpico_result_t on_events(
@@ -307,6 +348,10 @@ libpico_result_t on_events(
                 reinterpret_cast<libpico_mainwnd_t*>(param),
                 false);
         }
+
+        g_config = config;
+        g_wnd = reinterpret_cast<libpico_mainwnd_t*>(param);
+        SetTimer(nullptr, 0, UPDATER_CHECK_INTERVAL_MS, on_check_timer);
 
         // Insert item in about menu to force a check for update
         libpico_menu_t* help;

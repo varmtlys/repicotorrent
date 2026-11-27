@@ -76,6 +76,7 @@
     "max_uploads": "Առավելագույն ներբեռնումներ",
     "max_uploads_help": "(-1: անսահմանափակ)",
     "sequential_download": "Հաջորդական ներբեռնում",
+    "state_checking_queued": "Սպասում է ստուգման",
     "download_order": "Ներբեռնման հերթականություն",
     "download_order_normal": "Սովորական (սկզբում հազվադեպ մասերը)",
     "download_order_files_sequential": "Յուրաքանչյուր ֆայլ հաջորդաբար",

@@ -68,6 +68,7 @@
     "dl_limit": "DL制限",
     "ul_limit": "UL制限",
     "sequential_download": "シーケンシャルダウンロード",
+    "state_checking_queued": "チェック待ち",
     "download_order": "ダウンロード順序",
     "download_order_normal": "通常 (レアなピースを優先)",
     "download_order_files_sequential": "各ファイルを順番に",

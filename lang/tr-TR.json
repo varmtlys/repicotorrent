@@ -68,6 +68,7 @@
     "max_uploads": "Maks. Upload",
     "max_uploads_help": "(-1: Limitsiz)",
     "sequential_download": "Ardışık indirme",
+    "state_checking_queued": "Denetim için sırada",
     "download_order": "İndirme sırası",
     "download_order_normal": "Normal (önce nadir parçalar)",
     "download_order_files_sequential": "Her dosya sırayla",

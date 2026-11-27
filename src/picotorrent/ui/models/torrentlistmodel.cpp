@@ -197,6 +197,7 @@ void TorrentListModel::SetStateIconSize(int size)
         { TorrentStatus::State::UploadingPaused,     paused },
         { TorrentStatus::State::UploadingQueued,     makeStateIcon(size, Shape::ArrowUp, gray) },
         { TorrentStatus::State::FilesMissing,        makeStateIcon(size, Shape::Error, amber) },
+        { TorrentStatus::State::CheckingQueued,      makeStateIcon(size, Shape::Dot, gray) },
     };
 }
 
@@ -520,6 +521,10 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
 
         case TorrentStatus::State::UploadingQueued:
             variant = i18n("state_uploading_queued");
+            break;
+
+        case TorrentStatus::State::CheckingQueued:
+            variant = i18n("state_checking_queued");
             break;
 
         case TorrentStatus::State::FilesMissing:

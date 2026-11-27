@@ -75,6 +75,7 @@
     "max_uploads": "Mέγιστες αναφορτώσεις",
     "max_uploads_help": "(-1: απεριόριστες)",
     "sequential_download": "Διαδοχική λήψη",
+    "state_checking_queued": "Σε αναμονή ελέγχου",
     "download_order": "Σειρά λήψης",
     "download_order_normal": "Κανονική (πρώτα τα σπάνια κομμάτια)",
     "download_order_files_sequential": "Κάθε αρχείο διαδοχικά",

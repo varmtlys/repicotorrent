@@ -64,6 +64,7 @@
     "max_uploads": "Max. Uploads",
     "max_uploads_help": "(-1: kein Limit)",
     "sequential_download": "Sequenzieller DL",
+    "state_checking_queued": "Wartet auf Prüfung",
     "download_order": "Download-Reihenfolge",
     "download_order_normal": "Normal (seltene Teile zuerst)",
     "download_order_files_sequential": "Jede Datei der Reihe nach",

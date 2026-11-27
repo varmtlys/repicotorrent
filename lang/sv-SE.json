@@ -84,6 +84,7 @@
     "max_uploads": "Max uppladdningar",
     "max_uploads_help": "(-1: obegränsat)",
     "sequential_download": "Sekventiell nedladdning",
+    "state_checking_queued": "Köad för kontroll",
     "download_order": "Nedladdningsordning",
     "download_order_normal": "Normal (sällsynta delar först)",
     "download_order_files_sequential": "Varje fil i ordning",

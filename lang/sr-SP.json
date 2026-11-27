@@ -1,6 +1,7 @@
 {
     "proxy_peer_connections": "Proxy peer konekcije",
     "sequential_download": "Sekvencijalno preuzimanje",
+    "state_checking_queued": "Čeka proveru",
     "download_order": "Redosled preuzimanja",
     "download_order_normal": "Uobičajeno (prvo retki delovi)",
     "download_order_files_sequential": "Svaka datoteka redom",

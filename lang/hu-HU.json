@@ -75,6 +75,7 @@
     "max_uploads": "Max. feltöltések",
     "max_uploads_help": "(-1: nincs korlát)",
     "sequential_download": "Egymás utáni letöltés",
+    "state_checking_queued": "Ellenőrzésre vár",
     "download_order": "Letöltési sorrend",
     "download_order_normal": "Normál (előbb a ritka részek)",
     "download_order_files_sequential": "Minden fájl sorban",

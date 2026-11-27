@@ -33,6 +33,7 @@
     "dl_limit": "AL limiit",
     "ul_limit": "ÜL limiit",
     "sequential_download": "Järjestikus allalaadimine",
+    "state_checking_queued": "Ootab kontrolli",
     "download_order": "Allalaadimise järjekord",
     "download_order_normal": "Tavaline (enne haruldased osad)",
     "download_order_files_sequential": "Iga fail järjest",

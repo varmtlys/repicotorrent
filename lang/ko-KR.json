@@ -74,6 +74,7 @@
     "max_uploads": "최대 업로드",
     "max_uploads_help": "(-1: 무제한)",
     "sequential_download": "순차 다운로드",
+    "state_checking_queued": "검사 대기 중",
     "download_order": "다운로드 순서",
     "download_order_normal": "보통 (희귀한 조각 먼저)",
     "download_order_files_sequential": "각 파일을 순서대로",

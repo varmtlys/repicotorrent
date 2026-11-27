@@ -85,6 +85,7 @@
     "max_uploads": "Unggahan maks",
     "max_uploads_help": "(-1: tidak terbatas)",
     "sequential_download": "Unduh berurutan",
+    "state_checking_queued": "Antre untuk diperiksa",
     "download_order": "Urutan unduhan",
     "download_order_normal": "Normal (bagian langka dulu)",
     "download_order_files_sequential": "Setiap berkas berurutan",

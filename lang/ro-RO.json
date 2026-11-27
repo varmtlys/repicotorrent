@@ -70,6 +70,7 @@
     "max_uploads": "Urcări maxime",
     "max_uploads_help": "(-1: nelimitat)",
     "sequential_download": "Descărcare secvențială",
+    "state_checking_queued": "În așteptarea verificării",
     "download_order": "Ordinea descărcării",
     "download_order_normal": "Normală (întâi piesele rare)",
     "download_order_files_sequential": "Fiecare fișier pe rând",

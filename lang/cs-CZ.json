@@ -163,6 +163,7 @@
     "limits": "Limity",
     "ul_limit": "Limity pro odesílání",
     "sequential_download": "Postupné stahování",
+    "state_checking_queued": "Ve frontě na kontrolu",
     "download_order": "Pořadí stahování",
     "download_order_normal": "Normální (nejdřív vzácné části)",
     "download_order_files_sequential": "Každý soubor postupně",

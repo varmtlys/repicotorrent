@@ -75,6 +75,7 @@
     "max_uploads": "Augšupiel. skaits",
     "max_uploads_help": "(-1: neierobežots)",
     "sequential_download": "Secīga lejupielāde",
+    "state_checking_queued": "Gaida pārbaudi",
     "download_order": "Lejupielādes secība",
     "download_order_normal": "Parastā (vispirms retās daļas)",
     "download_order_files_sequential": "Katrs fails pēc kārtas",

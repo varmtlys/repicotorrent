@@ -64,6 +64,7 @@
     "max_uploads": "अधिकतम अपलोड",
     "max_uploads_help": "(-1: असीमित)",
     "sequential_download": "अनुक्रमिक डाउनलोड",
+    "state_checking_queued": "जाँच की कतार में",
     "download_order": "डाउनलोड क्रम",
     "download_order_normal": "सामान्य (पहले दुर्लभ हिस्से)",
     "download_order_files_sequential": "हर फ़ाइल क्रम से",

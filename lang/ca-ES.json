@@ -72,6 +72,7 @@
     "max_uploads": "Nombre màxim de pujades",
     "max_uploads_help": "(-1: il·limitat)",
     "sequential_download": "Descarregues seqüencials",
+    "state_checking_queued": "A la cua per comprovar",
     "download_order": "Ordre de baixada",
     "download_order_normal": "Normal (primer les peces rares)",
     "download_order_files_sequential": "Cada fitxer en ordre",

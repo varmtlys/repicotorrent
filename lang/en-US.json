@@ -61,6 +61,7 @@
     "dl_limit": "DL limit",
     "ul_limit": "UL limit",
     "sequential_download": "Sequential download",
+    "state_checking_queued": "Queued for checking",
     "download_order": "Download order",
     "download_order_normal": "Normal (rarest pieces first)",
     "download_order_files_sequential": "Each file sequentially",

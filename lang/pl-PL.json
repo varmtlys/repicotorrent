@@ -74,6 +74,7 @@
     "max_uploads": "Maksymalne wysyłania",
     "max_uploads_help": "(-1: nielimitowane)",
     "sequential_download": "Pobieranie sekwencyjne",
+    "state_checking_queued": "W kolejce do sprawdzenia",
     "download_order": "Kolejność pobierania",
     "download_order_normal": "Zwykła (najpierw rzadkie części)",
     "download_order_files_sequential": "Każdy plik po kolei",

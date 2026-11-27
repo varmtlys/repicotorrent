@@ -85,6 +85,7 @@
     "max_uploads": "Макс. отдача",
     "max_uploads_help": "(-1: неограниченно)",
     "sequential_download": "Последовательная загрузка",
+    "state_checking_queued": "В очереди на проверку",
     "download_order": "Порядок загрузки",
     "download_order_normal": "Обычный (сначала редкие части)",
     "download_order_files_sequential": "Каждый файл последовательно",

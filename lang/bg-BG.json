@@ -208,6 +208,7 @@
     "invalid_listen_port": "Недействителен порт. Трябва да бъде число между 1024 и 65535.",
     "max_connections": "Макс. връзки",
     "sequential_download": "Последователно изтегляне",
+    "state_checking_queued": "Чака проверка",
     "download_order": "Ред на изтегляне",
     "download_order_normal": "Обичаен (първо редките части)",
     "download_order_files_sequential": "Всеки файл последователно",

@@ -1,4 +1,5 @@
 {
+    "state_checking_queued": "排隊等待檢查",
     "download_order": "下載順序",
     "download_order_normal": "一般（稀有區塊優先）",
     "download_order_files_sequential": "逐個檔案依序",

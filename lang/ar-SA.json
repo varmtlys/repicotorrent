@@ -70,6 +70,7 @@
     "max_uploads": "المرفوعات القصوى",
     "max_uploads_help": "(1-: لا محدود)",
     "sequential_download": "تحميل تسلسلي",
+    "state_checking_queued": "في انتظار الفحص",
     "download_order": "ترتيب التنزيل",
     "download_order_normal": "عادي (القطع النادرة أولاً)",
     "download_order_files_sequential": "كل ملف بالتسلسل",
