@@ -41,6 +41,7 @@ namespace Models
         wxDataViewItem GetParent(const wxDataViewItem &item) const wxOVERRIDE;
         bool IsContainer(const wxDataViewItem &item) const wxOVERRIDE;
         unsigned int GetChildren(const wxDataViewItem &parent, wxDataViewItemArray &array) const wxOVERRIDE;
+        int Compare(const wxDataViewItem& item1, const wxDataViewItem& item2, unsigned int column, bool ascending) const wxOVERRIDE;
 
         void ClearNodes();
         std::vector<libtorrent::file_index_t> GetFileIndices(wxDataViewItemArray&);

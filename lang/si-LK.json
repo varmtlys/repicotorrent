@@ -1,4 +1,12 @@
 {
+    "download_order": "බාගැනීමේ පිළිවෙල",
+    "download_order_normal": "සාමාන්‍ය (දුර්ලභ කොටස් මුලින්)",
+    "download_order_files_sequential": "සෑම ගොනුවක්ම අනුපිළිවෙලින්",
+    "download_order_first_last": "ගොනුවල ආරම්භය හා අවසානය මුලින්",
+    "download_order_first_last_sequential": "ආරම්භය හා අවසානය, පසුව අනුපිළිවෙලින්",
+    "state_files_missing": "ගොනු හමු නොවීය: {0}",
+    "files_missing_alert": "ගොනු හමු නොවීය, ටොරන්ටය නැවැත්විණි",
+    "files_found_alert": "ගොනු නැවත ඇත",
     "upload_gb_per_hour": "උඩුගත කිරීම GB/පැය",
     "upload_gb_per_day": "උඩුගත කිරීම GB/දිනය",
     "queue_position": "#",

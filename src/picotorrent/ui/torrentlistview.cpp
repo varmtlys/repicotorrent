@@ -357,6 +357,10 @@ TorrentListView::TorrentListView(wxWindow* parent, wxWindowID id, pt::UI::Models
                 {
                     // Status().paused is also set for torrents waiting in the queue.
                     auto const state = t->Status().state;
+
+                    // Waiting for its files: paused says whether it starts then.
+                    if (state == BitTorrent::TorrentStatus::State::FilesMissing) { return !t->Status().paused; }
+
                     return state != BitTorrent::TorrentStatus::State::DownloadingPaused
                         && state != BitTorrent::TorrentStatus::State::UploadingPaused;
                 });

@@ -1,4 +1,12 @@
 {
+    "download_order": "下載順序",
+    "download_order_normal": "一般（稀有區塊優先）",
+    "download_order_files_sequential": "逐個檔案依序",
+    "download_order_first_last": "優先下載檔案的首尾",
+    "download_order_first_last_sequential": "先首尾，再依序",
+    "state_files_missing": "找不到檔案：{0}",
+    "files_missing_alert": "找不到檔案，已停止種子",
+    "files_found_alert": "檔案已恢復",
     "upload_gb_per_hour": "上傳 GB/小時",
     "upload_gb_per_day": "上傳 GB/天",
     "name": "名稱",

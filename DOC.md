@@ -52,6 +52,7 @@ The lower part shows the details of the selected torrent:
   torrent in progress has gaps.
 - **Files**: the files and folders with their progress. Right-click to
   set a priority or skip a file; double-click opens a downloaded file.
+  Click a column header to sort; folders stay on top.
 - **Peers**: connected peers with their country, client, rates and
   connection flags written out in words.
 - **Trackers**: tracker status, seeds and leeches it reports and the
@@ -59,6 +60,8 @@ The lower part shows the details of the selected torrent:
 
 The status bar shows the number of torrents, DHT nodes, the current rates,
 whether the IP filter is on and the amount transferred in this session.
+The notification area icon shows the rates and the session totals when
+the mouse rests on it.
 **View** hides or shows the details panel, the status bar and the
 console.
 
@@ -83,8 +86,11 @@ Right-click one or more torrents:
 
 - **Resume**, **Resume (force)** (ignores the queue), **Pause**.
 - **Force reannounce**, **Force recheck** (verifies the data on disk).
-- **Sequential download**: fetch pieces in order, useful for watching a
-  video while it downloads.
+- **Download order**: **Normal (rarest pieces first)**, **Sequential download**, **Each file sequentially**, **First and last pieces first**, **First and last pieces, then sequentially**.
+  Normal fetches the rarest pieces first; sequential goes through the
+  torrent in order; each file sequentially goes through every file from
+  its start, the files side by side; first and last pieces lets a player
+  open a video early.
 - **Label**: assign a label.
 - **Export**: the magnet link or the `.torrent` file.
 - **Move**: move the data to another folder.
@@ -92,6 +98,8 @@ Right-click one or more torrents:
   (Shift+Del).
 - **Queuing**: move up or down in the download queue.
 - **Copy info hash**, **Open in Explorer**.
+
+If the save folder or the drive goes away (a USB drive, a network share), the torrent stops with **Files not found, the torrent is stopped** in the notification area instead of downloading everything again. Once the data is back, it goes on where it was, without a recheck. **Force recheck** downloads it anew.
 
 
 ## Labels

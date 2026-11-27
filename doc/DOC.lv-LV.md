@@ -88,8 +88,7 @@ Ar labo klikšķi uz viena vai vairākiem torrentiem:
 
 - **Sākt**, **Sākt (piespiedu)** (neņem vērā rindu), **Pauze**.
 - **Force reannounce**, **Force recheck** (pārbauda datus diskā).
-- **Secīga lejupielāde**: daļas lejupielādē pēc kārtas, ērti, lai
-  skatītos video lejupielādes laikā.
+- **Lejupielādes secība**: **Parastā (vispirms retās daļas)**, **Secīga lejupielāde**, **Katrs fails pēc kārtas**, **Vispirms failu sākums un beigas**, **Sākums un beigas, tad pēc kārtas**.
 - **Label**: piešķirt etiķeti.
 - **Export**: magnet saite vai `.torrent` fails.
 - **Pārvietot**: pārvietot datus uz citu mapi.
@@ -97,6 +96,8 @@ Ar labo klikšķi uz viena vai vairākiem torrentiem:
   (Shift+Del).
 - **Queuing**: uz augšu vai uz leju lejupielādes rindā.
 - **Kopēt info hash**, **Atvērt failu pārlukā**.
+
+Ja mape vai disks pazūd, torrents apstājas un gaida; kad tas atgriežas, turpina bez atkārtotas pārbaudes.
 
 
 ## Etiķetes

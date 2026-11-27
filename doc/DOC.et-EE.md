@@ -89,8 +89,7 @@ Paremklõps ühel või mitmel torrentil:
 - **Jätka**, **Jätka (sunni)** (eirab järjekorda), **Pausi**.
 - **Force reannounce**, **Sunni ülekontrolli** (kontrollib kettal olevaid
   andmeid).
-- **Järjestikus allalaadimine**: tükid laaditakse järjest, kasulik video
-  vaatamiseks allalaadimise ajal.
+- **Allalaadimise järjekord**: **Tavaline (enne haruldased osad)**, **Järjestikus allalaadimine**, **Iga fail järjest**, **Enne failide algus ja lõpp**, **Algus ja lõpp, siis järjest**.
 - **Silt**: sildi määramine.
 - **Ekspordi**: magnetlink või `.torrent` fail.
 - **Liiguta**: andmete teisaldamine teise kausta.
@@ -98,6 +97,8 @@ Paremklõps ühel või mitmel torrentil:
   failidega (Shift+Del).
 - **Queuing**: üles või alla allalaadimisjärjekorras.
 - **Kopeeri info räsi**, **Ava Exploreris**.
+
+Kui kaust või ketas kaob, torrent peatub ja ootab; kui see tagasi tuleb, jätkab see ilma uue kontrollita.
 
 
 ## Sildid

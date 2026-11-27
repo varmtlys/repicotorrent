@@ -86,8 +86,7 @@ Desni klik na jedan ili više torenata:
 - **Nastavi**, **Nastavi (prisilno)** (zanemaruje red), **Pauziraj**.
 - **Forsiraj najavu**, **Ponovo proveri** (proverava podatke na
   disku).
-- **Sekvencijalno preuzimanje**: preuzimanje delova redom, korisno za gledanje
-  videa dok se preuzima.
+- **Redosled preuzimanja**: **Uobičajeno (prvo retki delovi)**, **Sekvencijalno preuzimanje**, **Svaka datoteka redom**, **Prvo početak i kraj datoteka**, **Početak i kraj, zatim redom**.
 - **Etiketa**: dodeliti oznaku.
 - **Izvezi**: magnet link ili `.torrent` datoteka.
 - **Premesti**: premestiti podatke u drugu fasciklu.
@@ -95,6 +94,8 @@ Desni klik na jedan ili više torenata:
   (Shift+Del).
 - **Čekanje u redu**: gore ili dole u redu preuzimanja.
 - **Kopiraj info heš**, **Otvori u Explorer-u**.
+
+Ako fascikla ili disk nestane, torent se zaustavlja i čeka; kada se vrati, nastavlja bez ponovne provere.
 
 
 ## Oznake

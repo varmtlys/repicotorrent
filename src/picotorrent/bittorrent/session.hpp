@@ -5,6 +5,7 @@
 #include <wx/wx.h>
 #endif
 
+#include <future>
 #include <map>
 #include <memory>
 #include <string>
@@ -54,6 +55,9 @@ wxDECLARE_EVENT(ptEVT_SESSION_DEBUG_MESSAGE, wxCommandEvent);
 wxDECLARE_EVENT(ptEVT_SESSION_STATISTICS, pt::BitTorrent::SessionStatisticsEvent);
 wxDECLARE_EVENT(ptEVT_TORRENT_ADDED, wxCommandEvent);
 wxDECLARE_EVENT(ptEVT_TORRENT_FINISHED, wxCommandEvent);
+// String: the torrent name (and the missing path); int: 1 when its data went
+// missing, 0 when it is back.
+wxDECLARE_EVENT(ptEVT_TORRENT_FILES_MISSING, wxCommandEvent);
 wxDECLARE_EVENT(ptEVT_TORRENT_METADATA_FOUND, pt::BitTorrent::MetadataFoundEvent);
 wxDECLARE_EVENT(ptEVT_TORRENT_REMOVED, pt::BitTorrent::InfoHashEvent);
 wxDECLARE_EVENT(ptEVT_TORRENT_STATISTICS, pt::BitTorrent::TorrentStatisticsEvent);
@@ -117,6 +121,10 @@ namespace BitTorrent
         bool IsSearching(libtorrent::info_hash_t hash, libtorrent::info_hash_t& result);
         void LoadIPFilter(std::string const& filePath);
         void LoadTorrents();
+        // Stops torrents whose save folder (or file) disappeared, and starts
+        // them again once it is back. Runs every few seconds.
+        void CheckDataPaths();
+        std::vector<char> ResumeDataBuffer(libtorrent::add_torrent_params params);
         void MigrateInfoHashKey(libtorrent::info_hash_t const& hash);
         void OnAlert();
         void OnSaveResumeDataTimer(wxTimerEvent&);
@@ -136,6 +144,12 @@ namespace BitTorrent
         std::shared_ptr<Core::Configuration> m_cfg;
         std::shared_ptr<Core::Environment> m_env;
         std::thread m_filterLoader;
+
+        // Off the UI thread: stat() on a vanished network share can hang.
+        // ponytail: a check stuck that way also holds up the exit, which waits
+        // for it; detach it if that shows.
+        std::future<std::vector<std::pair<libtorrent::info_hash_t, bool>>> m_pathCheck;
+        int m_pathCheckTick = 0;
 
         std::map<libtorrent::info_hash_t, TorrentHandle*> m_pauseAfterRecheck;
         std::map<libtorrent::info_hash_t, TorrentHandle*> m_torrents;

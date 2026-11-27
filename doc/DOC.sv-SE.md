@@ -89,8 +89,7 @@ Högerklicka på en eller flera torrenter:
 - **Återuppta**, **Återuppta (tvinga)** (ignorerar kön), **Pausa**.
 - **Tvinga nyannonsering**, **Tvinga återkontroll** (kontrollerar data på
   disken).
-- **Sekventiell nedladdning**: hämta delar i ordning, praktiskt för att
-  titta på en video medan den laddas ner.
+- **Nedladdningsordning**: **Normal (sällsynta delar först)**, **Sekventiell nedladdning**, **Varje fil i ordning**, **Början och slutet av filerna först**, **Början och slutet, sedan i ordning**.
 - **Label**: tilldela en etikett.
 - **Export**: magnetlänken eller `.torrent`-filen.
 - **Flytta**: flytta data till en annan mapp.
@@ -98,6 +97,8 @@ Högerklicka på en eller flera torrenter:
   (Skift+Del).
 - **Köar**: upp eller ner i nedladdningskön.
 - **Kopiera infohash**, **Öppna i Utforskaren**.
+
+Om mappen eller enheten försvinner stoppas torrenten och väntar; när den är tillbaka fortsätter den utan ny kontroll.
 
 
 ## Etiketter

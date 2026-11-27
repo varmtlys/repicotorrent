@@ -134,6 +134,7 @@ MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr
             bool dhtEnabled = m_cfg->Get<bool>("libtorrent.enable_dht").value_or(true);
             m_statusBar->UpdateDhtNodesCount(dhtEnabled ? evt.GetData().dhtNodes : -1);
             m_statusBar->UpdateSessionTotals(evt.GetData().totalDownloaded, evt.GetData().totalUploaded);
+            m_taskBarIcon->SetSessionTotals(evt.GetData().totalDownloaded, evt.GetData().totalUploaded);
         });
 
     this->Bind(ptEVT_TORRENT_ADDED, [this](wxCommandEvent& evt)
@@ -143,12 +144,22 @@ MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr
             m_torrentListModel->AddTorrent(static_cast<BitTorrent::TorrentHandle*>(evt.GetClientData()));
         });
 
+    // The text comes with the event: the torrent may be removed (and its
+    // handle deleted) before the event is handled.
     this->Bind(ptEVT_TORRENT_FINISHED, [this](wxCommandEvent& evt)
         {
-            auto torrent = static_cast<BitTorrent::TorrentHandle*>(evt.GetClientData());
+            m_taskBarIcon->ShowBalloon(i18n("torrent_finished"), evt.GetString());
+        });
+
+    this->Bind(ptEVT_TORRENT_FILES_MISSING, [this](wxCommandEvent& evt)
+        {
+            // The tray balloon, or nothing to see the message in when the
+            // icon is off - then the status column says it.
             m_taskBarIcon->ShowBalloon(
-                i18n("torrent_finished"),
-                Utils::toStdWString(torrent->Status().name));
+                evt.GetInt() ? i18n("files_missing_alert") : i18n("files_found_alert"),
+                evt.GetString(),
+                0,
+                evt.GetInt() ? wxICON_WARNING : wxICON_INFORMATION);
         });
 
     this->Bind(ptEVT_TORRENT_REMOVED, [this](pt::BitTorrent::InfoHashEvent& evt)
@@ -174,6 +185,10 @@ MainFrame::MainFrame(std::shared_ptr<pt::Core::Environment> env, std::shared_ptr
             m_statusBar->UpdateTransferRates(
                 stats.totalPayloadDownloadRate,
                 stats.totalPayloadUploadRate);
+            m_taskBarIcon->SetRates(
+                stats.totalPayloadDownloadRate,
+                stats.totalPayloadUploadRate);
+
 
             if (wxTaskBarButton* tbb = MSWGetTaskBarButton())
             {
@@ -918,7 +933,11 @@ void MainFrame::OnFileImportQBittorrent(wxCommandEvent&)
         return std::vector<char>(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
     };
 
-    for (auto const& entry : fs::directory_iterator(dlg.GetPath().ToStdWstring()))
+    // The throwing iterator took the program down on a folder it could not
+    // list.
+    std::error_code listError;
+
+    for (auto const& entry : fs::directory_iterator(dlg.GetPath().ToStdWstring(), listError))
     {
         fs::path resumePath = entry.path();
         if (resumePath.extension() != ".fastresume") { continue; }

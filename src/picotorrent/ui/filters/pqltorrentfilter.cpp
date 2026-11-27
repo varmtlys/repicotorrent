@@ -260,7 +260,11 @@ public:
             return FilterFunc(
                 [oper, term](TorrentStatus const& ts)
                 {
-                    if (term == "error" && ts.state == TorrentStatus::State::Error) return true;
+                    if (term == "error"
+                        && (ts.state == TorrentStatus::State::Error || ts.state == TorrentStatus::State::FilesMissing))
+                    {
+                        return true;
+                    }
                     if (term == "downloading")
                     {
                         return ts.state == TorrentStatus::State::Downloading
@@ -410,6 +414,12 @@ std::unique_ptr<pt::UI::Filters::TorrentFilter> PqlTorrentFilter::Create(std::st
     catch (QueryException const& ex)
     {
         BOOST_LOG_TRIVIAL(error) << "Failed to execute query: " << ex.what();
+        *error = ex.what();
+    }
+    catch (std::exception const& ex)
+    {
+        // std::stoll / std::stof on a number too large for them.
+        BOOST_LOG_TRIVIAL(error) << "Failed to parse query: " << ex.what();
         *error = ex.what();
     }
 

@@ -6,12 +6,16 @@
 #endif
 
 #include <memory>
+#include <set>
+#include <string>
 #include <vector>
 
 #include <libtorrent/download_priority.hpp>
 #include <libtorrent/fwd.hpp>
 #include <libtorrent/info_hash.hpp>
 #include <libtorrent/sha1_hash.hpp>
+#include <libtorrent/torrent_flags.hpp>
+#include <libtorrent/units.hpp>
 
 namespace pt
 {
@@ -25,6 +29,21 @@ namespace BitTorrent
         friend class Session;
 
     public:
+        // Stored in the resume data, keep the values.
+        enum class DownloadOrder
+        {
+            // Rarest pieces first, libtorrent's default.
+            Normal = 0,
+            // The whole torrent in piece order.
+            Sequential = 1,
+            // Every wanted file front to back, the files side by side.
+            FilesSequential = 2,
+            // The first and the last pieces of every file first, then the rest.
+            FirstLast = 3,
+            // The first and the last pieces of every file, then in piece order.
+            FirstLastSequential = 4,
+        };
+
         virtual ~TorrentHandle();
 
         void AddTracker(libtorrent::announce_entry const& entry);
@@ -32,7 +51,8 @@ namespace BitTorrent
         std::vector<libtorrent::download_priority_t> GetFilePriorities() const;
         void GetPeerInfo(std::vector<libtorrent::peer_info>& peers) const;
         libtorrent::info_hash_t InfoHash();
-        bool IsSequentialDownload();
+        DownloadOrder GetDownloadOrder() const;
+        bool IsFilesMissing() const;
         bool IsValid();
         void ReplaceTrackers(std::vector<libtorrent::announce_entry> const& trackers);
         void ScrapeTracker(int trackerIndex);
@@ -59,7 +79,7 @@ namespace BitTorrent
         void ResumeForce();
         void SetFilePriorities(std::vector<libtorrent::download_priority_t> priorities);
         void SetFilePriority(libtorrent::file_index_t index, libtorrent::download_priority_t priority);
-        void SetSequentialDownload(bool seq);
+        void SetDownloadOrder(DownloadOrder order);
 
         // Labels
         int Label();
@@ -77,6 +97,21 @@ namespace BitTorrent
         void BuildStatus(libtorrent::torrent_status const& ts);
         std::unique_ptr<TorrentStatus> Update(libtorrent::torrent_status const& ts);
         std::int64_t CompletedFilesSize(libtorrent::torrent_status const& ts);
+        void ApplyDownloadOrder(libtorrent::torrent_status const& ts);
+        void ResetPieceDeadlines();
+
+        // The folder (multi-file torrent) or the file the data lives in, empty
+        // when nothing is downloaded yet - then there is nothing to miss.
+        std::string DataRoot() const;
+        // Stops the torrent until its data shows up again. wasRunning and
+        // autoManaged are what it goes back to then.
+        void SetFilesMissing(std::string const& path, bool wasRunning, bool autoManaged);
+        void SetFilesFound();
+        bool WasRunning() const;
+        bool WasAutoManaged() const;
+        // Writes the state the torrent had before its data went missing, so a
+        // restart while it is missing does not leave it stopped for good.
+        void PatchResumeData(libtorrent::add_torrent_params& params) const;
 
         Session* m_session;
         std::unique_ptr<libtorrent::torrent_handle> m_th;
@@ -94,6 +129,25 @@ namespace BitTorrent
         // CompletedFilesSize() is only recomputed when the piece count changes.
         int m_completedPieces = -1;
         std::int64_t m_completedSize = 0;
+
+        // From the last status, so callers need no blocking flags() call.
+        libtorrent::torrent_flags_t m_flags{};
+        bool m_hasError = false;
+
+        DownloadOrder m_downloadOrder = DownloadOrder::Normal;
+        // Pieces given a deadline (time-critical) by ApplyDownloadOrder().
+        std::set<libtorrent::piece_index_t> m_deadlines;
+        // Cached; invalidated whenever the file priorities change.
+        std::vector<libtorrent::download_priority_t> m_filePriorities;
+        // FirstLast*: the pieces at both ends of every wanted file.
+        std::vector<libtorrent::piece_index_t> m_firstLast;
+        // FilesSequential: per file, the first piece which may still be missing.
+        std::vector<libtorrent::piece_index_t> m_cursor;
+
+        bool m_missing = false;
+        bool m_resumeWhenFound = false;
+        bool m_autoManagedWhenFound = true;
+        std::string m_missingPath;
     };
 }
 }

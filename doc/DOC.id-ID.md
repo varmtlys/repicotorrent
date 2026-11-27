@@ -89,8 +89,7 @@ Klik kanan pada satu atau beberapa torrent:
 
 - **Lanjut**, **Lanjut (paksa)** (mengabaikan antrean), **Jeda**.
 - **Paksa siar ulang**, **Paksa periksa ulang** (memeriksa data di disk).
-- **Unduh berurutan**: mengunduh kepingan secara berurutan, berguna
-  untuk menonton video sambil mengunduh.
+- **Urutan unduhan**: **Normal (bagian langka dulu)**, **Unduh berurutan**, **Setiap berkas berurutan**, **Awal dan akhir berkas dulu**, **Awal dan akhir, lalu berurutan**.
 - **Label**: memberi label.
 - **Export**: tautan magnet atau berkas `.torrent`.
 - **Pindah**: memindahkan data ke folder lain.
@@ -98,6 +97,8 @@ Klik kanan pada satu atau beberapa torrent:
   (Shift+Del).
 - **Mengantrekan**: naik atau turun dalam antrean unduhan.
 - **Salin info hash**, **Buka di Explorer**.
+
+Jika folder atau drive hilang, torrent berhenti dan menunggu; saat kembali, torrent berlanjut tanpa diperiksa ulang.
 
 
 ## Label

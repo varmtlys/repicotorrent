@@ -88,8 +88,7 @@ Clic dreapta pe unul sau mai multe torrente:
 - **Repornește**, **Repornește (forțat)** (ignoră coada), **Pauză**.
 - **Force reannounce**, **Force recheck** (verifică datele de pe
   disc).
-- **Descărcare secvențială**: descărcarea bucăților în ordine, utilă pentru
-  a viziona un video în timp ce se descarcă.
+- **Ordinea descărcării**: **Normală (întâi piesele rare)**, **Descărcare secvențială**, **Fiecare fișier pe rând**, **Întâi începutul și sfârșitul fișierelor**, **Început și sfârșit, apoi pe rând**.
 - **Label**: atribuirea unei etichete.
 - **Export**: linkul magnet sau fișierul `.torrent`.
 - **Mută**: mutarea datelor în alt folder.
@@ -97,6 +96,8 @@ Clic dreapta pe unul sau mai multe torrente:
   fișierelor (Shift+Del).
 - **Coadă**: sus sau jos în coada de descărcare.
 - **Copie informația hash**, **Deschide în Explorer**.
+
+Dacă folderul sau unitatea dispare, torrentul se oprește și așteaptă; când revine, continuă fără o nouă verificare.
 
 
 ## Etichete

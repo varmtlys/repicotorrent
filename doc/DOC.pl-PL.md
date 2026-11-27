@@ -83,8 +83,7 @@ Prawy klik na jednym lub kilku torrentach:
 
 - **Wznów**, **Wznów (Wymuś)** (pomija kolejkę), **Pauza**.
 - **Wymuś aktualizację trackerów**, **Wymuś ponowne sprawdzenie** (sprawdza dane na dysku).
-- **Pobieranie sekwencyjne**: pobieranie części po kolei, przydatne do
-  oglądania filmu w trakcie pobierania.
+- **Kolejność pobierania**: **Zwykła (najpierw rzadkie części)**, **Pobieranie sekwencyjne**, **Każdy plik po kolei**, **Najpierw początek i koniec plików**, **Początek i koniec, potem po kolei**.
 - **Etykieta**: przypisz etykietę.
 - **Export**: link magnet lub plik `.torrent`.
 - **Przesuń**: przenieś dane do innego folderu.
@@ -92,6 +91,8 @@ Prawy klik na jednym lub kilku torrentach:
   (Shift+Del).
 - **W kolejce**: w górę lub w dół kolejki pobierania.
 - **Kopiuj info-hash**, **Otwórz w Eksploratorze**.
+
+Gdy folder lub dysk zniknie, torrent zatrzymuje się i czeka; gdy wróci, działa dalej bez ponownego sprawdzania.
 
 
 ## Etykiety

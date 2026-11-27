@@ -89,8 +89,7 @@ Botó dret sobre un o més torrents:
 - **Reprén**, **Reprén (forçat)** (ignora la cua), **Pausa**.
 - **Force reannounce**, **Force recheck** (comprova les dades del
   disc).
-- **Descarregues seqüencials**: baixar les peces en ordre, útil per mirar un
-  vídeo mentre es baixa.
+- **Ordre de baixada**: **Normal (primer les peces rares)**, **Descarregues seqüencials**, **Cada fitxer en ordre**, **Primer l'inici i el final dels fitxers**, **Inici i final, després en ordre**.
 - **Label**: assignar una etiqueta.
 - **Export**: l'enllaç magnet o el fitxer `.torrent`.
 - **Mou**: moure les dades a una altra carpeta.
@@ -98,6 +97,8 @@ Botó dret sobre un o més torrents:
   (Maj+Supr).
 - **En cola**: pujar o baixar a la cua de baixades.
 - **Copia la informació hash**, **Obre en el Explorador**.
+
+Si la carpeta o la unitat desapareix, el torrent s’atura i espera; quan torna, continua sense tornar a comprovar.
 
 
 ## Etiquetes

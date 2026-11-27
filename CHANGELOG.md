@@ -14,8 +14,35 @@ Versions follow [Semantic Versioning](https://semver.org). A release is a
   open those settings, because Windows does not let programs change that
   choice themselves.
 - Torrent list columns **Upload GB/hour** and **Upload GB/day**: all the
-  uploaded data divided by the time the torrent has been seeding. A
-  torrent that has not seeded yet shows `-`.
+  uploaded data divided by the time the torrent has been running,
+  downloading or seeding.
+- **Download order** in the torrent menu and the Add torrent dialog:
+  normal (rarest pieces first), sequential, each file sequentially (every
+  file from its start, the files side by side), first and last pieces of
+  every file first, or first and last pieces and then sequentially. It is
+  kept across restarts.
+- When the save folder or the drive of a torrent goes away (a USB drive, a
+  network share), the torrent stops and shows **Files not found** instead
+  of downloading everything again into an empty folder. Once the data is
+  back, it goes on without a recheck. The notification area tells about
+  both.
+- The notification area icon shows the download and upload rates and the
+  session totals in its tooltip.
+
+### Fixed
+
+- The Files tab and the file list of the Add torrent dialog could not be
+  sorted. Sizes now sort by size, names the way Explorer sorts them, and
+  folders stay on top.
+- Pad files of v2 and hybrid torrents showed in the Files tab as a `.pad`
+  folder.
+- A tier that is not a number in Add tracker, a number too large for the
+  filter console, or a qBittorrent folder that cannot be read made the
+  program crash.
+- Pending magnet links being looked up were written to the database on
+  exit as if they were torrents.
+- A torrent removed right after it finished could crash the program when
+  the "torrent finished" notification was shown.
 
 ### Changed
 

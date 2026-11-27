@@ -90,8 +90,7 @@ Clique com o botão direito num ou mais torrents:
 - **Continuar**, **Continuar (forçar)** (ignora a fila), **Pausa**.
 - **Force reannounce**, **Force recheck** (verifica os dados no
   disco).
-- **Download sequencial**: transferir as partes por ordem, útil para ver
-  um vídeo enquanto é transferido.
+- **Ordem de transferência**: **Normal (peças raras primeiro)**, **Download sequencial**, **Cada ficheiro por ordem**, **Início e fim dos ficheiros primeiro**, **Início e fim, depois por ordem**.
 - **Label**: atribuir uma etiqueta.
 - **Export**: a ligação magnet ou o ficheiro `.torrent`.
 - **Mover**: mover os dados para outra pasta.
@@ -99,6 +98,8 @@ Clique com o botão direito num ou mais torrents:
   (Shift+Del).
 - **Queuing**: subir ou descer na fila de transferências.
 - **Copiar informação hash**, **Abrir no Explorador**.
+
+Se a pasta ou a unidade desaparecer, o torrent para e espera; quando voltar, continua sem nova verificação.
 
 
 ## Etiquetas

@@ -86,8 +86,7 @@ Desni klik na jedan ili više torrenata:
 - **Nastavi**, **Nastavi (prisilno)** (zanemaruje red), **Pauziraj**.
 - **Forsiraj najavu**, **Forsiraj provjeru** (provjerava podatke na
   disku).
-- **Sekvencijalno preuzimanje**: preuzimanje dijelova redom, korisno za
-  gledanje videa dok se preuzima.
+- **Redoslijed preuzimanja**: **Uobičajeno (prvo rijetki dijelovi)**, **Sekvencijalno preuzimanje**, **Svaka datoteka redom**, **Prvo početak i kraj datoteka**, **Početak i kraj, zatim redom**.
 - **Naljepnica**: dodijeliti oznaku.
 - **Export**: magnet poveznica ili `.torrent` datoteka.
 - **Preseli**: premjestiti podatke u drugu mapu.
@@ -95,6 +94,8 @@ Desni klik na jedan ili više torrenata:
   (Shift+Del).
 - **Čekanje u redu**: gore ili dolje u redu preuzimanja.
 - **Kopiraj hash informaciju**, **Otvori u Exploreru**.
+
+Ako mapa ili disk nestane, torrent se zaustavi i čeka; kad se vrati, nastavlja bez ponovne provjere.
 
 
 ## Oznake

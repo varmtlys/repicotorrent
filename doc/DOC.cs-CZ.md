@@ -84,8 +84,7 @@ Pravým kliknutím na jeden nebo více torrentů:
 
 - **Obnovit**, **Obnovit (vynuceně)** (ignoruje frontu), **Pauza**.
 - **Vynucená reannounce**, **Vynucená kontrola** (ověří data na disku).
-- **Postupné stahování**: stahovat části popořadě, užitečné pro
-  sledování videa během stahování.
+- **Pořadí stahování**: **Normální (nejdřív vzácné části)**, **Postupné stahování**, **Každý soubor postupně**, **Nejdřív začátek a konec souborů**, **Začátek a konec, pak postupně**.
 - **Štítek**: přiřadit štítek.
 - **Export**: magnet odkaz nebo soubor `.torrent`.
 - **Přesunout**: přesunout data do jiné složky.
@@ -93,6 +92,8 @@ Pravým kliknutím na jeden nebo více torrentů:
   (Shift+Del).
 - **Čekání ve frontě**: posunout nahoru nebo dolů ve frontě stahování.
 - **Kopírovat hash s informacemi**, **Otevřít v Průzkumníku**.
+
+Když složka nebo disk zmizí, torrent se zastaví a čeká; po návratu pokračuje bez nové kontroly.
 
 
 ## Štítky

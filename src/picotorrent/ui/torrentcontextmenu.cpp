@@ -74,15 +74,33 @@ TorrentContextMenu::TorrentContextMenu(wxWindow* parent, std::shared_ptr<pt::Cor
     Append(ptID_FORCE_REANNOUNCE, i18n("force_reannounce"));
     Append(ptID_FORCE_RECHECK, i18n("force_recheck"));
 
-    if (selectedTorrents.size() == 1)
     {
         AppendSeparator();
 
-        BitTorrent::TorrentHandle* t = selectedTorrents.at(0);
+        using Order = BitTorrent::TorrentHandle::DownloadOrder;
 
-        wxMenuItem* item = Append(ptID_SEQUENTIAL_DOWNLOAD, i18n("sequential_download"));
-        item->SetCheckable(true);
-        item->Check(t->IsSequentialDownload());
+        // Radio items, checked when every selected torrent has that order.
+        wxMenu* orderMenu = new wxMenu();
+        std::pair<int, char const*> const orders[] =
+        {
+            { ptID_ORDER_NORMAL,                "download_order_normal" },
+            { ptID_ORDER_SEQUENTIAL,            "sequential_download" },
+            { ptID_ORDER_FILES_SEQUENTIAL,      "download_order_files_sequential" },
+            { ptID_ORDER_FIRST_LAST,            "download_order_first_last" },
+            { ptID_ORDER_FIRST_LAST_SEQUENTIAL, "download_order_first_last_sequential" },
+        };
+
+        Order const first = selectedTorrents.front()->GetDownloadOrder();
+        bool const same = std::all_of(selectedTorrents.begin(), selectedTorrents.end(),
+            [first](auto t) { return t->GetDownloadOrder() == first; });
+
+        for (auto const& [id, key] : orders)
+        {
+            wxMenuItem* item = orderMenu->AppendCheckItem(id, i18n(key));
+            item->Check(same && static_cast<int>(first) == id - ptID_ORDER_NORMAL);
+        }
+
+        AppendSubMenu(orderMenu, i18n("download_order"));
     }
 
     // Labels
@@ -356,8 +374,14 @@ TorrentContextMenu::TorrentContextMenu(wxWindow* parent, std::shared_ptr<pt::Cor
 
     Bind(
         wxEVT_MENU,
-        [&](wxCommandEvent& evt) { for (auto torrent : selectedTorrents) { torrent->SetSequentialDownload(evt.IsChecked()); } },
-        TorrentContextMenu::ptID_SEQUENTIAL_DOWNLOAD);
+        [&](wxCommandEvent& evt)
+        {
+            auto const order = static_cast<BitTorrent::TorrentHandle::DownloadOrder>(evt.GetId() - ptID_ORDER_NORMAL);
+            for (auto torrent : selectedTorrents) { torrent->SetDownloadOrder(order); }
+        },
+        TorrentContextMenu::ptID_ORDER_NORMAL,
+        TorrentContextMenu::ptID_ORDER_FIRST_LAST_SEQUENTIAL);
+
 
     Bind(
         wxEVT_MENU,

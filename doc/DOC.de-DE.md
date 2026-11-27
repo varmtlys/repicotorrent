@@ -94,8 +94,7 @@ Rechtsklick auf einen oder mehrere Torrents:
   **Pausieren**.
 - **Neue Ankündigung erzwingen**, **Überprüfung erzwingen** (prüft die Daten auf der
   Festplatte).
-- **Sequenzieller DL**: Teile der Reihe nach laden, praktisch, um
-  ein Video schon während des Downloads anzusehen.
+- **Download-Reihenfolge**: **Normal (seltene Teile zuerst)**, **Sequenzieller DL**, **Jede Datei der Reihe nach**, **Zuerst Anfang und Ende der Dateien**, **Anfang und Ende, dann der Reihe nach**.
 - **Label**: ein Label zuweisen.
 - **Exportieren**: Magnet-Link oder `.torrent`-Datei.
 - **Verschieben**: die Daten in einen anderen Ordner verschieben.
@@ -103,6 +102,8 @@ Rechtsklick auf einen oder mehrere Torrents:
   Dateien (Umschalt+Entf).
 - **in Warteschlange**: in der Download-Warteschlange nach oben oder unten.
 - **Info-Hash kopieren**, **Im Explorer öffnen**.
+
+Verschwindet der Ordner oder das Laufwerk, hält der Torrent an und wartet; sobald es zurück ist, läuft er ohne erneute Prüfung weiter.
 
 
 ## Labels

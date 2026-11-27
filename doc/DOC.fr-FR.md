@@ -91,8 +91,7 @@ Clic droit sur un ou plusieurs torrents :
 - **Reprendre**, **Reprendre (forcer)** (ignore la file), **Interrompre**.
 - **Forcer la nouvelle annonce**, **Forcer la revérification** (vérifie les données sur le
   disque).
-- **Téléchargement séquentiel** : télécharger les pièces dans l'ordre, pratique
-  pour regarder une vidéo pendant son téléchargement.
+- **Ordre de téléchargement**: **Normal (pièces rares d’abord)**, **Téléchargement séquentiel**, **Chaque fichier dans l’ordre**, **Début et fin des fichiers d’abord**, **Début et fin, puis dans l’ordre**.
 - **Étiquette** : attribuer une étiquette.
 - **Exporter** : lien magnet ou fichier `.torrent`.
 - **Déplacer** : déplacer les données vers un autre dossier.
@@ -100,6 +99,8 @@ Clic droit sur un ou plusieurs torrents :
   (Maj+Suppr).
 - **En attente** : monter ou descendre dans la file de téléchargement.
 - **Copier les informations de hachage**, **Ouvrir dans l'explorateur de fichiers**.
+
+Si le dossier ou le disque disparaît, le torrent s’arrête et attend ; à son retour, il reprend sans nouvelle vérification.
 
 
 ## Étiquettes

@@ -99,7 +99,7 @@ namespace Dialogs
         wxComboBox* m_torrentSavePath;
         wxButton* m_torrentSavePathBrowse;
         wxDataViewCtrl* m_filesView;
-        wxCheckBox* m_sequentialDownload;
+        wxChoice* m_downloadOrder;
         wxCheckBox* m_startTorrent;
         wxCheckBox* m_seedMode;
         wxListView* m_peers;

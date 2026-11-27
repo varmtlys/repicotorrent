@@ -1,4 +1,12 @@
 {
+    "download_order": "Thứ tự tải",
+    "download_order_normal": "Bình thường (mảnh hiếm trước)",
+    "download_order_files_sequential": "Từng tệp theo thứ tự",
+    "download_order_first_last": "Đầu và cuối tệp trước",
+    "download_order_first_last_sequential": "Đầu và cuối, rồi theo thứ tự",
+    "state_files_missing": "Không tìm thấy tệp: {0}",
+    "files_missing_alert": "Không tìm thấy tệp, torrent đã dừng",
+    "files_found_alert": "Các tệp đã trở lại",
     "upload_gb_per_hour": "Tải lên GB/giờ",
     "upload_gb_per_day": "Tải lên GB/ngày",
     "low": "Thấp",

@@ -89,8 +89,7 @@ Clique com o botão direito em um ou mais torrents:
 - **Retomar**, **Retomar (forçado)** (ignora a fila), **Pausar**.
 - **Forçar reanúncio**, **Forçar rechecagem** (verifica os dados no
   disco).
-- **Download sequencial**: baixar as partes em ordem, útil para assistir
-  a um vídeo enquanto ele baixa.
+- **Ordem de download**: **Normal (peças raras primeiro)**, **Download sequencial**, **Cada arquivo em ordem**, **Início e fim dos arquivos primeiro**, **Início e fim, depois em ordem**.
 - **Etiqueta**: atribuir um rótulo.
 - **Exportar**: o link magnet ou o arquivo `.torrent`.
 - **Mover**: mover os dados para outra pasta.
@@ -98,6 +97,8 @@ Clique com o botão direito em um ou mais torrents:
   (Shift+Del).
 - **Fila**: subir ou descer na fila de downloads.
 - **Copiar info hash**, **Abrir no Explorador de Arquivos**.
+
+Se a pasta ou a unidade sumir, o torrent para e espera; quando voltar, continua sem nova verificação.
 
 
 ## Rótulos

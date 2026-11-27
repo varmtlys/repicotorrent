@@ -90,8 +90,7 @@ Rechtsklik op een of meer torrents:
 - **Hervatten**, **Hervatten (forceren)** (negeert de wachtrij), **Pauzeren**.
 - **Forceer opnieuw aankondigen**, **Forceer opnieuw controleren** (controleert de gegevens op
   schijf).
-- **Opeenvolgend downloaden**: stukken op volgorde downloaden, handig om een
-  video te kijken terwijl hij binnenkomt.
+- **Downloadvolgorde**: **Normaal (zeldzame stukken eerst)**, **Opeenvolgend downloaden**, **Elk bestand op volgorde**, **Eerst begin en einde van de bestanden**, **Begin en einde, dan op volgorde**.
 - **Label**: een label toekennen.
 - **Exporteren**: de magnetlink of het `.torrent`-bestand.
 - **Verplaatsen**: de gegevens naar een andere map verplaatsen.
@@ -99,6 +98,8 @@ Rechtsklik op een of meer torrents:
   bestanden (Shift+Del).
 - **Wachtrij**: omhoog of omlaag in de downloadwachtrij.
 - **Info-hash kopiëren**, **Open in Verkenner**.
+
+Verdwijnt de map of de schijf, dan stopt de torrent en wacht; zodra die terug is, gaat hij verder zonder opnieuw te controleren.
 
 
 ## Labels

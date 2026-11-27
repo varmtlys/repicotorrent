@@ -86,8 +86,7 @@ Bir veya birkaç torrente sağ tıklayın:
 - **Devam Ettir**, **Devam Ettir (zorla)** (kuyruğu yok sayar), **Duraklat**.
 - **Force reannounce**, **Tekrar kontrole zorla** (diskteki verileri
   doğrular).
-- **Ardışık indirme**: parçaları sırayla indirir, bir videoyu inerken
-  izlemek için kullanışlıdır.
+- **İndirme sırası**: **Normal (önce nadir parçalar)**, **Ardışık indirme**, **Her dosya sırayla**, **Önce dosyaların başı ve sonu**, **Baş ve son, sonra sırayla**.
 - **Etiket**: etiket atama.
 - **Dışa aktar**: magnet bağlantısı veya `.torrent` dosyası.
 - **Taşı**: verileri başka bir klasöre taşıma.
@@ -95,6 +94,8 @@ Bir veya birkaç torrente sağ tıklayın:
   birlikte kaldırma (Shift+Del).
 - **Kuyruğa alınıyor**: indirme kuyruğunda yukarı veya aşağı.
 - **Info-Hash kopyala**, **Dosya yöneticisi ile aç**.
+
+Klasör veya sürücü kaybolursa torrent durur ve bekler; geri geldiğinde yeniden denetlenmeden devam eder.
 
 
 ## Etiketler

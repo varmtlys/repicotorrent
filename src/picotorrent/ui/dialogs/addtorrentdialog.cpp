@@ -14,6 +14,7 @@
 #include "addtrackerdialog.hpp"
 #include "../../bittorrent/addparams.hpp"
 #include "../../bittorrent/session.hpp"
+#include "../../bittorrent/torrenthandle.hpp"
 #include "../../core/configuration.hpp"
 #include "../../core/database.hpp"
 #include "../../core/utils.hpp"
@@ -53,7 +54,13 @@ AddTorrentDialog::AddTorrentDialog(wxWindow* parent, wxWindowID id, lt::add_torr
 
     auto optionsSizer = new wxStaticBoxSizer(wxVERTICAL, infoPanel, i18n("options"));
     m_torrentLabel = new wxBitmapComboBox(optionsSizer->GetStaticBox(), ptID_LABEL_COMBO, "", wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY);
-    m_sequentialDownload = new wxCheckBox(optionsSizer->GetStaticBox(), ptID_SEQUENTIAL_DOWNLOAD, i18n("sequential_download"));
+    // In TorrentHandle::DownloadOrder order.
+    m_downloadOrder = new wxChoice(optionsSizer->GetStaticBox(), ptID_SEQUENTIAL_DOWNLOAD);
+    m_downloadOrder->Append(i18n("download_order_normal"));
+    m_downloadOrder->Append(i18n("sequential_download"));
+    m_downloadOrder->Append(i18n("download_order_files_sequential"));
+    m_downloadOrder->Append(i18n("download_order_first_last"));
+    m_downloadOrder->Append(i18n("download_order_first_last_sequential"));
     m_startTorrent = new wxCheckBox(optionsSizer->GetStaticBox(), ptID_START_TORRENT, i18n("start_torrent"));
     m_seedMode = new wxCheckBox(optionsSizer->GetStaticBox(), ptID_SEED_MODE, i18n("seed_mode"));
 
@@ -61,9 +68,10 @@ AddTorrentDialog::AddTorrentDialog(wxWindow* parent, wxWindowID id, lt::add_torr
     optionsGrid->AddGrowableCol(1, 1);
     optionsGrid->Add(new wxStaticText(optionsSizer->GetStaticBox(), wxID_ANY, i18n("label")), 0, wxALIGN_CENTER_VERTICAL);
     optionsGrid->Add(m_torrentLabel, 1, wxEXPAND | wxALL, FromDIP(3));
+    optionsGrid->Add(new wxStaticText(optionsSizer->GetStaticBox(), wxID_ANY, i18n("download_order")), 0, wxALIGN_CENTER_VERTICAL);
+    optionsGrid->Add(m_downloadOrder, 1, wxEXPAND | wxALL, FromDIP(3));
 
     auto flagsGrid = new wxFlexGridSizer(2, FromDIP(7), FromDIP(10));
-    flagsGrid->Add(m_sequentialDownload, 1, wxALL);
     flagsGrid->Add(m_startTorrent, 1, wxALL);
     flagsGrid->Add(m_seedMode, 1, wxALL);
 
@@ -132,7 +140,8 @@ AddTorrentDialog::AddTorrentDialog(wxWindow* parent, wxWindowID id, lt::add_torr
         new wxDataViewCheckIconTextRenderer(),
         Models::FileStorageModel::Columns::Name,
         FromDIP(180),
-        wxALIGN_LEFT);
+        wxALIGN_LEFT,
+        wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE);
 
     m_filesView->AppendColumn(nameCol);
 
@@ -141,13 +150,16 @@ AddTorrentDialog::AddTorrentDialog(wxWindow* parent, wxWindowID id, lt::add_torr
         Models::FileStorageModel::Columns::Size,
         wxDATAVIEW_CELL_INERT,
         FromDIP(80),
-        wxALIGN_RIGHT);
+        wxALIGN_RIGHT,
+        wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE);
 
     auto prioCol = m_filesView->AppendTextColumn(
         i18n("priority"),
         Models::FileStorageModel::Columns::Priority,
         wxDATAVIEW_CELL_INERT,
-        FromDIP(80));
+        FromDIP(80),
+        wxALIGN_NOT,
+        wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE);
 
     // Ugly hack to prevent the last "real" column from stretching.
     m_filesView->AppendColumn(new wxDataViewColumn(wxEmptyString, new wxDataViewTextRenderer(), Models::FileStorageModel::Columns::_Max, 0));
@@ -271,11 +283,16 @@ AddTorrentDialog::AddTorrentDialog(wxWindow* parent, wxWindowID id, lt::add_torr
         ptID_SAVE_PATH_INPUT);
 
     this->Bind(
-        wxEVT_CHECKBOX,
+        wxEVT_CHOICE,
         [this](wxCommandEvent&)
         {
-            if (m_sequentialDownload->IsChecked()) { m_params.flags |= lt::torrent_flags::sequential_download; }
+            using Order = BitTorrent::TorrentHandle::DownloadOrder;
+            auto const order = static_cast<Order>(m_downloadOrder->GetSelection());
+
+            if (order == Order::Sequential || order == Order::FirstLastSequential) { m_params.flags |= lt::torrent_flags::sequential_download; }
             else { m_params.flags &= ~lt::torrent_flags::sequential_download; }
+
+            m_params.userdata.get<BitTorrent::AddParams>()->downloadOrder = static_cast<int>(order);
         },
         ptID_SEQUENTIAL_DOWNLOAD);
 
@@ -422,8 +439,17 @@ void AddTorrentDialog::Load()
     // Save path
     m_torrentSavePath->ChangeValue(wxString::FromUTF8(m_params.save_path));
 
-    m_sequentialDownload->SetValue(
-        (m_params.flags & lt::torrent_flags::sequential_download) == lt::torrent_flags::sequential_download);
+    {
+        int order = m_params.userdata.get<BitTorrent::AddParams>()->downloadOrder;
+
+        if (order == 0 && (m_params.flags & lt::torrent_flags::sequential_download))
+        {
+            order = static_cast<int>(BitTorrent::TorrentHandle::DownloadOrder::Sequential);
+        }
+
+        m_downloadOrder->SetSelection(order);
+    }
+
 
     bool isPaused = (m_params.flags & lt::torrent_flags::paused) == lt::torrent_flags::paused
         && (m_params.flags & lt::torrent_flags::auto_managed) != lt::torrent_flags::auto_managed;

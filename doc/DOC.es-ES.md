@@ -89,8 +89,7 @@ Clic derecho sobre uno o varios torrents:
 - **Reanudar**, **Reanudar (forzado)** (ignora la cola), **Pausar**.
 - **Forzar recomunicación**, **Forzar verificación** (comprueba los datos en
   disco).
-- **Descarga secuencial**: descargar las piezas en orden, útil para ver
-  un vídeo mientras se descarga.
+- **Orden de descarga**: **Normal (primero las piezas raras)**, **Descarga secuencial**, **Cada archivo en orden**, **Primero el inicio y el final de los archivos**, **Inicio y final, luego en orden**.
 - **Etiqueta**: asignar una etiqueta.
 - **Export**: el enlace magnet o el archivo `.torrent`.
 - **Mover**: mover los datos a otra carpeta.
@@ -98,6 +97,8 @@ Clic derecho sobre uno o varios torrents:
   (Mayús+Supr).
 - **En cola**: subir o bajar en la cola de descargas.
 - **Copiar información hash**, **Abrir en el Explorador**.
+
+Si la carpeta o la unidad desaparece, el torrent se detiene y espera; cuando vuelve, continúa sin volver a comprobar.
 
 
 ## Etiquetas

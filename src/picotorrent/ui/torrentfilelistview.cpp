@@ -10,39 +10,48 @@ using pt::UI::Models::FileStorageModel;
 TorrentFileListView::TorrentFileListView(wxWindow* parent, wxWindowID id)
     : wxDataViewCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxDV_MULTIPLE, wxDefaultValidator, "TorrentFileListView")
 {
+    // FileStorageModel::Compare sorts by the values, not the shown text.
+    int const flags = wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE;
+
     auto nameCol = AppendIconTextColumn(
         i18n("name"),
         FileStorageModel::Columns::Name,
         wxDATAVIEW_CELL_INERT,
         FromDIP(220),
-        wxALIGN_LEFT);
+        wxALIGN_LEFT,
+        flags);
 
     AppendTextColumn(
         i18n("size"),
         FileStorageModel::Columns::Size,
         wxDATAVIEW_CELL_INERT,
         FromDIP(80),
-        wxALIGN_RIGHT);
+        wxALIGN_RIGHT,
+        flags);
 
     AppendProgressColumn(
         i18n("progress"),
         FileStorageModel::Columns::Progress,
         wxDATAVIEW_CELL_INERT,
         FromDIP(80),
-        wxALIGN_LEFT);
+        wxALIGN_LEFT,
+        flags);
 
     AppendTextColumn(
         i18n("percent"),
         FileStorageModel::Columns::Percent,
         wxDATAVIEW_CELL_INERT,
         FromDIP(60),
-        wxALIGN_RIGHT);
+        wxALIGN_RIGHT,
+        flags);
 
     AppendTextColumn(
         i18n("priority"),
         FileStorageModel::Columns::Priority,
         wxDATAVIEW_CELL_INERT,
-        FromDIP(120));
+        FromDIP(120),
+        wxALIGN_NOT,
+        flags);
 
     // Ugly hack to prevent the last "real" column from stretching.
     AppendColumn(new wxDataViewColumn(wxEmptyString, new wxDataViewTextRenderer(), FileStorageModel::Columns::_Max, 0));

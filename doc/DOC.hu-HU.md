@@ -93,8 +93,7 @@ Jobb gombbal egy vagy több torrenten:
   **Szünet**.
 - **Kényszerített újrabejelentés**, **Kényszerített újraellenőrzés** (ellenőrzi az adatokat a
   lemezen).
-- **Egymás utáni letöltés**: darabok letöltése sorrendben, hasznos, ha
-  letöltés közben néz egy videót.
+- **Letöltési sorrend**: **Normál (előbb a ritka részek)**, **Egymás utáni letöltés**, **Minden fájl sorban**, **Előbb a fájlok eleje és vége**, **Eleje és vége, aztán sorban**.
 - **Label**: címke hozzárendelése.
 - **Export**: magnet hivatkozás vagy `.torrent` fájl.
 - **Áthelyezés**: az adatok áthelyezése másik mappába.
@@ -102,6 +101,8 @@ Jobb gombbal egy vagy több torrenten:
   (Shift+Del).
 - **Várakozási sorban**: fel vagy le a letöltési sorban.
 - **Hash infó másolása**, **Tárolómappa megnyitása**.
+
+Ha a mappa vagy a meghajtó eltűnik, a torrent leáll és vár; amikor visszakerül, újraellenőrzés nélkül folytatódik.
 
 
 ## Címkék

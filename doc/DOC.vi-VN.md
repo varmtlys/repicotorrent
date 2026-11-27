@@ -86,8 +86,7 @@ Bấm chuột phải vào một hoặc nhiều torrent:
 - **Tiếp tục**, **Buộc tiếp tục** (bỏ qua hàng đợi), **Tạm dừng**.
 - **Force reannounce**, **Force recheck** (kiểm tra dữ liệu trên
   đĩa).
-- **Sequential download**: tải các mảnh theo thứ tự, tiện để xem video
-  khi đang tải.
+- **Thứ tự tải**: **Bình thường (mảnh hiếm trước)**, **Sequential download**, **Từng tệp theo thứ tự**, **Đầu và cuối tệp trước**, **Đầu và cuối, rồi theo thứ tự**.
 - **Label**: gán nhãn.
 - **Export**: liên kết magnet hoặc tệp `.torrent`.
 - **Di chuyển tệp tin đến**: chuyển dữ liệu sang thư mục khác.
@@ -95,6 +94,8 @@ Bấm chuột phải vào một hoặc nhiều torrent:
   (Shift+Del).
 - **Queuing**: lên hoặc xuống trong hàng đợi tải.
 - **Copy info hash**, **Mở thư mục chứa tệp tin**.
+
+Nếu thư mục hoặc ổ đĩa biến mất, torrent sẽ dừng và chờ; khi nó trở lại, torrent tiếp tục mà không kiểm tra lại.
 
 
 ## Nhãn

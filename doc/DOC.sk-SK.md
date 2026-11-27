@@ -84,8 +84,7 @@ Pravým kliknutím na jeden alebo viac torrentov:
 
 - **Pokračovať**, **Vynútiť pokračovanie** (ignoruje frontu), **Pozastaviť**.
 - **Vynútiť znovuohlásenie**, **Vynútiť opätovnú kontrolu** (overí dáta na disku).
-- **Postupné sťahovanie**: sťahovať časti po poradí, užitočné na
-  pozeranie videa počas sťahovania.
+- **Poradie sťahovania**: **Normálne (najprv vzácne časti)**, **Postupné sťahovanie**, **Každý súbor postupne**, **Najprv začiatok a koniec súborov**, **Začiatok a koniec, potom postupne**.
 - **Štítok**: priradiť štítok.
 - **Exportovať**: magnet odkaz alebo súbor `.torrent`.
 - **Presunúť**: presunúť dáta do iného priečinka.
@@ -93,6 +92,8 @@ Pravým kliknutím na jeden alebo viac torrentov:
   (Shift+Del).
 - **Čakanie vo fronte**: posunúť hore alebo dole vo fronte sťahovania.
 - **Kopírovať hash s informáciami**, **Otvoriť cieľový priečinok**.
+
+Keď priečinok alebo disk zmizne, torrent sa zastaví a čaká; po návrate pokračuje bez novej kontroly.
 
 
 ## Štítky

@@ -6,6 +6,7 @@
 #include <boost/log/trivial.hpp>
 #include <libtorrent/add_torrent_params.hpp>
 #include <libtorrent/alert_types.hpp>
+#include <libtorrent/bencode.hpp>
 #include <libtorrent/entry.hpp>
 #include <libtorrent/extensions/smart_ban.hpp>
 #include <libtorrent/extensions/ut_metadata.hpp>
@@ -39,6 +40,7 @@
 #include "sessionstatistics.hpp"
 #include "torrenthandle.hpp"
 #include "torrentstatistics.hpp"
+#include "torrentstatus.hpp"
 
 namespace fs = std::filesystem;
 namespace lt = libtorrent;
@@ -48,6 +50,7 @@ wxDEFINE_EVENT(ptEVT_SESSION_DEBUG_MESSAGE, wxCommandEvent);
 wxDEFINE_EVENT(ptEVT_SESSION_STATISTICS, pt::BitTorrent::SessionStatisticsEvent);
 wxDEFINE_EVENT(ptEVT_TORRENT_ADDED, wxCommandEvent);
 wxDEFINE_EVENT(ptEVT_TORRENT_FINISHED, wxCommandEvent);
+wxDEFINE_EVENT(ptEVT_TORRENT_FILES_MISSING, wxCommandEvent);
 wxDEFINE_EVENT(ptEVT_TORRENT_METADATA_FOUND, pt::BitTorrent::MetadataFoundEvent);
 wxDEFINE_EVENT(ptEVT_TORRENT_REMOVED, pt::BitTorrent::InfoHashEvent);
 wxDEFINE_EVENT(ptEVT_TORRENT_STATISTICS, pt::BitTorrent::TorrentStatisticsEvent);
@@ -57,6 +60,26 @@ wxDEFINE_EVENT(ptEVT_IPFILTER_UPDATED, wxThreadEvent);
 static std::string str(lt::info_hash_t ih)
 {
     return pt::BitTorrent::infoHashKey(ih);
+}
+
+// Our own key in the resume data; libtorrent ignores keys it does not know.
+static char const* const DownloadOrderKey = "repicotorrent-download-order";
+
+// Where the downloaded data of the torrent lives: <save path>/<torrent folder>
+// or <save path>/<file>. Empty without metadata.
+static fs::path dataRoot(std::string const& savePath, lt::torrent_info const& ti)
+{
+    auto const& files = ti.layout();
+
+    for (lt::file_index_t f : files.file_range())
+    {
+        if (files.pad_file_at(f)) { continue; }
+
+        fs::path rel(pt::Utils::toStdWString(files.file_path(f)));
+        return fs::path(pt::Utils::toStdWString(savePath)) / *rel.begin();
+    }
+
+    return {};
 }
 
 // A setting which is missing from the database (or stored as NULL) yields an
@@ -364,6 +387,8 @@ Session::Session(wxEvtHandler* parent, std::shared_ptr<pt::Core::Database> db, s
             m_session->post_dht_stats();
             m_session->post_session_stats();
             m_session->post_torrent_updates();
+
+            CheckDataPaths();
         },
         ptID_TIMER_SESSION);
 
@@ -625,6 +650,24 @@ void Session::OnAlert()
             AddParams* add = ata->params.userdata.get<AddParams>();
             if (add && add->labelId > 0) { handle->SetLabel(add->labelId, add->labelName, true); }
 
+            if (add && add->downloadOrder > 0)
+            {
+                handle->SetDownloadOrder(static_cast<TorrentHandle::DownloadOrder>(add->downloadOrder));
+            }
+
+            if (add && add->missing)
+            {
+                // Loaded without checking the files (see LoadTorrents); the
+                // next start must check them again.
+                ata->handle.unset_flags(lt::torrent_flags::no_verify_files);
+                handle->SetFilesMissing(add->missingPath, add->resumeWhenFound, add->autoManagedWhenFound);
+
+                wxCommandEvent missing(ptEVT_TORRENT_FILES_MISSING);
+                missing.SetString(Utils::toStdWString(handle->Status().name + "\n" + add->missingPath));
+                missing.SetInt(1);
+                wxPostEvent(m_parent, missing);
+            }
+
             // load_torrent_file() and read_resume_data() fill params.comment,
             // but the alert does not carry it - AddTorrent() and
             // LoadTorrents() copy it into AddParams.
@@ -733,7 +776,7 @@ void Session::OnAlert()
         case lt::save_resume_data_alert::alert_type:
         {
             lt::save_resume_data_alert* srda = lt::alert_cast<lt::save_resume_data_alert>(alert);
-            std::vector<char> buffer = lt::write_resume_data_buf(srda->params);
+            std::vector<char> buffer = ResumeDataBuffer(srda->params);
 
             {
                 // Store the data
@@ -868,7 +911,7 @@ void Session::OnAlert()
             if (it == m_torrents.end()) { break; }
 
             wxCommandEvent evt(ptEVT_TORRENT_FINISHED);
-            evt.SetClientData(it->second);
+            evt.SetString(Utils::toStdWString(it->second->Status().name));
             wxPostEvent(m_parent, evt);
 
             if (auto shouldMove = m_cfg->Get<bool>("move_completed_downloads"))
@@ -1158,12 +1201,47 @@ void Session::LoadTorrents()
             continue;
         }
 
-        params.userdata = lt::client_data_t(new AddParams{ 0, "", params.comment });
+        auto add = new AddParams{ 0, "", params.comment };
+        params.userdata = lt::client_data_t(add);
 
         if (label_id > 0)
         {
-            params.userdata.get<AddParams>()->labelId = label_id;
-            params.userdata.get<AddParams>()->labelName = label_name;
+            add->labelId = label_id;
+            add->labelName = label_name;
+        }
+
+        if (resume_data.size() > 0)
+        {
+            lt::error_code ec;
+            lt::bdecode_node node = lt::bdecode(resume_data, ec);
+            if (!ec) { add->downloadOrder = static_cast<int>(node.dict_find_int_value(DownloadOrderKey, 0)); }
+        }
+
+        // Resume data checked against missing files makes libtorrent recheck
+        // the torrent and download it all over again - into the folder that is
+        // gone, or wherever the drive letter now points. Trust the resume data
+        // instead and keep the torrent stopped until its data is back.
+        bool const hasData = !params.have_pieces.none_set()
+            || (params.flags & lt::torrent_flags::seed_mode);
+
+        if (params.ti && hasData)
+        {
+            fs::path const root = dataRoot(params.save_path, *params.ti);
+            std::error_code ec;
+
+            if (!root.empty() && !fs::exists(root, ec))
+            {
+                BOOST_LOG_TRIVIAL(warning) << "Data of " << info_hash << " not found at " << Utils::toStdString(root.wstring());
+
+                add->missing = true;
+                add->missingPath = Utils::toStdString(root.wstring());
+                add->resumeWhenFound = !(params.flags & lt::torrent_flags::paused)
+                    || (params.flags & lt::torrent_flags::auto_managed);
+                add->autoManagedWhenFound = static_cast<bool>(params.flags & lt::torrent_flags::auto_managed);
+
+                params.flags |= lt::torrent_flags::paused | lt::torrent_flags::no_verify_files;
+                params.flags &= ~lt::torrent_flags::auto_managed;
+            }
         }
 
         m_session->async_add_torrent(params);
@@ -1214,7 +1292,97 @@ bool Session::ParamsFromStored(
     return !params.info_hashes.v1.is_all_zeros() || !params.info_hashes.v2.is_all_zeros() || params.ti;
 }
 
+void Session::CheckDataPaths()
+{
+    using Results = std::vector<std::pair<lt::info_hash_t, bool>>;
+
+    if (m_pathCheck.valid())
+    {
+        if (m_pathCheck.wait_for(std::chrono::seconds(0)) != std::future_status::ready) { return; }
+
+        for (auto const& [hash, exists] : m_pathCheck.get())
+        {
+            auto it = m_torrents.find(hash);
+            if (it == m_torrents.end()) { continue; }
+
+            TorrentHandle* torrent = it->second;
+            if (exists == !torrent->IsFilesMissing()) { continue; }
+
+            // Re-read: it may have changed while the check ran.
+            std::string const root = torrent->DataRoot();
+            if (root.empty()) { continue; }
+
+            if (exists)
+            {
+                BOOST_LOG_TRIVIAL(info) << "Data of " << str(hash) << " is back at " << root;
+                torrent->SetFilesFound();
+            }
+            else
+            {
+                BOOST_LOG_TRIVIAL(warning) << "Data of " << str(hash) << " not found at " << root << ", stopping it";
+                torrent->SetFilesMissing(root, torrent->WasRunning(), torrent->WasAutoManaged());
+            }
+
+            wxCommandEvent evt(ptEVT_TORRENT_FILES_MISSING);
+            evt.SetString(Utils::toStdWString(exists ? torrent->Status().name : torrent->Status().name + "\n" + root));
+            evt.SetInt(exists ? 0 : 1);
+            wxPostEvent(m_parent, evt);
+
+            TorrentsUpdatedEvent updated(ptEVT_TORRENTS_UPDATED);
+            updated.SetData({ torrent });
+            wxPostEvent(m_parent, updated);
+        }
+    }
+
+    // Results are picked up every second, a new check starts every five.
+    if (m_pathCheck.valid() || ++m_pathCheckTick % 5 != 0) { return; }
+
+    std::vector<std::pair<lt::info_hash_t, std::wstring>> paths;
+
+    for (auto const& [hash, torrent] : m_torrents)
+    {
+        // The save path, not the stored missing one: the torrent may have
+        // been moved to where its data is now.
+        std::string const root = torrent->DataRoot();
+        if (!root.empty()) { paths.push_back({ hash, Utils::toStdWString(root) }); }
+    }
+
+    if (paths.empty()) { return; }
+
+    m_pathCheck = std::async(std::launch::async, [paths = std::move(paths)]
+    {
+        Results results;
+
+        for (auto const& [hash, path] : paths)
+        {
+            std::error_code ec;
+            results.push_back({ hash, fs::exists(path, ec) });
+        }
+
+        return results;
+    });
+}
+
+std::vector<char> Session::ResumeDataBuffer(lt::add_torrent_params params)
+{
+    auto it = FindTorrent(params.info_hashes);
+
+    if (it != m_torrents.end()) { it->second->PatchResumeData(params); }
+
+    lt::entry e = lt::write_resume_data(params);
+
+    if (it != m_torrents.end() && it->second->GetDownloadOrder() != TorrentHandle::DownloadOrder::Normal)
+    {
+        e[DownloadOrderKey] = static_cast<int>(it->second->GetDownloadOrder());
+    }
+
+    std::vector<char> buffer;
+    lt::bencode(std::back_inserter(buffer), e);
+    return buffer;
+}
+
 void Session::PauseAfterRecheck(pt::BitTorrent::TorrentHandle* th)
+
 {
     if (m_pauseAfterRecheck.find(th->InfoHash()) != m_pauseAfterRecheck.end())
     {
@@ -1284,11 +1452,12 @@ void Session::SaveTorrents()
         ++numOutstandingResumeData;
     }
 
-    // Save all torrents without metadata
+    // Save all torrents without metadata - not the metadata searches, which
+    // have no row in the torrent table.
     auto missingMeta = m_session->get_torrent_status(
         [this](const lt::torrent_status& st)
         {
-            return !st.has_metadata;
+            return !st.has_metadata && !IsSearching(st.info_hashes);
         });
 
     BOOST_LOG_TRIVIAL(info) << "Saving data for " << missingMeta.size() + numOutstandingResumeData << " torrent(s)";
@@ -1352,7 +1521,7 @@ void Session::SaveTorrents()
             if (!rd) { continue; }
             --numOutstandingResumeData;
 
-            std::vector<char> buffer = lt::write_resume_data_buf(rd->params);
+            std::vector<char> buffer = ResumeDataBuffer(rd->params);
             std::string infoHash = str(rd->handle.info_hashes());
 
             // Store state

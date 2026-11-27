@@ -87,8 +87,7 @@ Clic destro su uno o più torrent:
 - **Riprendi**, **Ripresa (forzata)** (ignora la coda), **Pausa**.
 - **Forza nuovo annuncio**, **Forza nuovo controllo** (verifica i dati sul
   disco).
-- **Download sequenziale**: scaricare i pezzi in ordine, utile per
-  guardare un video mentre si scarica.
+- **Ordine di scaricamento**: **Normale (prima i pezzi rari)**, **Download sequenziale**, **Ogni file in ordine**, **Prima inizio e fine dei file**, **Inizio e fine, poi in ordine**.
 - **Etichetta**: assegnare un'etichetta.
 - **Export**: il link magnet o il file `.torrent`.
 - **Sposta**: spostare i dati in un'altra cartella.
@@ -96,6 +95,8 @@ Clic destro su uno o più torrent:
   (Maiusc+Canc).
 - **Posizione in coda**: salire o scendere nella coda dei download.
 - **Copia info hash**, **Apri in Esplora risorse**.
+
+Se la cartella o l’unità scompare, il torrent si ferma e aspetta; quando torna, riprende senza un nuovo controllo.
 
 
 ## Etichette

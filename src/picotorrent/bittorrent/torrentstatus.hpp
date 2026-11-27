@@ -32,7 +32,10 @@ namespace BitTorrent
             DownloadingQueued,
             Uploading,
             UploadingPaused,
-            UploadingQueued
+            UploadingQueued,
+            // The save folder or the files are gone (a drive or share went
+            // away); the torrent waits for them, see Session::CheckDataPaths.
+            FilesMissing
         };
 
         // Every member is initialized here: a status built for an invalid
@@ -49,6 +52,8 @@ namespace BitTorrent
         std::string                                           error;
         std::string                                           errorDetails;
         std::chrono::seconds                                  eta{ 0 };
+        // FilesMissing: the path that was not found.
+        std::string                                           missingPath;
         std::string                                           comment;
         std::string                                           infoHash;
         // Hybrid (v1+v2) torrents carry both hashes; v1 is what older
@@ -66,7 +71,9 @@ namespace BitTorrent
         int                                                   queuePosition        = -1;
         float                                                 ratio                = 0;
         std::string                                           savePath;
-        std::chrono::seconds                                  seedingTime{ 0 };
+        // Time the torrent has been running - downloading or seeding - the
+        // span all of allTimeUpload was uploaded in.
+        std::chrono::seconds                                  activeTime{ 0 };
         int                                                   seedsCurrent         = 0;
         int                                                   swarmSeeds           = 0;
         int                                                   swarmLeechers        = 0;

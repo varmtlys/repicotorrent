@@ -89,8 +89,7 @@ Høyreklikk på én eller flere torrenter:
 - **Fortsett**, **Fortsett (påtving)** (ignorerer køen), **Pause**.
 - **Påtving omannonsering**, **Påtving omsjekk** (kontrollerer dataene på
   disken).
-- **Sekvensiell nedlasting**: hent biter i rekkefølge, nyttig for å se en
-  video mens den lastes ned.
+- **Nedlastingsrekkefølge**: **Normal (sjeldne deler først)**, **Sekvensiell nedlasting**, **Hver fil i rekkefølge**, **Start og slutt av filene først**, **Start og slutt, så i rekkefølge**.
 - **Etikett**: tildele en etikett.
 - **Export**: magnetlenken eller `.torrent`-filen.
 - **Flytt**: flytte dataene til en annen mappe.
@@ -98,6 +97,8 @@ Høyreklikk på én eller flere torrenter:
   (Shift+Del).
 - **Legger i kø**: opp eller ned i nedlastingskøen.
 - **Kopier infosjekksum**, **Åpne i filutforsker**.
+
+Hvis mappen eller disken forsvinner, stopper torrenten og venter; når den er tilbake, fortsetter den uten ny kontroll.
 
 
 ## Etiketter

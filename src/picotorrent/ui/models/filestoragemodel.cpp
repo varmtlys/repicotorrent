@@ -9,6 +9,7 @@
 #include <functional>
 #include <filesystem>
 #include <shellapi.h>
+#include <Shlwapi.h>
 
 #include <libtorrent/file_storage.hpp>
 #include <libtorrent/torrent_info.hpp>
@@ -121,6 +122,10 @@ void FileStorageModel::RebuildTree(std::shared_ptr<const lt::torrent_info> ti)
 
     for (lt::file_index_t idx : files.file_range())
     {
+        // Pad files of v2 and hybrid torrents are not data, and showed as
+        // a ".pad" folder.
+        if (files.pad_file_at(idx)) { continue; }
+
         std::shared_ptr<Node> currentNode = m_root;
 
         std::vector<std::string> parts;
@@ -222,7 +227,10 @@ void FileStorageModel::UpdateProgress(std::vector<int64_t> const& progress)
 {
     for (size_t i = 0; i < progress.size(); i++)
     {
-        std::shared_ptr<Node> const& node = m_map.at(lt::file_index_t{ static_cast<int>(i) });
+        auto it = m_map.find(lt::file_index_t{ static_cast<int>(i) });
+        if (it == m_map.end()) { continue; }
+
+        std::shared_ptr<Node> const& node = it->second;
         float calculatedProgress = .0f;
 
         if (progress.at(i) > 0)
@@ -421,6 +429,43 @@ bool FileStorageModel::IsContainer(const wxDataViewItem &item) const
     if (!item.IsOk()) { return true; }
     Node* node = static_cast<Node*>(item.GetID());
     return !(node->children.empty());
+}
+
+int FileStorageModel::Compare(const wxDataViewItem& item1, const wxDataViewItem& item2, unsigned int column, bool ascending) const
+{
+    // The default compares the shown text: "9 MB" above "10 GB".
+    Node const* a = static_cast<Node*>(item1.GetID());
+    Node const* b = static_cast<Node*>(item2.GetID());
+
+    // Folders above files whichever way it is sorted, like Explorer.
+    bool const folderA = !a->children.empty();
+    bool const folderB = !b->children.empty();
+    if (folderA != folderB) { return folderA ? -1 : 1; }
+
+    auto cmp = [](auto l, auto r) { return l < r ? -1 : (l > r ? 1 : 0); };
+    int result = 0;
+
+    switch (column)
+    {
+    case Columns::Size:
+        result = cmp(a->size, b->size);
+        break;
+    case Columns::Progress:
+    case Columns::Percent:
+        result = cmp(a->progress, b->progress);
+        break;
+    case Columns::Priority:
+        result = cmp(static_cast<int>(static_cast<std::uint8_t>(a->priority)), static_cast<int>(static_cast<std::uint8_t>(b->priority)));
+        break;
+    }
+
+    // Names as Explorer sorts them: "file 2" before "file 10".
+    if (result == 0)
+    {
+        result = StrCmpLogicalW(Utils::toStdWString(a->name).c_str(), Utils::toStdWString(b->name).c_str());
+    }
+
+    return ascending ? result : -result;
 }
 
 unsigned int FileStorageModel::GetChildren(const wxDataViewItem &item, wxDataViewItemArray &array) const

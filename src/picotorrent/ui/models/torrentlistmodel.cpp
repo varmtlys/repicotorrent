@@ -17,11 +17,12 @@ using pt::UI::Models::TorrentListModel;
 
 namespace
 {
-    // GB (1024^3) uploaded per hour of seeding, -1 before any seeding time.
+    // GB (1024^3) uploaded per hour the torrent has been running, -1 before
+    // it has run at all.
     double uploadPerHour(TorrentStatus const& s)
     {
-        return s.seedingTime.count() > 0
-            ? s.allTimeUpload / (1024.0 * 1024 * 1024) / (s.seedingTime.count() / 3600.0)
+        return s.activeTime.count() > 0
+            ? s.allTimeUpload / (1024.0 * 1024 * 1024) / (s.activeTime.count() / 3600.0)
             : -1;
     }
 
@@ -195,6 +196,7 @@ void TorrentListModel::SetStateIconSize(int size)
         { TorrentStatus::State::Uploading,           makeStateIcon(size, Shape::ArrowUp, blue) },
         { TorrentStatus::State::UploadingPaused,     paused },
         { TorrentStatus::State::UploadingQueued,     makeStateIcon(size, Shape::ArrowUp, gray) },
+        { TorrentStatus::State::FilesMissing,        makeStateIcon(size, Shape::Error, amber) },
     };
 }
 
@@ -382,7 +384,8 @@ bool TorrentListModel::GetAttrByRow(unsigned int row, unsigned int col, wxDataVi
     {
         BitTorrent::TorrentStatus const& status = torrent->Status();
 
-        if (status.state == TorrentStatus::State::Error)
+        if (status.state == TorrentStatus::State::Error
+            || status.state == TorrentStatus::State::FilesMissing)
         {
             attr.SetColour(*wxRED);
             return true;
@@ -517,6 +520,12 @@ void TorrentListModel::GetValueByRow(wxVariant& variant, uint32_t row, uint32_t 
 
         case TorrentStatus::State::UploadingQueued:
             variant = i18n("state_uploading_queued");
+            break;
+
+        case TorrentStatus::State::FilesMissing:
+            variant = fmt::format(
+                i18n("state_files_missing"),
+                Utils::toStdWString(status.missingPath).c_str());
             break;
         default:
             variant = "-";

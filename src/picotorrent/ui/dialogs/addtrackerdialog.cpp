@@ -72,7 +72,9 @@ AddTrackerDialog::~AddTrackerDialog()
 
 int AddTrackerDialog::GetTier()
 {
-    return std::stoi(m_tier->GetValue().ToStdString());
+    // std::stoi threw on anything but a number and took the program down.
+    long tier = 0;
+    return m_tier->GetValue().ToLong(&tier) && tier >= 0 && tier < 1000 ? static_cast<int>(tier) : 0;
 }
 
 std::string AddTrackerDialog::GetUrl()

@@ -91,8 +91,7 @@ Napsauta hiiren oikealla yhtä tai useampaa torrenttia:
 - **Jatka**, **Jatka (pakotettu)** (ohittaa jonon), **Pysäytä**.
 - **Pakota päivitys**, **Pakota uudelleentarkistus** (tarkistaa levyllä olevat
   tiedot).
-- **Lataa osat järjestyksessä**: palat ladataan järjestyksessä, kätevää
-  videon katsomiseen latauksen aikana.
+- **Latausjärjestys**: **Tavallinen (harvinaiset osat ensin)**, **Lataa osat järjestyksessä**, **Jokainen tiedosto järjestyksessä**, **Tiedostojen alku ja loppu ensin**, **Alku ja loppu, sitten järjestyksessä**.
 - **Label**: tunnisteen asettaminen.
 - **Export**: magnet-linkki tai `.torrent`-tiedosto.
 - **Siirrä tiedostot**: tietojen siirto toiseen kansioon.
@@ -100,6 +99,8 @@ Napsauta hiiren oikealla yhtä tai useampaa torrenttia:
   poisto (Vaihto+Del).
 - **Siirrä jonossa**: ylös tai alas latausjonossa.
 - **Kopioi tarkistesumma**, **Avaa latauskansio**.
+
+Jos kansio tai asema katoaa, torrent pysähtyy ja odottaa; kun se palaa, torrent jatkaa ilman uutta tarkistusta.
 
 
 ## Tunnisteet

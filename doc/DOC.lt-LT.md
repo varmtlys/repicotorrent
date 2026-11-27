@@ -87,8 +87,7 @@ Dešiniu mygtuku ant vieno ar kelių torentų:
 - **Pratęsti**, **Pratęsti (priverstinai)** (nepaiso eilės), **Pristabdyti**.
 - **Priverstinai apsiskelbti**, **Pakartotinai patikrinti** (patikrina duomenis
   diske).
-- **Sekvencinis parsiuntimas**: dalys atsiunčiamos iš eilės, patogu žiūrėti
-  vaizdo įrašą jam dar siunčiantis.
+- **Atsisiuntimo tvarka**: **Įprasta (pirmiausia retos dalys)**, **Sekvencinis parsiuntimas**, **Kiekvienas failas iš eilės**, **Pirmiausia failų pradžia ir pabaiga**, **Pradžia ir pabaiga, tada iš eilės**.
 - **Etiketė**: priskirti žymę.
 - **Export**: magnet nuoroda arba `.torrent` failas.
 - **Perkelti**: perkelti duomenis į kitą aplanką.
@@ -96,6 +95,8 @@ Dešiniu mygtuku ant vieno ar kelių torentų:
   (Shift+Del).
 - **Perkelti eilėje**: aukštyn ar žemyn atsiuntimų eilėje.
 - **Kopijuoti informacijos santrauką**, **Atverti failų naršyklėje**.
+
+Jei aplankas ar diskas dingsta, torentas sustoja ir laukia; kai jis grįžta, tęsia be pakartotinio tikrinimo.
 
 
 ## Žymės
