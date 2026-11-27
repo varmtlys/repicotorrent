@@ -57,8 +57,10 @@ jobs:
       # CMake 4 (on the ARM runner) rejects the vendored wxWidgets' old
       # cmake_minimum_required without the policy floor. Quoted: PowerShell
       # splits an unquoted -Dname=3.5 at the dot.
+      # No -G: CMake takes the newest Visual Studio on the runner. The ARM
+      # runner dropped VS 2022 and the configure failed with it named here.
       - name: Configure
-        run: cmake -S . -B build -G "Visual Studio 17 2022" -A ${{ matrix.platform }} -DVCPKG_TARGET_TRIPLET=${{ matrix.arch }}-windows-static-md-rel "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+        run: cmake -S . -B build -A ${{ matrix.platform }} -DVCPKG_TARGET_TRIPLET=${{ matrix.arch }}-windows-static-md-rel "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
 
       # Saved right after vcpkg ran, so a failing build does not throw
       # away the compiled dependencies.
